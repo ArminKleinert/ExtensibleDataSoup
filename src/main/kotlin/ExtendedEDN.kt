@@ -462,7 +462,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
         return if (useOrdered) SeqMap(temp) else memo
     }
 
-    fun tryConvertNumber(
+    private fun tryConvertNumber(
         text: String,
     ): Number? {
         var startIndex = 0
