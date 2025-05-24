@@ -1,0 +1,92 @@
+import java.math.BigInteger
+
+
+
+fun main(args: Array<String>) {
+    println("Hello World!")
+
+    // Try adding program arguments via Run/Debug configuration.
+    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
+    println("Program arguments: ${args.joinToString()}")
+
+//    run {
+//        val s = """
+//            {:a :b}
+//        """.trimIndent()
+//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+//        println(data)
+//    }
+//
+//    run {
+//        val s = """
+//            :a
+//        """.trimIndent()
+//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+//        println(data)
+//    }
+//
+//    run {
+//        val s = """
+//            [#'n :a #'n :abc]
+//        """.trimIndent()
+//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedReaderOptions(
+//            mapOf("n" to {o -> (o as Keyword).name().length})
+//        ))
+//        println(data)
+//    }
+//
+//    run {
+//        val s = """
+//            [#'f #'n :abc]
+//        """.trimIndent()
+//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedReaderOptions(
+//            mapOf("n" to {o -> (o as Keyword).name().length}, "f" to {o -> (o as Int)+1})
+//        ))
+//        println(data)
+//    }
+//
+//    run {
+//        data class EDNTestClass(val bbb: Int)
+//
+//        val s = listOf(EDNTestClass(4))
+//        val encoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(
+//            EDNTestClass::class.java to { o:Any? -> o as EDNTestClass
+//                                        "test" to o.bbb*3},
+//        )
+//        val encoded = EDNSoapWriter(EDNSoapOptions.extendedWriterOptions(encoders)).encode(s)
+//        println(encoded)
+//        val data = EDNSoapReader.readString(encoded, EDNSoapOptions.extendedReaderOptions(
+//            mapOf("test" to {o -> EDNTestClass((o as Int) / 3)})
+//        ))
+//        println(data)
+//    }
+//
+//    run {
+//        val s = """
+//            \u03A9
+//        """.trimIndent()
+//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedReaderOptions(
+//            mapOf("n" to {o -> (o as Keyword).name().length})
+//        ))
+//        println(data)
+//    }
+
+//    run {
+//        val s = """
+//            [123 +123 -123 123i +123i -123i]
+//        """.trimIndent()
+//        val data = EDNSoapReader.readString(s)
+//        println(data)
+//    }
+//
+//    run {
+//        println(BigInteger.valueOf(256).toByte())
+//    }
+
+//    run {
+//        val s = "[-123 -123M -123L -123i -123S -123B -123D -123F -.123 -.123M -123.123]"
+//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions.copy(intPostfix = 'i'))
+//        data as List<*>
+//        println(data.map { it to it?.javaClass }.joinToString("\n"))
+//    }
+}
