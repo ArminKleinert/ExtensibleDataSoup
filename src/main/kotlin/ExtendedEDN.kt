@@ -244,8 +244,8 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
             if (l == '(' || l == '[' || l == '{')
                 return readSpecialForm(p)
 
-            // Special forms for direct conversion #'...
-            if (p.length > 2 && p.drop(1).all { it.isLetterOrDigit() }) {
+            // Special forms for direct conversion #...
+            if (p.length > 1 && p.drop(1).all { it.isLetterOrDigit() }) {
                 val typeName = p.substring(1)
                 require(options.ednClassDecoders.containsKey(typeName))
                 next()
@@ -255,6 +255,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
         }
         return when (p) {
             null -> null
+            "#_" -> readForm()
             "(" -> readList()
             ")" -> throw EdnReaderException("expected form, got ')'")
             "[" -> readVector()
