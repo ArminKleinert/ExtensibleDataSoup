@@ -25,11 +25,11 @@ data class EDNSoapOptions(
     val longPostfix: Char = 'L',
     val floatPostfix: Char = 'F',
     val doublePostfix: Char = 'D',
-    val bigIntPostfix: Char = 'M',
+    val bigIntPostfix: Char = 'N',
     val bigDecimalPostfix: Char = 'M',
 
     val automaticallyExtendNumbers: Boolean = false,
-    val intIsLowerExtendBound: Boolean = false,
+    val longIsLowerExtendBound: Boolean = false,
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
     val ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(),
 ) {
@@ -49,16 +49,13 @@ data class EDNSoapOptions(
 
                 allowNumberUnderscores = false,
                 allowNumberPrefixes = false,
-                bytePostfix = NULL_CHAR,
-                shortPostfix = NULL_CHAR,
                 intPostfix = NULL_CHAR,
                 longPostfix = NULL_CHAR,
-                floatPostfix = NULL_CHAR,
                 doublePostfix = NULL_CHAR,
-                bigIntPostfix = 'M',
-                bigDecimalPostfix = NULL_CHAR,
+                bigIntPostfix = 'N',
+                bigDecimalPostfix = 'M',
                 automaticallyExtendNumbers = false,
-                intIsLowerExtendBound = true,
+                longIsLowerExtendBound = true,
 
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = mapOf()
@@ -74,16 +71,13 @@ data class EDNSoapOptions(
                 allowNumberUnderscores = true,
                 allowNumberPrefixes = true,
 
-                bytePostfix = 'B',
-                shortPostfix = 'S',
-                intPostfix = NULL_CHAR,
-                longPostfix = 'L',
-                floatPostfix = 'F',
+                intPostfix = 'i',
+                longPostfix = NULL_CHAR,
                 doublePostfix = 'D',
-                bigIntPostfix = 'M',
+                bigIntPostfix = 'N',
                 bigDecimalPostfix = 'M',
                 automaticallyExtendNumbers = true,
-                intIsLowerExtendBound = true,
+                longIsLowerExtendBound = true,
 
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf()
@@ -251,8 +245,8 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                 return readSpecialForm(p)
 
             // Special forms for direct conversion #'...
-            if (p.length > 2 && p[1] == '\'' && p.drop(2).all { it.isLetterOrDigit() }) {
-                val typeName = p.substring(2)
+            if (p.length > 2 && p.drop(1).all { it.isLetterOrDigit() }) {
+                val typeName = p.substring(1)
                 require(options.ednClassDecoders.containsKey(typeName))
                 next()
                 val form = readForm()
@@ -510,26 +504,21 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
 
         if (dotIndex != -1 || anyFloatPostfix || (options.bigIntPostfix.let { it != NULL_CHAR && text.endsWith(it) })) {
             val num: Number = text.substring(startIndex, endIndex + 1).toBigDecimal()
-            if (options.floatPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num.toFloat()
-            if (options.bigDecimalPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num
             if (options.doublePostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num.toDouble()
+            if (options.bigDecimalPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num
             return num.toDouble() // Default
         } else {
             val base1 = if (base != -1) base else options.defaultIntegralNumberBase
             val num: BigInteger = BigInteger(text.substring(startIndex, endIndex + 1), base1)
 
             if (options.intPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num.toInt()
-            if (options.bytePostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num.toByte()
-            if (options.shortPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num.toShort()
             if (options.longPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num.toLong()
             if (options.bigIntPostfix.let { it != NULL_CHAR && text.endsWith(it) }) return num
 
             if (!options.automaticallyExtendNumbers) return num.toInt() // Default to int
 
-            if (!options.intIsLowerExtendBound && num.toByte() != 0.toByte()) return num.toByte()
-            if (!options.intIsLowerExtendBound && num.toShort() != 0.toShort()) return num.toShort()
-            if (num.toInt() != 0) return num.toShort()
-            if (num.toLong() != 0.toLong()) return num.toLong()
+            if (!options.longIsLowerExtendBound && num.toInt() != 0) return num.toInt()
+            if (num.toLong() != 0L) return num.toLong()
 
             return num
         }
@@ -739,7 +728,7 @@ class EDNSoapWriter(private val options: EDNSoapOptions) {
         } else if (obj is Boolean) {
             obj.toString()
         } else {
-            throw EdnReaderException("Unsupported object type ${obj.javaClass} of object $obj.")
+            throw EdnWriterException("Unsupported object type ${obj.javaClass} of object $obj.")
         }
     }
 
