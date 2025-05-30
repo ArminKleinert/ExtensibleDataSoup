@@ -1,7 +1,9 @@
 import java.io.File
+import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.collections.RandomAccess
+import kotlin.streams.toList
 import kotlin.text.Regex
 
 
@@ -111,14 +113,25 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
             return EDNSoapReader(tokens, options).readForm(false)
         }
 
-        fun keyword(s: String) = Keyword.keyword(s)
-        fun symbol(s: String) = Symbol.symbol(s)
+
+
+//        private fun tokenizeString(chars: IntIterator, currentToken: String, options: EDNSoapOptions): String {
+//            var isStringEscaped = false
+//            val currentToken = StringBuilder()
+//
+//            while (chars.hasNext()) {
+//                val ch = chars.next()
+//                if (ch == '"'.code) return currentToken.toString()
+//            }
+//
+//            throw EdnReaderException("Unclosed String $currentToken")
+//        }
 
         private fun tokenize(s: String, options: EDNSoapOptions): Iterator<String> {
             val tokens = mutableListOf<String>()
             val currentToken = StringBuilder()
             var isInString = false
-            val chars = s.iterator()
+            val chars = s.codePoints().iterator()
             var isStringEscaped = false
             var lineCommented = false
 
@@ -126,12 +139,12 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                 val ch = chars.next()
 
                 if (isInString) {
-                    currentToken.append(ch)
-                    if (ch == '\\') {
+                    currentToken.appendCodePoint(ch)
+                    if (ch == '\\'.code) {
                         isStringEscaped = true
                         continue
                     }
-                    if (ch != '"')
+                    if (ch != '"'.code)
                         continue
                     if (isStringEscaped) {
                         isStringEscaped = false
@@ -153,49 +166,49 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                 }
 
                 if (lineCommented) {
-                    if (ch == '\n') {
+                    if (ch == '\n'.code) {
                         lineCommented = false
                     }
                     continue
                 }
 
                 when (ch) {
-                    '"' -> {
+                    '"'.code -> {
                         tokens.add(currentToken.toString())
                         isInString = true
                         currentToken.clear()
                         currentToken.append(ch)
                     }
 
-                    ';' -> {
+                    ';'.code -> {
                         lineCommented = true
                     }
 
-                    ' ', '\n', '\t', ',' -> {
+                    ' '.code, '\n'.code, '\t'.code, ','.code -> {
                         tokens.add(currentToken.toString())
                         tokens.add(ch.toString())
                         currentToken.clear()
                     }
 
-                    '(', '[' -> {
-                        val t = currentToken.toString()
-                        if (options.useCollectionPrefixes && t == "#a") {
-                            tokens.add("$t$ch") // Extended EDN only
-                        } else {
-                            tokens.add(currentToken.toString())
-                            tokens.add(ch.toString())
+                    '_'.code -> {
+                        currentToken.append(ch)
+                        if (currentToken.length==1 && currentToken[0] == '#') {
+                            tokens.add("#_")
+                            currentToken.clear()
                         }
+                    }
+
+                    '('.code, '['.code -> {
+                        tokens.add(currentToken.toString())
+                        tokens.add(ch.toString())
                         currentToken.clear()
                     }
 
-                    '{' -> {
+                    '{'.code -> {
                         val t = currentToken.toString()
                         if (t == "#") {
                             tokens.add("#{")
                             currentToken.clear()
-                        } else if (options.useCollectionPrefixes && (t == "#a" || t == "##a")) {
-                            tokens.add("$t{")
-                            currentToken.clear()
                         } else {
                             tokens.add(currentToken.toString())
                             tokens.add(ch.toString())
@@ -203,7 +216,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                         }
                     }
 
-                    ')', ']', '}' -> {
+                    ')'.code, ']'.code, '}' .code-> {
                         tokens.add(currentToken.toString())
                         currentToken.clear()
                         tokens.add(ch.toString())
@@ -238,29 +251,28 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
     @Throws(EdnReaderException::class)
     private fun readForm(discard: Boolean): Any? {
         val p = peek()
-        if (options.useCollectionPrefixes && p is String && p.first() == '#') {
-            val l = p.last()
-            // Code for prefixed collections.
-            if (l == '(' || l == '[' || l == '{')
-                return readSpecialForm(p,discard)
+//        if (options.useCollectionPrefixes && p is String && p.first() == '#') {
+//            val l = p.last()
+//            // Code for prefixed collections.
+//            if (l == '(' || l == '[' || l == '{')
+//                return readSpecialForm(p,discard)
+//
+//            // Special forms for direct conversion #...
+//            if (p.length > 1 && p.drop(1).all { it.isLetterOrDigit() }) {
+//                val typeName = p.substring(1)
+//                require(options.ednClassDecoders.containsKey(typeName))
+//                next()
+//                val form = readForm(discard)
+//                return options.ednClassDecoders[typeName]!!(form)
+//            }
+//        }
 
-            // Special forms for direct conversion #...
-            if (p.length > 1 && p.drop(1).all { it.isLetterOrDigit() }) {
-                val typeName = p.substring(1)
-                require(options.ednClassDecoders.containsKey(typeName))
-                next()
-                val form = readForm(discard)
-                return options.ednClassDecoders[typeName]!!(form)
-            }
-        }
         return when (p) {
             null -> null
-            "#_" -> readForm(true)
             "(" -> readList(discard)
             ")" -> throw EdnReaderException("expected form, got ')'")
             "[" -> readVector(discard)
             "]" -> throw EdnReaderException("expected form, got ']'")
-            "#{" -> readSet(discard,false)
             "{" -> readMap(discard,false)
             "}" -> throw EdnReaderException("expected form, got '}'")
             else -> readAtom(discard)
@@ -510,7 +522,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                 throw EdnReaderException("Unrecognized token: $next")
 
             next.startsWith(":") && next.length > 1 -> {
-                keyword(next.substring(1))
+                Keyword.keyword(next.substring(1))
             }
 
             next.startsWith('"') && next.endsWith('"') -> {
@@ -536,7 +548,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
             next[0] == '\\' && next.length > 1 -> makeChar(next)
 
             !next.contains('"') -> {
-                symbol(next)
+                Symbol.symbol(next)
             }
 
             else -> {

@@ -20,26 +20,6 @@ object EdnReader {
 
     val TAG_KEY = Keyword.keyword(null as String?, "tag")
 
-    init {
-        macros['"'.code] = StringReader
-        macros[';'.code] = CommentReader
-        macros['^'.code] = MetaReader
-        macros['('.code] = ListReader
-        macros[')'.code] = UnmatchedDelimiterReader
-        macros['['.code] = VectorReader
-        macros[']'.code] = UnmatchedDelimiterReader
-        macros['{'.code] = MapReader
-        macros['}'.code] = UnmatchedDelimiterReader
-        macros['\\'.code] = CharacterReader
-        macros['#'.code] = DispatchReader
-        dispatchMacros['#'.code] = SymbolicValueReader
-        dispatchMacros['^'.code] = MetaReader
-        dispatchMacros['{'.code] = SetReader
-        dispatchMacros['<'.code] = UnreadableReader
-        dispatchMacros['_'.code] = DiscardReader
-        dispatchMacros[':'.code] = NamespaceMapReader
-    }
-
     private fun nonConstituent(ch: Int): Boolean = ch == '@'.code || ch == '`'.code || ch == '~'.code
 
     fun readString(s: String, opts: Map<*, *> = mapOf<Any?, Any?>()): Any? {
@@ -285,7 +265,7 @@ object EdnReader {
         return ch != 35 && ch != 39 && isMacro(ch)
     }
 
-    fun readDelimitedList(delim: Char, r: PushbackReader, isRecursive: Boolean, opts: Any?): List<*> {
+    private fun readDelimitedList(delim: Char, r: PushbackReader, isRecursive: Boolean, opts: Any?): List<*> {
         val firstline = if (r is LineNumberingPushbackReader) r.lineNumber else -1
         val a = ArrayList<Any?>()
         while (true) {
@@ -334,10 +314,12 @@ object EdnReader {
 
         private fun readTagged(reader: PushbackReader, tag: Symbol?, opts: Map<*, *>): Any? {
             val o = read(reader, true, null as Any?, true, opts)
-            val readers = opts[READERS] as Map<*, *>
+            val readersKeyword: Keyword = Keyword.keyword(null as String?, "readers")
+            val readers = opts[readersKeyword] as Map<*, *>
             val dataReader: AFn? = readers[tag] as AFn?
             return if (dataReader == null) {
-                val defaultReader: AFn? = opts[DEFAULT] as AFn?
+                val defaultKeyword: Keyword = Keyword.keyword(null as String?, "default")
+                val defaultReader: AFn? = opts[defaultKeyword] as AFn?
                 if (defaultReader != null) {
                     defaultReader.invoke(tag, o, null)
                 } else {
@@ -347,9 +329,6 @@ object EdnReader {
                 dataReader.invoke(o, null, null)
             }
         }
-
-        private val READERS: Keyword = Keyword.keyword(null as String?, "readers")
-        private val DEFAULT: Keyword = Keyword.keyword(null as String?, "default")
     }
 
     private object SymbolicValueReader : AFn {
@@ -372,60 +351,48 @@ object EdnReader {
         }
     }
 
-    private object UnreadableReader : AFn {
-        override operator fun invoke(reader: Any?, leftangle: Any?, opts: Any?): Any? {
-            throw EdnParserException(msg="Unreadable form")
+    private val UnreadableReader : AFn = { _: Any?, _: Any?, _: Any?->
+        throw EdnParserException(msg="Unreadable form")
+    }
+
+    private val UnmatchedDelimiterReader:AFn = { _: Any?, rightHandDelimiter: Any?, _: Any?->
+        throw EdnParserException(msg="Unmatched delimiter: $rightHandDelimiter")
+    }
+
+    private val SetReader = { reader: Any?, _: Any?, opts: Any?->
+        val r = reader as PushbackReader
+        readDelimitedList('}', r, true, opts).toSet()
+    }
+
+    private val MapReader = { reader: Any?, _: Any?, opts: Any? ->
+        val r = reader as PushbackReader
+        val a = readDelimitedList('}', r, true, opts).toTypedArray()
+        if (a.size and 1 == 1) {
+            throw EdnParserException(msg="Map literal must contain an even number of forms")
+        } else {
+            RT.map(a)
         }
     }
 
-    private object UnmatchedDelimiterReader : AFn {
-        override operator fun invoke(reader: Any?, rightdelim: Any?, opts: Any?): Any? {
-            throw EdnParserException(msg="Unmatched delimiter: $rightdelim")
-        }
+    private val VectorReader = { reader: Any?, _: Any?, opts: Any?->
+        val r = reader as PushbackReader
+        readDelimitedList(']', r, true, opts)
     }
 
-    private object SetReader : AFn {
-        override operator fun invoke(reader: Any?, leftbracket: Any?, opts: Any?): Any? {
-            val r = reader as PushbackReader
-            return readDelimitedList('}', r, true, opts).toSet()
+    private val ListReader = { reader: Any?, _: Any?, opts: Any?->
+        val r = reader as PushbackReader
+        var line: Int = 1
+        var column: Int = 1
+        if (r is LineNumberingPushbackReader) {
+            line = r.lineNumber
+            column = r.columnNumber - 1
         }
-    }
-
-    private object MapReader : AFn {
-        override operator fun invoke(reader: Any?, leftparen: Any?, opts: Any?): Any? {
-            val r = reader as PushbackReader
-            val a = readDelimitedList('}', r, true, opts).toTypedArray()
-            return if (a.size and 1 == 1) {
-                throw EdnParserException(msg="Map literal must contain an even number of forms")
-            } else {
-                RT.map(a)
-            }
-        }
-    }
-
-    private object VectorReader : AFn {
-        override operator fun invoke(reader: Any?, leftparen: Any?, opts: Any?): Any? {
-            val r = reader as PushbackReader
-            return readDelimitedList(']', r, true, opts)
-        }
-    }
-
-    private object ListReader : AFn {
-        override operator fun invoke(reader: Any?, leftparen: Any?, opts: Any?): Any? {
-            val r = reader as PushbackReader
-            var line: Int = 1
-            var column: Int = 1
-            if (r is LineNumberingPushbackReader) {
-                line = r.lineNumber
-                column = r.columnNumber - 1
-            }
-            val list = readDelimitedList(')', r, true, opts)
-            return if (list.isEmpty()) {
-                listOf<Any?>()
-            } else {
-                list
-                //list as IObj<*>
-            }
+        val list = readDelimitedList(')', r, true, opts)
+        if (list.isEmpty()) {
+            listOf<Any?>()
+        } else {
+            list
+            //list as IObj<*>
         }
     }
 
@@ -514,12 +481,10 @@ object EdnReader {
         }
     }
 
-    private object DispatchReader : AFn {
-        override operator fun invoke(reader: Any?, hash: Any?, opts: Any?): Any? {
+    private val DispatchReader = { reader: Any?, _: Any?, opts: Any?->
             val ch = read1(reader as Reader)
-            return if (ch == -1) {
-                throw EdnParserException(msg="EOF while reading character")
-            } else {
+            if (ch == -1) throw EdnParserException(msg="EOF while reading character")
+
                 val fn: AFn? = dispatchMacros[ch]
                 if (fn == null) {
                     if (Character.isLetter(ch)) {
@@ -531,15 +496,12 @@ object EdnReader {
                 } else {
                     fn.invoke(reader, ch, opts)
                 }
-            }
-        }
     }
 
-    private object NamespaceMapReader : AFn {
-        override operator fun invoke(reader: Any?, colon: Any?, opts: Any?): Any? {
+    private val NamespaceMapReader: (Any?,Any?,Any?)->Any? = { reader: Any?, _: Any?, opts: Any? ->
             val r = reader as PushbackReader
             val sym = read(r, true, null as Any?, false, opts)
-            return if (sym is Symbol && sym.prefix == null) {
+            if (sym is Symbol && sym.prefix == null) {
                 val ns: String = sym.name
                 var nextChar: Int
                 nextChar = read1(r)
@@ -584,73 +546,86 @@ object EdnReader {
             } else {
                 throw RuntimeException("Namespaced map must specify a valid namespace: $sym")
             }
-        }
     }
 
-    private object DiscardReader : AFn {
-        override operator fun invoke(reader: Any?, underscore: Any?, opts: Any?): Any? {
+    private val DiscardReader = { reader: Any?, _: Any?, opts: Any?->
             val r = reader as PushbackReader
             read(r, true, null as Any?, true, opts)
-            return r
+            r
         }
-    }
 
-    private object CommentReader : AFn {
-        override operator fun invoke(reader: Any?, semicolon: Any?, opts: Any?): Any? {
+    private val CommentReader = { reader: Any?, _: Any?, _: Any?->
             val r = reader as Reader
             var ch: Int
             do {
                 ch = read1(r)
             } while (ch != -1 && ch != 10 && ch != 13)
-            return r
-        }
+             r
     }
 
-    private object StringReader : AFn {
-        override operator fun invoke(reader: Any?, doublequote: Any?, opts: Any?): Any? {
-            val sb = StringBuilder()
-            val r = reader as Reader
-            var ch = read1(r)
-            while (ch != 34) {
+    private val StringReader = { reader: Any?, _: Any?, _: Any?->
+        val sb = StringBuilder()
+        val r = reader as Reader
+        var ch = read1(r)
+        while (ch != 34) {
+            if (ch == -1) {
+                throw EdnParserException(msg="EOF while reading string")
+            }
+            if (ch == '\\'.code) {
+                ch = read1(r)
                 if (ch == -1) {
                     throw EdnParserException(msg="EOF while reading string")
                 }
-                if (ch == '\\'.code) {
-                    ch = read1(r)
-                    if (ch == -1) {
-                        throw EdnParserException(msg="EOF while reading string")
-                    }
-                    when (ch) {
-                        '"'.code, '\\'.code -> {}
-                        'b'.code -> ch = '\b'.code
-                        'f'.code -> ch = '\u000c'.code // formfeed
-                        'n'.code -> ch = '\n'.code
-                        'r'.code -> ch = '\r'.code
-                        't'.code -> ch = '\t'.code
-                        'u'.code -> {
-                            ch = read1(r)
-                            if ((ch.toChar().digitToIntOrNull(16) ?: -1) == -1) {
-                                throw EdnParserException(msg="Invalid unicode escape: \\u" + ch.toString(16))
-                            }
-                            ch = readUnicodeChar(r as PushbackReader, ch, 16, 4, true)
+                when (ch) {
+                    '"'.code, '\\'.code -> {}
+                    'b'.code -> ch = '\b'.code
+                    'f'.code -> ch = '\u000c'.code // formfeed
+                    'n'.code -> ch = '\n'.code
+                    'r'.code -> ch = '\r'.code
+                    't'.code -> ch = '\t'.code
+                    'u'.code -> {
+                        ch = read1(r)
+                        if ((ch.toChar().digitToIntOrNull(16) ?: -1) == -1) {
+                            throw EdnParserException(msg="Invalid unicode escape: \\u" + ch.toString(16))
                         }
+                        ch = readUnicodeChar(r as PushbackReader, ch, 16, 4, true)
+                    }
 
-                        else -> {
-                            if (!Character.isDigit(ch)) {
-                                throw EdnParserException(msg="Unsupported escape character: \\" + ch.toChar())
-                            }
-                            ch = readUnicodeChar(r as PushbackReader, ch, 8, 3, false)
-                            if (ch > 255) {
-                                throw EdnParserException(msg="Octal escape sequence must be in range [0, 377].")
-                            }
+                    else -> {
+                        if (!Character.isDigit(ch)) {
+                            throw EdnParserException(msg="Unsupported escape character: \\" + ch.toChar())
+                        }
+                        ch = readUnicodeChar(r as PushbackReader, ch, 8, 3, false)
+                        if (ch > 255) {
+                            throw EdnParserException(msg="Octal escape sequence must be in range [0, 377].")
                         }
                     }
                 }
-                sb.append(ch.toChar())
-                ch = read1(r)
             }
-            return sb.toString()
+            sb.append(ch.toChar())
+            ch = read1(r)
         }
+        sb.toString()
+    }
+
+    init {
+        macros['"'.code] = StringReader
+        macros[';'.code] = CommentReader
+        macros['^'.code] = MetaReader
+        macros['('.code] = ListReader
+        macros[')'.code] = UnmatchedDelimiterReader
+        macros['['.code] = VectorReader
+        macros[']'.code] = UnmatchedDelimiterReader
+        macros['{'.code] = MapReader
+        macros['}'.code] = UnmatchedDelimiterReader
+        macros['\\'.code] = CharacterReader
+        macros['#'.code] = DispatchReader
+        dispatchMacros['#'.code] = SymbolicValueReader
+        dispatchMacros['^'.code] = MetaReader
+        dispatchMacros['{'.code] = SetReader
+        dispatchMacros['<'.code] = UnreadableReader
+        dispatchMacros['_'.code] = DiscardReader
+        dispatchMacros[':'.code] = NamespaceMapReader
     }
 
     class ReaderException(val line: Int=-1, val column: Int=-1, cause: Throwable?=null) : RuntimeException(cause)
@@ -738,10 +713,6 @@ object EdnReader {
         }
     }
 
-    interface AFn {
-        operator fun invoke(reader: Any?, doublequote: Any?, opts: Any?): Any?
-    }e
-
     internal object RT {
         val LINE_KEY: Keyword = Keyword.keyword(null as String?, "line")
         val COLUMN_KEY: Keyword = Keyword.keyword(null as String?, "column")
@@ -761,3 +732,8 @@ object EdnReader {
         fun booleanCast(x: Any?): Boolean = if (x is Boolean) x else x != null
     }
 }
+
+//    interface AFn {
+//        operator fun invoke(reader: Any?, doublequote: Any?, opts: Any?): Any?
+//    }
+    typealias AFn = (Any?,Any?,Any?)->Any?
