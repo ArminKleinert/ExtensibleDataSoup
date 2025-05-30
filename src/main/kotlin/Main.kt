@@ -3,12 +3,6 @@ import java.math.BigInteger
 
 
 fun main(args: Array<String>) {
-    println("Hello World!")
-
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
-
 //    run {
 //        val s = """
 //            {:a :b}
@@ -89,4 +83,10 @@ fun main(args: Array<String>) {
 //        data as List<*>
 //        println(data.map { it to it?.javaClass }.joinToString("\n"))
 //    }
+
+    run {
+        val s = "2.2E-2"
+        val data = EdnReader.readString(s)
+        println(""+data + " " + (data?.javaClass?: "null"))
+    }
 }

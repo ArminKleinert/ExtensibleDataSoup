@@ -1,5 +1,4 @@
-class Keyword private constructor(
-    private val s:Symbol) : Comparable<Keyword> {
+class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
     companion object {
         private val definedKeywords = mutableMapOf<String, Int>()
         private val definedKeywordList = mutableListOf<Keyword>()
@@ -25,16 +24,24 @@ class Keyword private constructor(
             return k
         }
 
-        fun keyword(     prefix: String,                         name: String): Keyword {
-            return Keyword(Symbol.symbol(prefix, name ))
+        fun keyword(prefix: String?, name: String): Keyword {
+            return Keyword(Symbol.symbol(prefix, name))
         }
 
         operator fun get(s: String): Keyword = keyword(s) ?: throw IllegalStateException("Illegal keyword format: $s")
     }
 
-    val length = s.length
+    val length
+        get() = s.length
 
-    val fullyQualified: Boolean = s.fullyQualified
+    val fullyQualified: Boolean
+        get() = s.fullyQualified
+
+    val prefix
+        get() = s.prefix
+
+    val name
+        get() = s.name
 
     override fun toString() = ":$s"
     override fun hashCode() = definedKeywords[s.toString()]!!
@@ -50,15 +57,15 @@ class Keyword private constructor(
         if (other !is Keyword) return false
         return this === other
     }
+
+    //operator fun <T> invoke(m: Map<Keyword, T>): T? = m[this]
+
+    operator fun <T> invoke(m: Map<*, T>): T? = m[this]
 }
 
-class Symbol private constructor(
-    val prefix: String,
-    val name: String
-): Comparable<Symbol> {
+class Symbol private constructor(val prefix: String?, val name: String) : Comparable<Symbol> {
     companion object {
         fun symbol(s: String): Symbol? {
-            //. * + ! - _ ? $ % & = < >
             var dividerIndex = -1
 
             s.forEachIndexed { index, chr ->
@@ -66,10 +73,10 @@ class Symbol private constructor(
                     '*', '!', '_', '?', '$', '%', '&', '=', '<', '>', in 'a'..'z', in 'A'..'Z' -> {}
 
                     // First-char restriction: If the name starts with dot, plus, or minus, the second char can not be numeric
-                    '.', '+', '-' -> if (index == dividerIndex+1 && s.length > dividerIndex+2 && s[dividerIndex+2] in '0'..'9') return null
+                    '.', '+', '-' -> if (index == dividerIndex + 1 && s.length > dividerIndex + 2 && s[dividerIndex + 2] in '0'..'9') return null
 
                     // First-char restriction: Can not start with numeric, dot, or hash symbol.
-                    in '0'..'9', ':', '#' -> if (index == dividerIndex+1) return null
+                    in '0'..'9', ':', '#' -> if (index == dividerIndex + 1) return null
 
                     // Restriction: Only one slash per symbol.
                     '/' -> if (dividerIndex == -1 && index > 0 && index < s.length - 2)
@@ -88,17 +95,23 @@ class Symbol private constructor(
             return Symbol("", s)
         }
 
-        fun symbol(     prefix: String,                    name: String) = Symbol(prefix, name)
+        fun symbol(prefix: String?, name: String) = Symbol(prefix, name)
     }
 
-    val length = if (prefix.isEmpty()) name.length else prefix.length+name.length+1
+    val length: Int
+        get() = if (prefix?.isEmpty() != false) name.length else prefix.length + name.length
 
-    val fullyQualified: Boolean = prefix.isNotEmpty()
+    val fullyQualified: Boolean
+        get() = prefix?.isNotEmpty() ?: false
 
-    override fun toString() = if (prefix.isEmpty()) name else "$prefix/$name"
+    override fun toString() = if (prefix?.isEmpty() == true) name else "$prefix/$name"
 
     override fun compareTo(other: Symbol): Int {
-        val prefixCompare = prefix.compareTo(other.prefix)
+        val prefixCompare = when {
+            prefix == null -> if (other.prefix == null) 0 else -1
+            other.prefix == null -> 1
+            else -> prefix.compareTo(other.prefix)
+        }
         if (prefixCompare != 0) return prefixCompare
         return name.compareTo(name)
     }
