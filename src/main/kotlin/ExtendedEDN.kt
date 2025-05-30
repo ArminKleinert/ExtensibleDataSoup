@@ -167,13 +167,15 @@ class EDNSoapReader private constructor(options: EDNSoapOptions = EDNSoapOptions
     fun parseUnicodeChar(cpi: PrimitiveIterator.OfInt, length: Int, base: Int, initChar: Char): Int {
         var code = 0
         for (i in 1..length) {
-            if (!cpi.hasNext())
-                throw EdnReaderException(
-                    "Invalid length of unicode sequence $i in sequence \\$initChar${code.toString(16)}"
-                )
+            if (!cpi.hasNext()) {
+                val msg = "Invalid length of unicode sequence $i in sequence \\$initChar${code.toString(16)}"
+                throw EdnReaderException(msg)
+            }
             val c = cpi.nextInt().toChar()
-            if (c !in ('0'..'9') && c !in ('a'..'z') && c !in ('A'..'Z'))
-                throw EdnReaderException("Invalid unicode codepoint $c in sequence \\$initChar${code.toString(16)}")
+            if (c !in ('0'..'9') && c !in ('a'..'z') && c !in ('A'..'Z')) {
+                val msg = "Invalid unicode codepoint $c in sequence \\$initChar${code.toString(16)}"
+                throw EdnReaderException(msg)
+            }
             code = code * base + c.digitToInt(16)
         }
         return code
@@ -203,5 +205,17 @@ class EDNSoapReader private constructor(options: EDNSoapOptions = EDNSoapOptions
         TODO()
     }
 
+    private fun readToken(cpi: PrimitiveIterator.OfInt): String {
+        val currentToken = StringBuilder()
 
+        while (cpi.hasNext()) {
+            val codepoint = cpi.nextInt()
+            if (isBreakingSymbol(codepoint))
+        }
+    }
+
+private fun isBreakingSymbol(sym: Int): Boolean = when (sym.toChar()) {
+    ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', '#', '\'', '"' -> true
+    else -> false
+}
 }
