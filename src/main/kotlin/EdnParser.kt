@@ -150,8 +150,7 @@ object EdnReader {
         return if (uc == -1) {
             throw IllegalArgumentException("Invalid digit: " + initch.toChar())
         } else {
-            var i: Int
-            i = 1
+            var i: Int = 1
             while (i < length) {
                 val ch = read1(r)
                 if (ch == -1 || isWhitespace(ch) || isMacro(ch)) {

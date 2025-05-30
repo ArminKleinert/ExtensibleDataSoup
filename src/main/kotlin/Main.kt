@@ -84,9 +84,25 @@ fun main(args: Array<String>) {
 //        println(data.map { it to it?.javaClass }.joinToString("\n"))
 //    }
 
+//    run {
+//        val s = "2.2E-2"
+//        val data = EdnReader.readString(s)
+//        println(""+data + " " + (data?.javaClass?: "null"))
+//    }
+
     run {
-        val s = "2.2E-2"
-        val data = EdnReader.readString(s)
-        println(""+data + " " + (data?.javaClass?: "null"))
+        val s = "\"\uD83C\uDF81\""
+        val data = EDNSoapReader.readString(s)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "\"\\uD83C\\uDF81\""
+        val data = EDNSoapReader.readString(s)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "\"\\x0001F381\""
+        val data = EDNSoapReader.readString(s)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
 }
