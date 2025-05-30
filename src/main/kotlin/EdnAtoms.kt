@@ -14,12 +14,19 @@ class Keyword private constructor(
 
             // Keywords follow the same conventions as symbols.
             val tempSymbol = Symbol.symbol(s.substring(1)) ?: return null
+            return keyword(tempSymbol)
+        }
 
-            val k = Keyword(tempSymbol)
+        fun keyword(s: Symbol): Keyword {
+            val k = Keyword(s)
             val index = definedKeywordList.size
-            definedKeywords[s] = index
+            definedKeywords[k.toString()] = index
             definedKeywordList.add(k)
             return k
+        }
+
+        fun keyword(     prefix: String,                         name: String): Keyword {
+            return Keyword(Symbol.symbol(prefix, name ))
         }
 
         operator fun get(s: String): Keyword = keyword(s) ?: throw IllegalStateException("Illegal keyword format: $s")
@@ -50,7 +57,7 @@ class Symbol private constructor(
     val name: String
 ): Comparable<Symbol> {
     companion object {
-        fun symbol(s: String, dividerAllowed:Boolean=true): Symbol? {
+        fun symbol(s: String): Symbol? {
             //. * + ! - _ ? $ % & = < >
             var dividerIndex = -1
 
@@ -65,14 +72,14 @@ class Symbol private constructor(
                     in '0'..'9', ':', '#' -> if (index == dividerIndex+1) return null
 
                     // Restriction: Only one slash per symbol.
-                    '/' -> if (dividerAllowed && dividerIndex == -1 && index > 0 && index < s.length - 2)
+                    '/' -> if (dividerIndex == -1 && index > 0 && index < s.length - 2)
                         dividerIndex = index else return null
 
                     else -> return null
                 }
             }
 
-            if (dividerAllowed && dividerIndex != -1) {
+            if (dividerIndex != -1) {
                 val prefix = s.substring(0..dividerIndex)
                 val postfix = s.substring(dividerIndex..<s.length)
                 return Symbol(prefix, postfix)
@@ -80,6 +87,8 @@ class Symbol private constructor(
 
             return Symbol("", s)
         }
+
+        fun symbol(     prefix: String,                    name: String) = Symbol(prefix, name)
     }
 
     val length = if (prefix.isEmpty()) name.length else prefix.length+name.length+1

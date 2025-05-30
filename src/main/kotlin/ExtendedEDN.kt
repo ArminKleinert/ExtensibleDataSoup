@@ -102,13 +102,13 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
         @Throws(EdnReaderException::class)
         fun readString(input: String, options: EDNSoapOptions = EDNSoapOptions.extendedOptions): Any? {
             val tokens = tokenize(input, options)
-            return EDNSoapReader(tokens, options).readForm()
+            return EDNSoapReader(tokens, options).readForm(false)
         }
 
         @Throws(EdnReaderException::class)
         fun readFile(input: File, options: EDNSoapOptions = EDNSoapOptions.extendedOptions): Any? {
             val tokens = tokenize(input.readText(), options)
-            return EDNSoapReader(tokens, options).readForm()
+            return EDNSoapReader(tokens, options).readForm(false)
         }
 
         fun keyword(s: String) = Keyword.keyword(s)
@@ -179,7 +179,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
 
                     '(', '[' -> {
                         val t = currentToken.toString()
-                        if (options.useCollectionPrefixes && (t == "#a" || t == "#ak")) {
+                        if (options.useCollectionPrefixes && t == "#a") {
                             tokens.add("$t$ch") // Extended EDN only
                         } else {
                             tokens.add(currentToken.toString())
@@ -193,7 +193,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                         if (t == "#") {
                             tokens.add("#{")
                             currentToken.clear()
-                        } else if (options.useCollectionPrefixes && (t == "#k" || t == "#a" || t == "##a" || t == "#ak" || t == "##ak")) {
+                        } else if (options.useCollectionPrefixes && (t == "#a" || t == "##a")) {
                             tokens.add("$t{")
                             currentToken.clear()
                         } else {
@@ -236,34 +236,34 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
     private fun advance(): String? = if (tokens.hasNext()) tokens.next() else null
 
     @Throws(EdnReaderException::class)
-    private fun readForm(): Any? {
+    private fun readForm(discard: Boolean): Any? {
         val p = peek()
         if (options.useCollectionPrefixes && p is String && p.first() == '#') {
             val l = p.last()
             // Code for prefixed collections.
             if (l == '(' || l == '[' || l == '{')
-                return readSpecialForm(p)
+                return readSpecialForm(p,discard)
 
             // Special forms for direct conversion #...
             if (p.length > 1 && p.drop(1).all { it.isLetterOrDigit() }) {
                 val typeName = p.substring(1)
                 require(options.ednClassDecoders.containsKey(typeName))
                 next()
-                val form = readForm()
+                val form = readForm(discard)
                 return options.ednClassDecoders[typeName]!!(form)
             }
         }
         return when (p) {
             null -> null
-            "#_" -> readForm()
-            "(" -> readList()
+            "#_" -> readForm(true)
+            "(" -> readList(discard)
             ")" -> throw EdnReaderException("expected form, got ')'")
-            "[" -> readVector()
+            "[" -> readVector(discard)
             "]" -> throw EdnReaderException("expected form, got ']'")
-            "#{" -> readSet(false)
-            "{" -> readMap(false)
+            "#{" -> readSet(discard,false)
+            "{" -> readMap(discard,false)
             "}" -> throw EdnReaderException("expected form, got '}'")
-            else -> readAtom()
+            else -> readAtom(discard)
         }
     }
 
@@ -274,57 +274,27 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
      * - #a : Load list as lazy sequence, vector as array, or Load maps as ordered maps
      * For sets (prefix with double #):
      * - ##a : Load as ordered set
-     * Data type prefixes:
-     * - k : Keyword
      */
     @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readSpecialForm(p: String): Any {
+    private fun readSpecialForm(p: String, discard: Boolean): Any {
         require(options.useCollectionPrefixes)
         return when (p) {
-            "#a(" -> readList().toList().toTypedArray() // Array
-            "#a[" -> readTypedArray() // Array
-            "##a{" -> readSet(true)
-            "#a{" -> readMap(true)
-
-            "#k(" -> ensureType<Keyword>(readList()) // List of Keywords
-            "#k[" -> ensureType<Keyword>(readVector()) // Vector of Keywords
-            "##k{" -> ensureType<Keyword>(readSet(false)) // Set of Keywords
-            "#k{" -> ensureType<Keyword>(readMap(false)) // Map of Keywords
-
-            "#ak(" -> ensureType<Keyword>(readList()).toList().toTypedArray() // Array of Keywords
-            "#ak[" -> ensureType<Keyword>(readVector()).toTypedArray() // Array of Keywords
-            "##ak{" -> ensureType<Keyword>(readSet(true)) // Ordered Set of Keywords
-            "#ak{" -> ensureType<Keyword>(readMap(true)) // Ordered Map of Keywords
-
+            "#a(" -> readList(discard).asSequence() // Array
+            "#a[" -> readTypedArray(discard) // Array
+            "##a{" -> readSet(discard, true)
+            "#a{" -> readMap(discard, true)
             else -> throw EdnReaderException("Invalid special form prefix $p")
         }
     }
 
-    @Throws(EdnReaderException::class)
-    private inline fun <reified T> ensureType(l: List<Any?>): List<T> =
-        if (l.all { it is T }) l as List<T> else throw EdnReaderException("")
-
-    @Throws(EdnReaderException::class)
-    private inline fun <reified T> ensureType(l: Iterable<Any?>) =
-        if (l.all { it is T }) l as Iterable<T> else throw EdnReaderException("")
-
-    @Throws(EdnReaderException::class)
-    private inline fun <reified T> ensureType(l: Set<Any?>) =
-        if (l.all { it is T }) l as Set<T> else throw EdnReaderException("")
-
-    @Throws(EdnReaderException::class)
-    private inline fun <reified T> ensureType(l: Map<Any?, Any?>) =
-        if (l.keys.all { it is T }) l as Map<T, Any?> else throw EdnReaderException("")
-
+    @Throws(EdnReaderException::class, EdnClassConversionError::class)
+    private fun readList(discard: Boolean): Iterable<Any?> = readSequence(discard,")")
 
     @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readList(): Iterable<Any?> = readSequence(")")
+    private fun readVector(discard: Boolean): List<Any?> = readSequence(discard,"]")
 
     @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readVector(): List<Any?> = readSequence("]")
-
-    @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readSequence(seqTerminator: String): List<Any?> = buildList {
+    private fun readSequence(discard: Boolean,seqTerminator: String): List<Any?> = buildList {
         next()
         do {
             val form = when (peek()) {
@@ -334,7 +304,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                     next(); break
                 }
 
-                else -> readForm()
+                else -> readForm(discard)
             }
             add(form)
         } while (form != null)
@@ -342,7 +312,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
 
 
     @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readSet(forceOrdered: Boolean = options.useCompacts): Set<Any?> {
+    private fun readSet(discard: Boolean, forceOrdered: Boolean = options.useCompacts): Set<Any?> {
         next()
         val memory = mutableSetOf<Any?>()
         val useOrdered = (forceOrdered || options.useCompacts)
@@ -354,7 +324,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                         next(); break
                     }
 
-                    else -> readForm()
+                    else -> readForm(discard)
                 }
                 if (!memory.add(form)) throw EdnReaderException("Duplicate value $form in Set.")
                 if (useOrdered) add(form)
@@ -368,7 +338,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
     }
 
     @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readTypedArray(): Any {
+    private fun readTypedArray(discard: Boolean): Any {
         next()
         val temp = mutableListOf<Any?>()
         do {
@@ -378,7 +348,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                     next(); break
                 }
 
-                else -> readForm()
+                else -> readForm(discard)
             }
             temp.add(form)
         } while (true)
@@ -430,7 +400,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
     }
 
     @Throws(EdnReaderException::class, EdnClassConversionError::class)
-    private fun readMap(forceOrdered: Boolean = options.useCompacts): Map<Any?, Any?> {
+    private fun readMap(discard: Boolean, forceOrdered: Boolean = options.useCompacts): Map<Any?, Any?> {
         next()
         val useOrdered = forceOrdered || options.useCompacts
         val temp = mutableListOf<Pair<Any?, Any?>>()
@@ -444,8 +414,8 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
                 }
 
                 else -> {
-                    val key = readForm()
-                    value = readForm()
+                    val key = readForm(discard)
+                    value = readForm(discard)
                     key
                 }
             }
@@ -527,7 +497,7 @@ class EDNSoapReader private constructor(private val tokens: Iterator<String>, pr
     }
 
     @Throws(EdnReaderException::class)
-    private fun readAtom(): Any? {
+    private fun readAtom(discard: Boolean): Any? {
         val next = next() ?: throw EdnReaderException("Unexpected null token")
 
         val numOrNull = tryConvertNumber(next)
