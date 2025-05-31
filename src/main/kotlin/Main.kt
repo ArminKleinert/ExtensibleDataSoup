@@ -120,4 +120,34 @@ fun main(args: Array<String>) {
         val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
         println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
+    run {
+        val s = ";bc\n#\\u0001F381"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[\"abc\"\"abc\"]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[\"abc\" \"abc\" \"b\" \"c\"]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "{\"abc\" \"abc\" \"b\" \"c\"}"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "#{\"dbc\" \"abc\" \"b\" \"c\"}"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
 }

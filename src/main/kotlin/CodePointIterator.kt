@@ -1,9 +1,9 @@
-import java.util.*
+import java.util.PrimitiveIterator
 import java.util.function.IntConsumer
 import java.util.stream.IntStream
 import kotlin.math.min
 
-class CodePointIterator(codepointStream: IntStream, memorySize:Int=128) : PrimitiveIterator.OfInt {
+class CodePointIterator(codepointStream: IntStream, memorySize: Int = 32) : PrimitiveIterator.OfInt {
     private var index = -1
     private var memory = IntArray(memorySize)
     private val iterator: PrimitiveIterator.OfInt = codepointStream.iterator()
@@ -48,14 +48,15 @@ class CodePointIterator(codepointStream: IntStream, memorySize:Int=128) : Primit
         while (hasNext()) p0!!.accept(nextInt())
     }
 
-    fun unread(v: Int) {
+    fun unread(v: Int): CodePointIterator {
         index++
         if (index == memory.size)
-            memory = memory.copyOf(memory.size + min(memory.size/2, 8))
+            memory = memory.copyOf(memory.size + min(memory.size / 2, 8))
         memory[index] = v
+        return this
     }
 
-    inline fun takeCodePoints(dest: StringBuilder = StringBuilder(), condition: (Int)->Boolean): StringBuilder {
+    inline fun takeCodePoints(dest: StringBuilder = StringBuilder(), condition: (Int) -> Boolean): StringBuilder {
         while (hasNext()) {
             val codepoint = nextInt()
             if (!condition(codepoint)) {
@@ -65,5 +66,36 @@ class CodePointIterator(codepointStream: IntStream, memorySize:Int=128) : Primit
             dest.appendCodePoint(codepoint)
         }
         return dest
+    }
+
+    inline fun takeCodePoints(
+        dest: StringBuilder = StringBuilder(), maxCount: Int, condition: (Int) -> Boolean
+    ): StringBuilder {
+        var count = 0
+        while (count < maxCount && hasNext()) {
+            val codepoint = nextInt()
+            if (!condition(codepoint)) {
+                unread(codepoint)
+                return dest
+            }
+            dest.appendCodePoint(codepoint)
+            count++
+        }
+        return dest
+    }
+
+    fun skipLine() {
+        while (hasNext())
+            if (nextInt() == '\n'.code) break
+    }
+
+    fun skipWhile(condition: (Int) -> Boolean) {
+        while (hasNext()) {
+            val code = nextInt()
+            if (!condition(code)) {
+                unread(code)
+                break
+            }
+        }
     }
 }

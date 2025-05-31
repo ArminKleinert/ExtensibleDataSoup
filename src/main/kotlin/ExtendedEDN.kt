@@ -1,5 +1,4 @@
-import java.util.*
-
+import java.time.LocalDateTime
 
 class EdnReaderException(text: String) : Exception(text)
 class EdnWriterException(text: String) : Exception(text)
@@ -9,6 +8,7 @@ data class EDNSoapOptions(
     val allowSchemeUTF32Codes: Boolean = false,
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
     val ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(),
+    val allowTimeDispatch: Boolean = false,
 ) {
     companion object {
         private const val NULL_CHAR = '\u0000'
@@ -19,13 +19,15 @@ data class EDNSoapOptions(
         val defaultOptions: EDNSoapOptions
             get() = EDNSoapOptions(
                 allowSchemeUTF32Codes = false,
+                allowTimeDispatch = false,
                 ednClassDecoders = mapOf(),
-                ednClassEncoders = mapOf()
+                ednClassEncoders = mapOf(),
             )
 
         fun extendedReaderOptions(ednClassDecoder: Map<String, (Any?) -> Any?>) =
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
+                allowTimeDispatch = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf()
             )
@@ -33,6 +35,7 @@ data class EDNSoapOptions(
         fun extendedWriterOptions(ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?>) =
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
+                allowTimeDispatch = true,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = ednClassEncoders
             )
@@ -64,24 +67,47 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 //        }
 
     fun readString(s: String): Any? {
-        val currentToken = StringBuilder()
         val codePointIterator = CodePointIterator(s.codePoints())
-
         if (!codePointIterator.hasNext())
             throw EdnReaderException("Empty input string.")
-
-        when (val codePoint = codePointIterator.nextInt()) {
-            '"'.code -> return parseString(codePointIterator)
-            '('.code -> return parseList(codePointIterator)
-            '['.code -> return parseVector(codePointIterator)
-            '{'.code -> return parseMap(codePointIterator)
-            '\\'.code -> return parseChar(codePointIterator)
-            '#'.code -> return parseDispatch(codePointIterator)
-            else -> return readForm(codePointIterator, codePoint)
-        }
+        return readForm(codePointIterator)
     }
 
-    fun parseString(cpi: CodePointIterator): String {
+    private fun parseNumber(cpi: CodePointIterator): Number {
+        var base = 10
+        var dotted = false
+
+        val token = readToken(cpi, ::isNotBreakingSymbol)
+        val result = StringBuilder(token.length)
+        var index = 0
+
+        val first = token[0]
+        if (first == '0') {
+            index += 2
+            base = when (token[1]) {
+                'x' -> 16
+                'o' -> 8
+                'b' -> 2
+                else -> {
+                    index--
+                    8
+                }
+            }
+        }
+
+        return 0
+    }
+
+    private fun parseComment(cpi: CodePointIterator) {
+//        while (cpi.hasNext()) {
+//            val codePoint = cpi.nextInt()
+//            if (codePoint == '\n'.code)
+//                break
+//        }
+        cpi.skipLine()
+    }
+
+    private fun parseString(cpi: CodePointIterator): String {
         val currentToken = StringBuilder()
 
         while (cpi.hasNext()) {
@@ -91,8 +117,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
                 '\\'.code -> {
                     if (!cpi.hasNext()) break
-                    val codePt2 = cpi.nextInt()
-                    when (codePt2) {
+                    when (val codePt2 = cpi.nextInt()) {
                         't'.code -> currentToken.append('\t')
                         'b'.code -> currentToken.append('\b')
                         'n'.code -> currentToken.append('\n')
@@ -100,14 +125,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                         '"'.code -> currentToken.append('\"')
                         '\\'.code -> currentToken.append("\\\\")
                         'u'.code -> currentToken.append(Char(parseUnicodeChar(cpi, 4, 4, 16, 'u'))) // UTF-16 code
-                        'o'.code -> currentToken.append(Char(parseUnicodeChar(cpi, 1, 3, 8, 'o')))
-                        'x'.code -> {
-                            if (options.allowSchemeUTF32Codes)
-                                currentToken.appendCodePoint(parseUnicodeChar(cpi, 8, 8, 16, 'x')) // UTF-32
-                            else
-                                throw EdnReaderException("Invalid escape sequence: \\${codePt2.toChar()} in string $currentToken")
-                        }
-
+                        'x'.code -> currentToken.appendCodePoint(parseUnicodeChar(cpi, 8, 8, 16, 'x')) // UTF-32 code
                         else ->
                             throw EdnReaderException("Invalid escape sequence: \\${codePt2.toChar()} in string $currentToken")
                     }
@@ -120,25 +138,14 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         throw EdnReaderException("Unclosed String literal \"$currentToken\" .")
     }
 
-    fun parseUnicodeChar(cpi: CodePointIterator, minLength: Int, maxLength: Int, base: Int, initChar: Char): Int {
-        var code = 0
-        for (i in 1..maxLength) {
-            if (!cpi.hasNext()) {
-                val msg =
-                    "Invalid length of unicode sequence $i in sequence \\$initChar${code.toString(base)} (should be at least $minLength)"
-                throw EdnReaderException(msg)
-            }
-            val c = cpi.nextInt()
-            if (!isAlphaNum(c)) {
-                val msg = "Invalid unicode codepoint ${c.toChar()} in sequence \\$initChar${code.toString(base)}"
-                throw EdnReaderException(msg)
-            }
-            code = code * base + c.toChar().digitToInt(base)
-        }
-        return code
+    private fun parseUnicodeChar(cpi: CodePointIterator, minLength: Int, maxLength: Int, base: Int, initChar: Char): Int {
+        val token = cpi.takeCodePoints(StringBuilder(), maxLength, ::isHexNum)
+        if (token.length < minLength || token.length > maxLength)
+            throw EdnReaderException("Invalid unicode sequence \\$initChar$token")
+        return parseUnicodeChar(token, base, initChar)
     }
 
-    fun parseUnicodeChar(token: CharSequence, base: Int, initChar: Char): Int {
+    private fun parseUnicodeChar(token: CharSequence, base: Int, initChar: Char): Int {
         try {
             var code = 0
             for (it in token) code = code * base + it.digitToInt(base)
@@ -148,28 +155,49 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
     }
 
-    fun parseList(cpi: CodePointIterator): Iterable<*> {
-        TODO()
+    private fun parseList(cpi: CodePointIterator): Iterable<*> {
+        return parseVector(cpi, ')'.code)
     }
 
-    fun parseVector(cpi: CodePointIterator): List<*> {
-        TODO()
+    private fun parseVector(cpi: CodePointIterator, separator: Int = ']'.code): List<*> = buildList {
+        do {
+            if (!cpi.hasNext()) throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+            if (cpi.peek() == separator) break
+
+            val elem = readForm(cpi)
+            add(elem)
+        } while(true)
     }
 
-    fun parseMap(cpi: CodePointIterator): Map<*, *> {
-        TODO()
+    private fun parseMap(cpi: CodePointIterator, separator: Int = '}'.code): Map<*, *> = buildMap {
+        do {
+            if (!cpi.hasNext()) throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+            if (cpi.peek() == separator) break
+
+            val key = readForm(cpi)
+            if (contains(key)) throw EdnReaderException("Illegal map. Duplicate key $key.")
+            val value = readForm(cpi)
+            put(key, value)
+        } while(true)
     }
 
-    fun parseSet(cpi: CodePointIterator): Map<*, *> {
-        TODO()
+    private fun parseSet(cpi: CodePointIterator, separator: Int = '}'.code): Set<*> = buildSet {
+        do {
+            if (!cpi.hasNext()) throw EdnReaderException("Unclosed set. Expected '${Char(separator)}', got EOF.")
+            if (cpi.peek() == separator) break
+
+            val elem = readForm(cpi)
+            if (contains(elem)) throw EdnReaderException("Illegal set. Duplicate element $elem.")
+            add(elem)
+        } while(true)
     }
 
-    fun parseChar(cpi: CodePointIterator): Char {
+    private fun parseChar(cpi: CodePointIterator): Char {
         val token = readToken(cpi, ::isNotBreakingSymbol)
         return Char(parseDispatchUnicodeChar(token, false))
     }
 
-    fun parseDispatchUnicodeChar(token: CharSequence, isDispatch: Boolean = false): Int {
+    private fun parseDispatchUnicodeChar(token: CharSequence, isDispatch: Boolean = false): Int {
         if (token.length == 1)
             return token[0].code
 
@@ -182,33 +210,33 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             "return" -> return '\r'.code
         }
 
-        val reducedLengthToken = token.subSequence(1, token.length)
+        val reducedToken = token.subSequence(1, token.length)
         val errorTokenText = if (isDispatch) "#\\$token" else "\\$token"
         when (token[0]) {
             'o' -> {
-                if (reducedLengthToken.length <= 1 || reducedLengthToken.length > 3) {
+                if (reducedToken.length <= 1 || reducedToken.length > 3) {
                     val msg =
-                        "Invalid length of unicode sequence ${reducedLengthToken.length} in sequence $errorTokenText (should be 4)"
+                        "Invalid length of unicode sequence ${reducedToken.length} in sequence $errorTokenText (should be 4)"
                     throw EdnReaderException(msg)
                 }
-                return parseUnicodeChar(reducedLengthToken, 16, 'o')
+                return parseUnicodeChar(reducedToken, 16, 'o')
             }
 
             'u' -> { // UTF-16 or UTF-32 code
-                if (reducedLengthToken.length == 4 || (isDispatch && reducedLengthToken.length == 8))
-                    return parseUnicodeChar(reducedLengthToken, 16, 'u')
+                if (reducedToken.length == 4 || (isDispatch && reducedToken.length == 8))
+                    return parseUnicodeChar(reducedToken, 16, 'u')
                 val msg =
-                    "Invalid length of unicode sequence ${reducedLengthToken.length} in char literal $errorTokenText (should be 4 or 8)"
+                    "Invalid length of unicode sequence ${reducedToken.length} in char literal $errorTokenText (should be 4 or 8)"
                 throw EdnReaderException(msg)
             }
 
             'x' -> { // UTF-32 code
                 if (!options.allowSchemeUTF32Codes)
                     throw EdnReaderException("Invalid char literal: $errorTokenText")
-                if (reducedLengthToken.length == 8)
-                    return parseUnicodeChar(reducedLengthToken, 16, 'x')
+                if (reducedToken.length == 8)
+                    return parseUnicodeChar(reducedToken, 16, 'x')
                 val msg =
-                    "Invalid length of unicode sequence ${reducedLengthToken.length} in char literal $errorTokenText (should be 8)"
+                    "Invalid length of unicode sequence ${reducedToken.length} in char literal $errorTokenText (should be 8)"
                 throw EdnReaderException(msg)
 
             }
@@ -217,7 +245,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
     }
 
-    fun parseDispatch(cpi: CodePointIterator): Any {
+    private fun parseDispatch(cpi: CodePointIterator): Any? {
         val token = cpi.takeCodePoints(StringBuilder(), ::isNotBreakingSymbol)
 
         if (token.isEmpty()) { // Next symbol was a breaking symbol (whitespace, bracket, etc.) or EOF
@@ -226,6 +254,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
             when (val code = cpi.nextInt()) {
                 '{'.code -> token.appendCodePoint(code)
+                '#'.code -> token.appendCodePoint(code)
             }
         }
 
@@ -235,14 +264,48 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                     return StringBuilder()
                         .appendCodePoint(parseDispatchUnicodeChar(token.subSequence(1, token.length), true))
                         .toString()
-            '{' -> parseSet(cpi)
+
+            '{' -> return parseSet(cpi)
+
+            '_' -> {
+                readForm(cpi)
+                return null
+            }
+        }
+
+        if (token[0] == '#') {
+            when (token.toString()) {
+                "##NaN" -> Double.NaN
+                "##INF" -> Double.POSITIVE_INFINITY
+                "##-INF" -> Double.NEGATIVE_INFINITY
+                "##time" -> LocalDateTime.now()
+            }
         }
 
         throw EdnReaderException("Invalid dispatch expression #$token.")
     }
 
-    private fun readForm(codePointIterator: CodePointIterator, initCodePoint: Int): Any? {
-        TODO()
+    private fun readForm(codePointIterator: CodePointIterator): Any? {
+        do {
+            codePointIterator.skipWhile(::isWhitespace)
+
+            when (val codePoint = codePointIterator.nextInt()) {
+                ';'.code -> parseComment(codePointIterator)
+                '"'.code -> return parseString(codePointIterator)
+                '('.code -> return parseList(codePointIterator)
+                '['.code -> return parseVector(codePointIterator)
+                '{'.code -> return parseMap(codePointIterator)
+                '\\'.code -> return parseChar(codePointIterator)
+                '#'.code -> return parseDispatch(codePointIterator)
+                '0'.code, '1'.code, '2'.code, '3'.code, '4'.code, '5'.code, '6'.code, '7'.code, '8'.code, '9'.code ->
+                    return parseNumber(codePointIterator.unread(codePoint))
+
+                ')'.code, ']'.code, '}'.code ->
+                    throw EdnReaderException("Unexpected character ${Char(codePoint)}.")
+
+                else -> return readForm(codePointIterator.unread(codePoint))
+            }
+        } while (true)
     }
 
     private fun readToken(cpi: CodePointIterator, condition: (Int) -> Boolean): String {
@@ -260,8 +323,12 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         return currentToken.toString()
     }
 
+    private fun isWhitespace(code: Int): Boolean =
+        if (code < Char.MIN_VALUE.code || code > Char.MAX_VALUE.code) false
+        else Char(code).isWhitespace()
+
     private fun isNotBreakingSymbol(sym: Int): Boolean = when (sym.toChar()) {
-        ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', '#', '\'', '"' -> false
+        ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', '#', '\'', '"', ';' -> false
         else -> true
     }
 
