@@ -19,6 +19,8 @@ class CodePointIterator(codepointStream: IntStream, memorySize:Int=128) : Primit
         index == -1 && !iterator.hasNext()
 
     fun peek(): Int {
+        if (index >= 0)
+            return memory[index]
         val temp = next()
         unread(temp)
         return temp
@@ -53,5 +55,15 @@ class CodePointIterator(codepointStream: IntStream, memorySize:Int=128) : Primit
         memory[index] = v
     }
 
-    f
+    inline fun takeCodePoints(dest: StringBuilder = StringBuilder(), condition: (Int)->Boolean): StringBuilder {
+        while (hasNext()) {
+            val codepoint = nextInt()
+            if (!condition(codepoint)) {
+                unread(codepoint)
+                return dest
+            }
+            dest.appendCodePoint(codepoint)
+        }
+        return dest
+    }
 }

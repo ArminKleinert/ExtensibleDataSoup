@@ -92,17 +92,32 @@ fun main(args: Array<String>) {
 
     run {
         val s = "\"\uD83C\uDF81\""
-        val data = EDNSoapReader.readString(s)
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
         println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
     run {
         val s = "\"\\uD83C\\uDF81\""
-        val data = EDNSoapReader.readString(s)
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
         println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
     run {
         val s = "\"\\x0001F381\""
-        val data = EDNSoapReader.readString(s)
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "\\u0660"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "#\\x0001F381"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "#\\u0001F381"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
         println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
 }
