@@ -150,4 +150,33 @@ fun main(args: Array<String>) {
         val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
         println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
+    run {
+        val s = "#_ #_ \"1\" \\a 1"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[0 1 074 0o74 0xFF 0.1M 0.1 1M 1N 1_i32 0xFF_i16]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
+        println(data.map{it to it?.javaClass})
+        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[+0 +1 +074 +0o74 +0xFF +0.1M +0.1 +1M +1N +1_i32 +0xFF_i16]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
+        println(data.map{it to it?.javaClass})
+        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[-0 -1 -074 -0o74 -0xFF -0.1M -0.1 -1M -1N -1_i32 -0xFF_i16]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
+        println(data.map{it to it?.javaClass})
+        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    run {
+        val s = "[+ - :a a abc/b :a/b :+ :-]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
+        println(data.map{it to it?.javaClass})
+        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
 }

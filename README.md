@@ -1,12 +1,7 @@
 # ExtensibleDataSoap
 An EDN library for Kotlin.
 
-nil
-set
-vector
-list
-map
-
-
+TODO:
+- Handle 'e', 'e+', 'e-', 'E', 'E+', 'E-' suffixes on numbers.
 ☑
 ☐

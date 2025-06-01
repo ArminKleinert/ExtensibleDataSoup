@@ -69,26 +69,30 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
             var dividerIndex = -1
 
             s.forEachIndexed { index, chr ->
+                println("Symbol char: $chr")
                 when (chr) {
-                    '*', '!', '_', '?', '$', '%', '&', '=', '<', '>', in 'a'..'z', in 'A'..'Z' -> {}
-
                     // First-char restriction: If the name starts with dot, plus, or minus, the second char can not be numeric
-                    '.', '+', '-' -> if (index == dividerIndex + 1 && s.length > dividerIndex + 2 && s[dividerIndex + 2] in '0'..'9') return null
+                    '.', '+', '-' ->
+                        if (index == dividerIndex + 1 && s.length > dividerIndex + 2 && s[dividerIndex + 2] in '0'..'9')
+                            return null
 
                     // First-char restriction: Can not start with numeric, dot, or hash symbol.
-                    in '0'..'9', ':', '#' -> if (index == dividerIndex + 1) return null
+                    in '0'..'9', ':', '#' ->
+                        if (index == dividerIndex + 1) return null
 
                     // Restriction: Only one slash per symbol.
-                    '/' -> if (dividerIndex == -1 && index > 0 && index < s.length - 2)
-                        dividerIndex = index else return null
+                    '/' ->
+                        if (dividerIndex == -1 && index > 0 && index < s.length - 1) dividerIndex = index
+                        else return null
+
+                    '*', '!', '_', '?', '$', '%', '&', '=', '<', '>', in 'a'..'z', in 'A'..'Z' -> {println("Valid")}
 
                     else -> return null
                 }
             }
 
             if (dividerIndex != -1) {
-                val prefix = s.substring(0..dividerIndex)
-                val postfix = s.substring(dividerIndex..<s.length)
+                val (prefix, postfix) = s.split('/')
                 return Symbol(prefix, postfix)
             }
 
