@@ -180,7 +180,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 'o' -> 8
                 'b' -> 2
                 else -> {
-                    startIndex--
+                    startIndex-=2 // Reset start index
                     8
                 }
             }
