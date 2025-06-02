@@ -23,40 +23,39 @@ fun examples1() {
 
     // Discard is right-associative.
     testFunDefault("#_ #_ \"1\" \\a 1") // "1" class java.lang.Long
-    testFunDefault("#_#_\"1\" \\a 1") // "1" class java.lang.Long
+    testFunDefault("#_#_ \"1\" \\a 1") // "1" class java.lang.Long
 
     // Comments are ignored
     testFunDefault(";bc\n123") // "123" class java.lang.Long
-    testFunDefault(";bc\n") // "123" class java.lang.Long
 
     testFunDefault("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"") // "f81d4fae-7dec-11d0-a765-00a0c91e6bf6" class java.util.UUID
 
     testFunDefault("#inst \"1985-04-12T23:20:50.52Z\"") // "1985-04-12T23:20:50.520Z" class java.time.Instant
 
-    testFunDefault(",")
+    testFunDefault("1,")
 }
 
 fun examples2() {
-    fun testFunDefault(s:String, decoders: Map<String, (Any?) -> Any?>) {
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
-        val data = EDNSoapReader.readString(s, options)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    fun testFunExtend(s:String, decoders: Map<String, (Any?) -> Any?>) {
-        val options = EDNSoapOptions.defaultOptions.copy(allowNonMapDecode = true, ednClassDecoders = decoders)
-        val data = EDNSoapReader.readString(s, options)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-
-    testFunDefault(
-        "#pair {\"first\" 4 \"second\" 5}",
-        mapOf("pair" to { elem: Any? -> elem as Map<*,*>; (elem["first"] to elem["second"]) })
-    )
-
-    testFunExtend(
-        "#pair [4 5]",
-        mapOf("pair" to { elem: Any? -> elem as List<*>; (elem[0] to elem[1]) })
-    )
+//    fun testFunDefault(s:String, decoders: Map<String, (Any?) -> Any?>) {
+//        val options = EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
+//        val data = EDNSoapReader.readString(s, options)
+//        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+//    }
+//    fun testFunExtend(s:String, decoders: Map<String, (Any?) -> Any?>) {
+//        val options = EDNSoapOptions.defaultOptions.copy(allowNonMapDecode = true, ednClassDecoders = decoders)
+//        val data = EDNSoapReader.readString(s, options)
+//        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+//    }
+//
+//    testFunDefault(
+//        "#pair {\"first\" 4 \"second\" 5}",
+//        mapOf("pair" to { elem: Any? -> elem as Map<*,*>; (elem["first"] to elem["second"]) })
+//    )
+//
+//    testFunExtend(
+//        "#pair [4 5]",
+//        mapOf("pair" to { elem: Any? -> elem as List<*>; (elem[0] to elem[1]) })
+//    )
 }
 
 fun main(args: Array<String>) {

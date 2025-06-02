@@ -58,7 +58,7 @@ class CodePointIterator(codepointStream: IntStream, memorySize: Int = 32) : Prim
         return this
     }
 
-    inline fun takeCodePoints(dest: StringBuilder = StringBuilder(), condition: (Int) -> Boolean): StringBuilder {
+    fun takeCodePoints(dest: StringBuilder = StringBuilder(), condition: (Int) -> Boolean): StringBuilder {
         while (hasNext()) {
             val codepoint = nextInt()
             if (!condition(codepoint)) {
@@ -70,7 +70,7 @@ class CodePointIterator(codepointStream: IntStream, memorySize: Int = 32) : Prim
         return dest
     }
 
-    inline fun takeCodePoints(
+    fun takeCodePoints(
         dest: StringBuilder = StringBuilder(), maxCount: Int, condition: (Int) -> Boolean
     ): StringBuilder {
         var count = 0

@@ -7,11 +7,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
 import java.util.*
 
-class EdnReaderException(text: String, cause: Throwable? = null) : Exception(text, cause) {
+open class EdnReaderException(text: String, cause: Throwable? = null) : Exception(text, cause) {
+    class EdnClassConversionError(text: String) : Exception(text)
+    class EdnEmptyInputException(text: String) : Exception(text)
 }
 
 class EdnWriterException(text: String) : Exception(text)
-class EdnClassConversionError(text: String) : Exception(text)
 
 data class EDNSoapOptions(
     val allowSchemeUTF32Codes: Boolean = false,
@@ -91,7 +92,14 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         val codePointIterator = CodePointIterator(s.codePoints())
         if (!codePointIterator.hasNext())
             throw EdnReaderException("Empty input string.")
-        return readForm(codePointIterator, 0)
+        val data = readForm(codePointIterator, 0)
+        try {
+            val rest = readForm(codePointIterator, 0)
+            return data to rest
+        } catch (ex: EdnReaderException.EdnEmptyInputException) {
+            return data to null
+        }
+        throw EdnReaderException("The string should only contain one expression, but there are multiple.")
     }
 
     private fun parseNumber(cpi: CodePointIterator, negate: Boolean = false): Number {
@@ -344,7 +352,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseDispatch(cpi: CodePointIterator, level: Int): Any? {
-        val token = cpi.takeCodePoints(StringBuilder(), ::isNotBreakingSymbol)
+        val token = cpi.takeCodePoints(StringBuilder(), ::isNotBreakingSymbolOrDispatch)
 
         if (token.isEmpty()) { // Next symbol was a breaking symbol (whitespace, bracket, etc.) or EOF
             if (!cpi.hasNext())
@@ -354,10 +362,17 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 '{'.code -> token.appendCodePoint(code)
                 '#'.code -> token.appendCodePoint(code)
                 else -> {
-                    token.appendCodePoint(code)
                     throw EdnReaderException("Invalid dispatch expression $token.")
                 }
             }
+        }
+
+        println(cpi.peek().toChar())
+
+        if (cpi.peek() == '_'.code) {
+            cpi.nextInt() // Skip '_'.code
+            readForm(cpi, level + 1) // Ignore
+            return readForm(cpi, level)
         }
 
         val tokenAsString = token.toString()
@@ -370,11 +385,6 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                         .toString()
 
             '{' -> return parseSet(cpi, level + 1)
-
-            '_' -> {
-                readForm(cpi, level + 1)
-                return readForm(cpi, level)
-            }
 
             '#' ->
                 return when (tokenAsString.toString()) {
@@ -454,9 +464,8 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             cpi.skipWhile(::isWhitespace)
 
             if (!cpi.hasNext()) {
-                if (level == 0)
-                    return null
-                throw EdnReaderException("Expected anything but got EOF.")
+                if (level != 0) throw EdnReaderException("Unclosed list, set, vector or map.")
+                throw EdnReaderException.EdnEmptyInputException("Expected anything but got EOF.")
             }
 
             when (val codePoint = cpi.nextInt()) {
@@ -513,6 +522,10 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     private fun isNotBreakingSymbol(code: Int): Boolean = when (code.toChar()) {
         ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', '\'', '"', ';', ',' -> false
         else -> true
+    }
+
+    private fun isNotBreakingSymbolOrDispatch(code: Int): Boolean {
+        return isNotBreakingSymbol(code) || code != '#'.code
     }
 
     private fun isAlphaNum(code: Int): Boolean = when (code.toChar()) {
