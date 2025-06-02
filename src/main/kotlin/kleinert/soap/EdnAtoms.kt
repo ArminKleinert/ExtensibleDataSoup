@@ -1,3 +1,5 @@
+package kleinert.soap
+
 class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
     companion object {
         private val definedKeywords = mutableMapOf<String, Int>()
@@ -69,7 +71,6 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
             var dividerIndex = -1
 
             s.forEachIndexed { index, chr ->
-                println("Symbol char: $chr")
                 when (chr) {
                     // First-char restriction: If the name starts with dot, plus, or minus, the second char can not be numeric
                     '.', '+', '-' ->
@@ -85,7 +86,7 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
                         if (dividerIndex == -1 && index > 0 && index < s.length - 1) dividerIndex = index
                         else return null
 
-                    '*', '!', '_', '?', '$', '%', '&', '=', '<', '>', in 'a'..'z', in 'A'..'Z' -> {println("Valid")}
+                    '*', '!', '_', '?', '$', '%', '&', '=', '<', '>', in 'a'..'z', in 'A'..'Z' -> {}
 
                     else -> return null
                 }

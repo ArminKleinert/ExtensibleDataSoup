@@ -1,3 +1,5 @@
+package kleinert.soap
+
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
@@ -12,7 +14,7 @@ data class Ratio private constructor(var num: BigInteger, val den: BigInteger) :
             var denominator = denominator1
 
             if (denominator == BigInteger.ZERO)
-                throw NumberFormatException("Ratio with 0 denominator.")
+                throw NumberFormatException("kleinert.soap.Ratio with 0 denominator.")
 
             if (denominator < BigInteger.ZERO) {
                 // Convert `a/-b` to `-a/b` or `-a/-b` to `a/b`.
@@ -47,7 +49,7 @@ data class Ratio private constructor(var num: BigInteger, val den: BigInteger) :
     }
 
     init {
-        if (den == BigInteger.ZERO) throw NumberFormatException("Ratio with 0 denominator.")
+        if (den == BigInteger.ZERO) throw NumberFormatException("kleinert.soap.Ratio with 0 denominator.")
     }
 
     override fun toByte(): Byte = toInt().toByte()
@@ -113,8 +115,8 @@ data class Ratio private constructor(var num: BigInteger, val den: BigInteger) :
         this.plus(b.negate())
 
     operator fun times(b: Ratio): Ratio {
-        val c = Ratio.of(this.num, b.den)
-        val d = Ratio.of(b.num, this.den)
+        val c = of(this.num, b.den)
+        val d = of(b.num, this.den)
         return Ratio(c.num * d.num, c.den * d.den)
     }
 

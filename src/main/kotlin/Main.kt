@@ -1,193 +1,65 @@
-import java.math.BigInteger
+import kleinert.soap.EDNSoapOptions
+import kleinert.soap.EDNSoapReader
 
+fun examples1() {
+    fun testFunDefault(s:String) {
+        val data = EDNSoapReader.readString(s)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    fun testFunExtend(s:String) {
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    testFunDefault("\\a") // "a Class Char"
 
+    // Unicode sequences in strings work.
+    testFunDefault("\"\\uD83C\\uDF81\"") // "🎁" class java.lang.String
+    testFunExtend ("\"\\x0001F381\"") // "🎁" class java.lang.String
+
+    // UTF-32 evaluates to strings.
+    testFunDefault("\\u0660") // "٠" class java.lang.Character
+    testFunExtend ("#\\u0660") // "٠" class java.lang.String
+    testFunExtend ("#\\u0001F381") // "🎁" class java.lang.String
+
+    // Discard is right-associative.
+    testFunDefault("#_ #_ \"1\" \\a 1") // "1" class java.lang.Long
+    testFunDefault("#_#_\"1\" \\a 1") // "1" class java.lang.Long
+
+    // Comments are ignored
+    testFunDefault(";bc\n123") // "123" class java.lang.Long
+    testFunDefault(";bc\n") // "123" class java.lang.Long
+
+    testFunDefault("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"") // "f81d4fae-7dec-11d0-a765-00a0c91e6bf6" class java.util.UUID
+
+    testFunDefault("#inst \"1985-04-12T23:20:50.52Z\"") // "1985-04-12T23:20:50.520Z" class java.time.Instant
+
+    testFunDefault(",")
+}
+
+fun examples2() {
+    fun testFunDefault(s:String, decoders: Map<String, (Any?) -> Any?>) {
+        val options = EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
+        val data = EDNSoapReader.readString(s, options)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+    fun testFunExtend(s:String, decoders: Map<String, (Any?) -> Any?>) {
+        val options = EDNSoapOptions.defaultOptions.copy(allowNonMapDecode = true, ednClassDecoders = decoders)
+        val data = EDNSoapReader.readString(s, options)
+        println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+
+    testFunDefault(
+        "#pair {\"first\" 4 \"second\" 5}",
+        mapOf("pair" to { elem: Any? -> elem as Map<*,*>; (elem["first"] to elem["second"]) })
+    )
+
+    testFunExtend(
+        "#pair [4 5]",
+        mapOf("pair" to { elem: Any? -> elem as List<*>; (elem[0] to elem[1]) })
+    )
+}
 
 fun main(args: Array<String>) {
-//    run {
-//        val s = """
-//            {:a :b}
-//        """.trimIndent()
-//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-//        println(data)
-//    }
-//
-//    run {
-//        val s = """
-//            :a
-//        """.trimIndent()
-//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-//        println(data)
-//    }
-//
-//    run {
-//        val s = """
-//            [#'n :a #'n :abc]
-//        """.trimIndent()
-//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedReaderOptions(
-//            mapOf("n" to {o -> (o as Keyword).name().length})
-//        ))
-//        println(data)
-//    }
-//
-//    run {
-//        val s = """
-//            [#'f #'n :abc]
-//        """.trimIndent()
-//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedReaderOptions(
-//            mapOf("n" to {o -> (o as Keyword).name().length}, "f" to {o -> (o as Int)+1})
-//        ))
-//        println(data)
-//    }
-//
-//    run {
-//        data class EDNTestClass(val bbb: Int)
-//
-//        val s = listOf(EDNTestClass(4))
-//        val encoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(
-//            EDNTestClass::class.java to { o:Any? -> o as EDNTestClass
-//                                        "test" to o.bbb*3},
-//        )
-//        val encoded = EDNSoapWriter(EDNSoapOptions.extendedWriterOptions(encoders)).encode(s)
-//        println(encoded)
-//        val data = EDNSoapReader.readString(encoded, EDNSoapOptions.extendedReaderOptions(
-//            mapOf("test" to {o -> EDNTestClass((o as Int) / 3)})
-//        ))
-//        println(data)
-//    }
-//
-//    run {
-//        val s = """
-//            \u03A9
-//        """.trimIndent()
-//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedReaderOptions(
-//            mapOf("n" to {o -> (o as Keyword).name().length})
-//        ))
-//        println(data)
-//    }
-
-//    run {
-//        val s = """
-//            [123 +123 -123 123i +123i -123i]
-//        """.trimIndent()
-//        val data = EDNSoapReader.readString(s)
-//        println(data)
-//    }
-//
-//    run {
-//        println(BigInteger.valueOf(256).toByte())
-//    }
-
-//    run {
-//        val s = "[-123 -123M -123L -123i -123S -123B -123D -123F -.123 -.123M -123.123]"
-//        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions.copy(intPostfix = 'i'))
-//        data as List<*>
-//        println(data.map { it to it?.javaClass }.joinToString("\n"))
-//    }
-
-//    run {
-//        val s = "2.2E-2"
-//        val data = EdnReader.readString(s)
-//        println(""+data + " " + (data?.javaClass?: "null"))
-//    }
-
-    run {
-        val s = "\"\uD83C\uDF81\""
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "\"\\uD83C\\uDF81\""
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "\"\\x0001F381\""
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "\\u0660"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "#\\x0001F381"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "#\\u0001F381"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = ";bc\n#\\u0001F381"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[\"abc\"\"abc\"]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[\"abc\" \"abc\" \"b\" \"c\"]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "{\"abc\" \"abc\" \"b\" \"c\"}"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "#{\"dbc\" \"abc\" \"b\" \"c\"}"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "#_ #_ \"1\" \\a 1"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-        println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[0 1 074 0o74 0xFF 0.1M 0.1 1M 1N 1_i32 0xFF_i16]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
-        println(data.map{it to it?.javaClass})
-        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[+0 +1 +074 +0o74 +0xFF +0.1M +0.1 +1M +1N +1_i32 +0xFF_i16]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
-        println(data.map{it to it?.javaClass})
-        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[-0 -1 -074 -0o74 -0xFF -0.1M -0.1 -1M -1N -1_i32 -0xFF_i16]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
-        println(data.map{it to it?.javaClass})
-        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[+ - :a a abc/b :a/b :+ :-]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
-        println(data.map{it to it?.javaClass})
-        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-    run {
-        val s = "[1.5E-5 1.5E-5M 0/7 -66/-55]"
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
-        println(data.map{it to it?.javaClass})
-        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
-    }
-
-    val denominator = BigInteger.valueOf(55L)
-    val numerator = BigInteger.valueOf(66L)
-    val res = numerator.divideAndRemainder(denominator).contentToString()
-    println(res)
+    examples1()
+    examples2()
 }
