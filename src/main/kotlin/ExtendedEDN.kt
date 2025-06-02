@@ -91,25 +91,60 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseNumber(cpi: CodePointIterator, negate: Boolean = false): Number {
         fun negateIfNegative(number: BigDecimal) = if (negate) number.negate() else number
-        fun negateIfNegative(number: BigInteger) =  if (negate) number.negate() else number
+        fun negateIfNegative(number: BigInteger) = if (negate) number.negate() else number
         fun negateIfNegative(number: Byte) = if (negate) (-number).toByte() else number
         fun negateIfNegative(number: Short) = if (negate) (-number).toShort() else number
         fun negateIfNegative(number: Int) = if (negate) -number else number
         fun negateIfNegative(number: Long) = if (negate) -number else number
         fun negateIfNegative(number: Double) = if (negate) -number else number
+        fun negateIfNegative(number: Ratio) = if (negate) number.negate() else number
+        try {
+            return when (val n = parseNumberHelper(cpi, negate)) {
+                is BigDecimal -> negateIfNegative(n)
+                is BigInteger -> negateIfNegative(n)
+                is Byte -> negateIfNegative(n)
+                is Short -> negateIfNegative(n)
+                is Int -> negateIfNegative(n)
+                is Long -> negateIfNegative(n)
+                is Double -> negateIfNegative(n)
+                is Ratio -> negateIfNegative(n)
+                else -> throw EdnReaderException("Could not negate number $n of type ${n!!.javaClass.name}")
+            }
+        } catch (ex: NumberFormatException) {
+            // For UUID.fromString
+            throw EdnReaderException(ex.toString(), ex)
+        }
+    }
+
+    private fun parseNumberHelper(cpi: CodePointIterator, negate: Boolean = false): Number {
 
         val token = readToken(cpi, ::isNotBreakingSymbol)
 
         val tokenLen = token.length
-        val dots = token.count { it == '.' }
+        var dotIndex = -1
+        var divIndex = -1
 
-        if (dots > 1)
-            throw EdnReaderException("Invalid number format: $token")
+        for ((index, c) in token.withIndex()) {
+            if (c == '/') {
+                if (divIndex != -1 || dotIndex != -1) throw EdnReaderException("Invalid number format: $token")
+                divIndex = index
+            } else if (c == '.') {
+                if (dotIndex != -1 || divIndex != -1) throw EdnReaderException("Invalid number format: $token")
+                dotIndex = index
+            }
+        }
 
-        if (dots == 1) { // Is floating point or BigDecimal
+        if (dotIndex != -1) {
             return (
-                if (token.endsWith('M')) negateIfNegative(token.substring(0, tokenLen - 1).toBigDecimal())
-            else negateIfNegative(token.toDouble()))
+                    if (token.endsWith('M')) token.substring(0, tokenLen - 1).toBigDecimal()
+                    else token.toDouble())
+        }
+
+        if (divIndex != -1) {
+            if (divIndex == 0 || divIndex == token.length - 1) throw EdnReaderException("Invalid number format: $token")
+            val part1 = token.substring(0, divIndex).toBigInteger()
+            val part2 = token.substring(divIndex + 1).toBigInteger()
+            return Ratio.of(part1, part2)
         }
 
         var base = 10
@@ -130,15 +165,15 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
 
         return when {
-            token.endsWith('M') -> negateIfNegative(token.substring(startIndex, tokenLen - 1).toBigDecimal())
-            token.endsWith("N") -> negateIfNegative(token.substring(startIndex, tokenLen - 1).toBigInteger(base))
-            !options.allowNumericSuffixes -> negateIfNegative(token.substring(startIndex, tokenLen - 0).toLong(base))
-            token.endsWith("_i8") -> negateIfNegative(token.substring(startIndex, tokenLen - 3).toByte(base))
-            token.endsWith("_i16") -> negateIfNegative(token.substring(startIndex, tokenLen - 4).toShort(base))
-            token.endsWith("_i32") -> negateIfNegative(token.substring(startIndex, tokenLen - 4).toInt(base))
-            token.endsWith("_i64") -> negateIfNegative(token.substring(startIndex, tokenLen - 4).toLong(base))
-            token.endsWith("L") -> negateIfNegative(token.substring(startIndex, tokenLen - 1).toLong(base))
-            else -> negateIfNegative(token.substring(startIndex, tokenLen - 0).toLong(base))
+            token.endsWith('M') -> token.substring(startIndex, tokenLen - 1).toBigDecimal()
+            token.endsWith("N") -> token.substring(startIndex, tokenLen - 1).toBigInteger(base)
+            !options.allowNumericSuffixes -> token.substring(startIndex, tokenLen - 0).toLong(base)
+            token.endsWith("_i8") -> token.substring(startIndex, tokenLen - 3).toByte(base)
+            token.endsWith("_i16") -> token.substring(startIndex, tokenLen - 4).toShort(base)
+            token.endsWith("_i32") -> token.substring(startIndex, tokenLen - 4).toInt(base)
+            token.endsWith("_i64") -> token.substring(startIndex, tokenLen - 4).toLong(base)
+            token.endsWith("L") -> token.substring(startIndex, tokenLen - 1).toLong(base)
+            else -> token.substring(startIndex, tokenLen - 0).toLong(base)
         }
     }
 
@@ -206,10 +241,10 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseList(cpi: CodePointIterator, level: Int): Iterable<*> {
-        return parseVector(cpi, ')'.code)
+        return parseVector(cpi, level + 1, ')'.code)
     }
 
-    private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int = ']'.code): List<*> = buildList {
+    private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {
         do {
             if (!cpi.hasNext()) throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
             if (cpi.peek() == separator) {
@@ -222,7 +257,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         } while (true)
     }.toList()
 
-    private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Map<*, *> = buildMap {
+    private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int): Map<*, *> = buildMap {
         do {
             if (!cpi.hasNext()) throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
             if (cpi.peek() == separator) {
@@ -340,7 +375,10 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                     "##NaN" -> Double.NaN
                     "##INF" -> Double.POSITIVE_INFINITY
                     "##-INF" -> Double.NEGATIVE_INFINITY
-                    "##time" -> LocalDateTime.now()
+                    "##time" ->
+                        if (options.allowTimeDispatch) LocalDateTime.now()
+                        else EdnReaderException("Unknown symbolic value $token")
+
                     else -> EdnReaderException("Unknown symbolic value $token")
                 }
         }
@@ -391,7 +429,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
         if (token.length > 1)
             when (token[0]) {
-                ':'->return Keyword.keyword(token)
+                ':' -> return Keyword.keyword(token)
                     ?: throw EdnReaderException("Token starts with colon, but is not a valid keyword: $token")
             }
 
@@ -420,8 +458,8 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 ';'.code -> parseComment(cpi)
                 '"'.code -> return parseString(cpi)
                 '('.code -> return parseList(cpi, level + 1)
-                '['.code -> return parseVector(cpi, level + 1)
-                '{'.code -> return parseMap(cpi, level + 1)
+                '['.code -> return parseVector(cpi, level + 1, ']'.code)
+                '{'.code -> return parseMap(cpi, level + 1, '}'.code)
                 '\\'.code -> return parseChar(cpi)
                 '#'.code -> return parseDispatch(cpi, level + 1)
                 '0'.code, '1'.code, '2'.code, '3'.code, '4'.code, '5'.code, '6'.code, '7'.code, '8'.code, '9'.code ->
@@ -433,6 +471,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 '+'.code ->
                     return if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi)
                     else parseOther(cpi.unread(codePoint), level + 1)
+
                 '-'.code ->
                     return if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi, true)
                     else parseOther(cpi.unread(codePoint), level + 1)

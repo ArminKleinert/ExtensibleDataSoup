@@ -244,7 +244,7 @@ object EdnReader {
                 if (m.matches()) {
                     var numerator = m.group(1)
                     if (numerator.startsWith("+")) numerator = numerator.substring(1)
-                    Ratio(BigInteger(numerator), BigInteger(m.group(2)))
+                    Ratio.of(BigInteger(numerator), BigInteger(m.group(2)))
                 } else {
                     null
                 }

@@ -179,4 +179,15 @@ fun main(args: Array<String>) {
         println(data.map{it to it?.javaClass})
         //println("\""+data+"\" " + (data?.javaClass ?: "null"))
     }
+    run {
+        val s = "[1.5E-5 1.5E-5M 0/7 -66/-55]"
+        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions) as List<*>
+        println(data.map{it to it?.javaClass})
+        //println("\""+data+"\" " + (data?.javaClass ?: "null"))
+    }
+
+    val denominator = BigInteger.valueOf(55L)
+    val numerator = BigInteger.valueOf(66L)
+    val res = numerator.divideAndRemainder(denominator).contentToString()
+    println(res)
 }
