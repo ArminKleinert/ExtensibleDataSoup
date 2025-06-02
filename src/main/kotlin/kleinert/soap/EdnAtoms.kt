@@ -97,7 +97,7 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
                 return Symbol(prefix, postfix)
             }
 
-            return Symbol("", s)
+            return Symbol(null, s)
         }
 
         fun symbol(prefix: String?, name: String) = Symbol(prefix, name)

@@ -21,7 +21,7 @@ data class EDNSoapOptions(
     val ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(),
     val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
-    val allowNonMapDecode: Boolean = false,
+    val allowMoreEncoderDecoderNames: Boolean = false,
 ) {
 
     companion object {
@@ -36,7 +36,7 @@ data class EDNSoapOptions(
                 allowDispatchChars = false,
                 allowTimeDispatch = false,
                 allowNumericSuffixes = false,
-                allowNonMapDecode = false,
+                allowMoreEncoderDecoderNames = false,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = mapOf(),
             )
@@ -47,7 +47,7 @@ data class EDNSoapOptions(
                 allowDispatchChars = true,
                 allowTimeDispatch = true,
                 allowNumericSuffixes = true,
-                allowNonMapDecode = true,
+                allowMoreEncoderDecoderNames = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf()
             )
@@ -58,7 +58,7 @@ data class EDNSoapOptions(
                 allowDispatchChars = true,
                 allowTimeDispatch = true,
                 allowNumericSuffixes = true,
-                allowNonMapDecode = true,
+                allowMoreEncoderDecoderNames = true,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = ednClassEncoders
             )
@@ -72,6 +72,21 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         @Throws(EdnReaderException::class)
         fun readString(input: String, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
             return EDNSoapReader(options).readString(input)
+        }
+    }
+
+    init {ensureValidDecoderNames()
+    }
+
+    /*
+     + Decoders (tags) must follow the same naming conventions as symbols AND must have a prefix part.
+     */
+    private fun ensureValidDecoderNames() {
+        if (!options.allowMoreEncoderDecoderNames) {
+            for (key in options.ednClassDecoders.keys) {
+                val name = Symbol.symbol(key)
+                if (name?.prefix == null) throw EdnReaderException("Invalid decoder name: \"$key\" (parsed as $name)")
+            }
         }
     }
 
@@ -93,13 +108,8 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         if (!codePointIterator.hasNext())
             throw EdnReaderException("Empty input string.")
         val data = readForm(codePointIterator, 0)
-        try {
-            val rest = readForm(codePointIterator, 0)
-            return data to rest
-        } catch (ex: EdnReaderException.EdnEmptyInputException) {
-            return data to null
-        }
-        throw EdnReaderException("The string should only contain one expression, but there are multiple.")
+        return data
+        //throw EdnReaderException("The string should only contain one expression, but there are multiple.")
     }
 
     private fun parseNumber(cpi: CodePointIterator, negate: Boolean = false): Number {
@@ -258,20 +268,27 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {
         do {
-            if (!cpi.hasNext()) throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+            cpi.skipWhile(::isWhitespace)
+
+            if (!cpi.hasNext())
+                throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+
             if (cpi.peek() == separator) {
                 cpi.nextInt()
                 break
             }
 
             val elem = readForm(cpi, level + 1)
+            println(elem)
             add(elem)
         } while (true)
     }.toList()
 
     private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int): Map<*, *> = buildMap {
         do {
-            if (!cpi.hasNext()) throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+            cpi.skipWhile(::isWhitespace)
+            if (!cpi.hasNext())
+                throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
             if (cpi.peek() == separator) {
                 cpi.nextInt()
                 break
@@ -286,7 +303,9 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseSet(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Set<*> = buildSet {
         do {
-            if (!cpi.hasNext()) throw EdnReaderException("Unclosed set. Expected '${Char(separator)}', got EOF.")
+            cpi.skipWhile(::isWhitespace)
+            if (!cpi.hasNext())
+                throw EdnReaderException("Unclosed set. Expected '${Char(separator)}', got EOF.")
             if (cpi.peek() == separator) {
                 cpi.nextInt()
                 break
@@ -367,21 +386,18 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             }
         }
 
-        println(cpi.peek().toChar())
-
-        if (cpi.peek() == '_'.code) {
-            cpi.nextInt() // Skip '_'.code
-            readForm(cpi, level + 1) // Ignore
-            return readForm(cpi, level)
-        }
-
         val tokenAsString = token.toString()
 
         when (token[0]) {
             '\\' ->
                 if (options.allowDispatchChars)
                     return StringBuilder()
-                        .appendCodePoint(parseDispatchUnicodeChar(tokenAsString.subSequence(1, tokenAsString.length), true))
+                        .appendCodePoint(
+                            parseDispatchUnicodeChar(
+                                tokenAsString.subSequence(1, tokenAsString.length),
+                                true
+                            )
+                        )
                         .toString()
 
             '{' -> return parseSet(cpi, level + 1)
@@ -434,8 +450,6 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             }
         }
 
-        if (form !is Map<*, *> && !options.allowNonMapDecode)
-            throw EdnReaderException("Dispatch decoders are only allowed on maps. Decoder: \"$token\", data: $form")
         return decoder!!(form)
     }
 
@@ -460,39 +474,65 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun readForm(cpi: CodePointIterator, level: Int): Any? {
+        val res = mutableListOf<Any?>()
         do {
             cpi.skipWhile(::isWhitespace)
 
             if (!cpi.hasNext()) {
-                if (level != 0) throw EdnReaderException("Unclosed list, set, vector or map.")
-                throw EdnReaderException.EdnEmptyInputException("Expected anything but got EOF.")
+                //throw EdnReaderException.EdnEmptyInputException("Expected anything but got EOF.")
+                break
             }
 
             when (val codePoint = cpi.nextInt()) {
-                ';'.code -> parseComment(cpi)
-                '"'.code -> return parseString(cpi)
-                '('.code -> return parseList(cpi, level + 1)
-                '['.code -> return parseVector(cpi, level + 1, ']'.code)
-                '{'.code -> return parseMap(cpi, level + 1, '}'.code)
-                '\\'.code -> return parseChar(cpi)
-                '#'.code -> return parseDispatch(cpi, level + 1)
+                ';'.code -> {
+                    parseComment(cpi)
+                    continue
+                }
+
+                '"'.code -> res.add(parseString(cpi))
+                '('.code -> res.add(parseList(cpi, level + 1))
+                '['.code -> res.add(parseVector(cpi, level + 1, ']'.code))
+                '{'.code -> res.add(parseMap(cpi, level + 1, '}'.code))
+                '\\'.code -> res.add(parseChar(cpi))
+                '#'.code -> {
+                    if (cpi.hasNext() && cpi.peek() == '_'.code) {
+                        cpi.nextInt()
+                        readForm(cpi, level + 1)
+                        continue
+                    } else {
+                        res.add(parseDispatch(cpi, level + 1))
+                    }
+                }
+
                 '0'.code, '1'.code, '2'.code, '3'.code, '4'.code, '5'.code, '6'.code, '7'.code, '8'.code, '9'.code ->
-                    return parseNumber(cpi.unread(codePoint))
+                    res.add(parseNumber(cpi.unread(codePoint)))
 
                 ')'.code, ']'.code, '}'.code ->
-                    throw EdnReaderException("Unexpected character ${Char(codePoint)}.")
+                    res.add(EdnReaderException("Unexpected character ${Char(codePoint)}."))
 
                 '+'.code ->
-                    return if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi)
-                    else parseOther(cpi.unread(codePoint), level + 1)
+                    res.add(
+                        if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi)
+                        else parseOther(cpi.unread(codePoint), level + 1)
+                    )
 
                 '-'.code ->
-                    return if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi, true)
-                    else parseOther(cpi.unread(codePoint), level + 1)
+                    res.add(
+                        if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi, true)
+                        else parseOther(cpi.unread(codePoint), level + 1)
+                    )
 
-                else -> return parseOther(cpi.unread(codePoint), level + 1)
+                else -> res.add(parseOther(cpi.unread(codePoint), level + 1))
+            }
+
+            if (level > 0 || res.isNotEmpty()) {
+                return res[0]
             }
         } while (true)
+
+        if (res.size != 1)
+            throw EdnReaderException("Reader requires exactly one expression, but got ${res.size}.")
+        return res
     }
 
     private fun readToken(cpi: CodePointIterator, condition: (Int) -> Boolean): String {
@@ -525,7 +565,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun isNotBreakingSymbolOrDispatch(code: Int): Boolean {
-        return isNotBreakingSymbol(code) || code != '#'.code
+        return isNotBreakingSymbol(code) && code != '#'.code
     }
 
     private fun isAlphaNum(code: Int): Boolean = when (code.toChar()) {
