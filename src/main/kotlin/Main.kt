@@ -36,6 +36,8 @@ fun examples1() {
 
     testFunDefault("1,")
     testFunDefault("1 2")
+
+    testFunDefault("[1]")
 }
 
 fun examples2() {
@@ -64,6 +66,8 @@ fun examples2() {
 }
 
 fun main(args: Array<String>) {
-    examples1()
-    examples2()
+    //examples1()
+    //examples2()
+    println(mapOf(1 to 2) == mapOf(1 to 2))
+    println(mapOf<Int,Int>(1 to 2) == mapOf<Long,Long>(1L to 2L))
 }

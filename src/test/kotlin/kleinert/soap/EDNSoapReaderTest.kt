@@ -120,6 +120,13 @@ class EDNSoapReaderTest {
         // Discard ignores comments
         soap("#_ ; abc\n 1 2").let { assertEquals(2L, it) }
 
+        // Discard in strings does nothing
+        soap("\"#_\"").let { assertEquals("#_", it) }
+        soap("\"#_1\"").let { assertEquals("#_1", it) }
+    }
+
+    @Test
+    fun parseDiscardInCollectionTest() {
         // Discard is nothing. When discard appears in a list, vector, set, or map, it does nothing
         soap("( #_ 1 #_ 2 #_ 3 )").let {
             assertTrue(it is Iterable<*>)
@@ -137,9 +144,159 @@ class EDNSoapReaderTest {
             assertTrue(it is Map<*,*>)
             assertTrue((it as Map<*,*>).isEmpty())
         }
-
-        // Discard in strings does nothing
-        soap("\"#_\"").let { assertEquals("#_", it) }
-        soap("\"#_1\"").let { assertEquals("#_1", it) }
     }
+
+    @Test
+    fun parseEmptyList() {
+        // Normal
+        soap("()").let {
+            assertTrue(it is Iterable<*>)
+            assertFalse((it as Iterable<*>).iterator().hasNext())
+        }
+
+        // Whitespace does not matter
+        soap("(  )").let {
+            assertTrue(it is Iterable<*>)
+            assertFalse((it as Iterable<*>).iterator().hasNext())
+        }
+        soap("(\t \n)").let {
+            assertTrue(it is Iterable<*>)
+            assertFalse((it as Iterable<*>).iterator().hasNext())
+        }
+        soap("(\n)").let {
+            assertTrue(it is Iterable<*>)
+            assertFalse((it as Iterable<*>).iterator().hasNext())
+        }
+    }
+
+    @Test
+    fun parseEmptyVector() {
+        // Normal
+        soap("[]").let {
+            assertTrue(it is List<*>)
+            assertTrue((it as List<*>).isEmpty())
+        }
+
+        // Whitespace does not matter
+        soap("[  ]").let {
+            assertTrue(it is List<*>)
+            assertTrue((it as List<*>).isEmpty())
+        }
+        soap("[\t \n]").let {
+            assertTrue(it is List<*>)
+            assertTrue((it as List<*>).isEmpty())
+        }
+        soap("[\n]").let {
+            assertTrue(it is List<*>)
+            assertTrue((it as List<*>).isEmpty())
+        }
+    }
+
+    @Test
+    fun parseEmptySet() {
+        // Normal
+        soap("#{}").let {
+            assertTrue(it is Set<*>)
+            assertTrue((it as Set<*>).isEmpty())
+        }
+
+        // Whitespace does not matter
+        soap("#{  }").let {
+            assertTrue(it is Set<*>)
+            assertTrue((it as Set<*>).isEmpty())
+        }
+        soap("#{\t \n}").let {
+            assertTrue(it is Set<*>)
+            assertTrue((it as Set<*>).isEmpty())
+        }
+        soap("#{\n}").let {
+            assertTrue(it is Set<*>)
+            assertTrue((it as Set<*>).isEmpty())
+        }
+    }
+
+    @Test
+    fun parseEmptyMap() {
+        // Normal
+        soap("{}").let {
+            assertTrue(it is Map<*,*>)
+            assertTrue((it as Map<*,*>).isEmpty())
+        }
+
+        // Whitespace does not matter
+        soap("{  }").let {
+            assertTrue(it is Map<*,*>)
+            assertTrue((it as Map<*,*>).isEmpty())
+        }
+        soap("{\t \n}").let {
+            assertTrue(it is Map<*,*>)
+            assertTrue((it as Map<*,*>).isEmpty())
+        }
+        soap("{\n}").let {
+            assertTrue(it is Map<*,*>)
+            assertTrue((it as Map<*,*>).isEmpty())
+        }
+    }
+
+    @Test
+    fun parseListSimple() {
+        soap("(\\a)").let {
+            assertTrue(it is Iterable<*>)
+            assertEquals(listOf<Any?>('a'), (it as Iterable<*>).toList())
+        }
+        soap("(\\a \\b)").let {
+            assertTrue(it is Iterable<*>)
+            assertEquals(listOf('a', 'b'), (it as Iterable<*>).toList())
+        }
+        soap("(()))").let {
+            assertTrue(it is Iterable<*>)
+            assertEquals(listOf(listOf<Any?>()), (it as Iterable<*>).toList())
+        }
+    }
+
+    @Test
+    fun parseVectorSimple() {
+        soap("[\\a]").let {
+            assertTrue(it is List<*>)
+            assertEquals(listOf('a'), (it as List<*>))
+        }
+        soap("[\\a \\b]").let {
+            assertTrue(it is Iterable<*>)
+            assertEquals(listOf('a', 'b'), (it as List<*>))
+        }
+        soap("[[]]").let {
+            assertTrue(it is Iterable<*>)
+            assertEquals(listOf(listOf<Any?>()), (it as List<*>))
+        }}
+
+    @Test
+    fun parseSetSimple(){
+        soap("#{\\a \\b}").let {
+            println(it?.javaClass)
+            assertTrue(it is Set<*>)
+            assertEquals(setOf('a', 'b'), (it as Set<*>))
+        }
+    soap("#{ \\a }").let {
+        assertTrue(it is Set<*>)
+        assertEquals(setOf('a'), (it as Set<*>))
+    }
+    soap("#{\\a #{}}").let {
+        assertTrue(it is Set<*>)
+        assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
+    }}
+
+    @Test
+    fun parseMapSimple() {
+        soap("{\\a \\b}").let {
+            assertTrue(it is Map<*,*>)
+            assertEquals(mapOf('a' to 'b').entries, (it as Map<*,*>).entries)
+        }
+        soap("{\\a {}}").let {
+            assertTrue(it is Map<*,*>)
+            assertEquals(mapOf('a' to mapOf<Any?,Any?>()).entries, (it as Map<*,*>).entries)
+        }
+        soap("{{} {}}").let {
+            assertTrue(it is Map<*,*>)
+            assertEquals(mapOf<Any?, Any?>(mapOf<Any?, Any?>() to mapOf<Any?, Any?>()), (it as Map<*,*>))
+        }}
 }
