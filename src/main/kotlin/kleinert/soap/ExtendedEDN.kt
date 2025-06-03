@@ -69,6 +69,8 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     companion object {
         private const val NULL_CHAR = '\u0000'
 
+        private val NOTHING = object{}
+
         @Throws(EdnReaderException::class)
         fun readString(input: String, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
             return EDNSoapReader(options).readString(input)
@@ -263,11 +265,12 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseList(cpi: CodePointIterator, level: Int): Iterable<*> {
-        return parseVector(cpi, level + 1, ')'.code)
+        return parseVector(cpi, level, ')'.code)
     }
 
     private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {
         do {
+            println(level)
             cpi.skipWhile(::isWhitespace)
 
             if (!cpi.hasNext())
@@ -279,8 +282,8 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             }
 
             val elem = readForm(cpi, level + 1)
-            println(elem)
-            add(elem)
+
+            if (elem != NOTHING) add(elem)
         } while (true)
     }.toList()
 
@@ -288,15 +291,24 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         do {
             cpi.skipWhile(::isWhitespace)
             if (!cpi.hasNext())
-                throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+                throw EdnReaderException("Unclosed map. Expected '${Char(separator)}', got EOF.")
             if (cpi.peek() == separator) {
                 cpi.nextInt()
                 break
             }
 
-            val key = readForm(cpi, level + 1)
-            if (contains(key)) throw EdnReaderException("Illegal map. Duplicate key $key.")
-            val value = readForm(cpi, level + 1)
+            val key: Any? = readForm(cpi, level + 1)
+            if (key == NOTHING) continue
+
+            if (contains(key))
+                throw EdnReaderException("Illegal map. Duplicate key $key.")
+
+            if (cpi.peek() == separator)
+                throw EdnReaderException("Odd number of elements in map. Last key was $key.")
+
+            var value: Any?
+            do { value = readForm(cpi, level + 1) } while (value == NOTHING)
+
             put(key, value)
         } while (true)
     }.toMap()
@@ -313,7 +325,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
             val elem = readForm(cpi, level + 1)
             if (contains(elem)) throw EdnReaderException("Illegal set. Duplicate element $elem.")
-            add(elem)
+            if (elem != NOTHING) add(elem)
         } while (true)
     }.toSet()
 
@@ -498,7 +510,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                     if (cpi.hasNext() && cpi.peek() == '_'.code) {
                         cpi.nextInt()
                         readForm(cpi, level + 1)
-                        continue
+                        return NOTHING
                     } else {
                         res.add(parseDispatch(cpi, level + 1))
                     }
@@ -508,7 +520,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                     res.add(parseNumber(cpi.unread(codePoint)))
 
                 ')'.code, ']'.code, '}'.code ->
-                    res.add(EdnReaderException("Unexpected character ${Char(codePoint)}."))
+                    throw EdnReaderException("Unexpected character ${Char(codePoint)}.")
 
                 '+'.code ->
                     res.add(

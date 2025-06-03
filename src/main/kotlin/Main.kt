@@ -68,6 +68,8 @@ fun examples2() {
 fun main(args: Array<String>) {
     //examples1()
     //examples2()
-    println(mapOf(1 to 2) == mapOf(1 to 2))
-    println(mapOf<Int,Int>(1 to 2) == mapOf<Long,Long>(1L to 2L))
+    println(EDNSoapReader.readString("(#_\\a)"))
+    println(EDNSoapReader.readString("[#_\\a]"))
+    println(EDNSoapReader.readString("#{#_\\a}"))
+    println(EDNSoapReader.readString("{1 #_\\a}"))
 }
