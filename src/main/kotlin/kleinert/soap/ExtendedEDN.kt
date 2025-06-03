@@ -224,7 +224,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                         'n'.code -> currentToken.append('\n')
                         'r'.code -> currentToken.append('\r')
                         '"'.code -> currentToken.append('\"')
-                        '\\'.code -> currentToken.append("\\\\")
+                        '\\'.code -> currentToken.append("\\")
                         'u'.code -> currentToken.append(Char(parseUnicodeChar(cpi, 4, 4, 16, 'u'))) // UTF-16 code
                         'x'.code -> currentToken.appendCodePoint(parseUnicodeChar(cpi, 8, 8, 16, 'x')) // UTF-32 code
                         else ->

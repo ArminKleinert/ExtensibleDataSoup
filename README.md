@@ -30,7 +30,7 @@ An EDN library for Kotlin.
 ## Known bugs
 
 - If an input contains more than one expression, the reader just returns the first expression. For example, `EDNSoapReader.readString("1 2")` should fail, but does not. It just returns `1`.
-
+- Discard tags (`#_`) do not work in vectors, lists, sets, and maps.
 
 ## Not implemented
 ☐ Metadata  
