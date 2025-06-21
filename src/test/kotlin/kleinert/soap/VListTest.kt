@@ -1,0 +1,261 @@
+package kleinert.soap
+
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+
+class VListTest {
+
+    @Test
+    fun testConstructor() {
+        assertTrue(VList<Int>() == VList(listOf<Int>()))
+        assertTrue(VList<Int>(arrayOf()) == VList(listOf<Int>()))
+        assertTrue(VList(listOf<Int>().asIterable()) == VList(listOf<Int>()))
+        assertTrue(VList(VList<Int>()) == VList(listOf<Int>()))
+
+        assertTrue(VList(arrayOf(1)) == VList(listOf(1)))
+        assertTrue(VList(listOf(1).asIterable()) == VList(listOf(1)))
+
+        assertTrue(VList(arrayOf(1, 2, 3, 4, 5)) == VList(listOf(1, 2, 3, 4, 5)))
+        assertTrue(VList(listOf(1, 2, 3, 4, 5).asIterable()) == VList(listOf(1, 2, 3, 4, 5)))
+    }
+
+    @Test
+    fun getSize() {
+        assertEquals(0, VList<Int>().size)
+        assertEquals(0, VList.of<Int>().size)
+        assertEquals(1, VList.of(99).size)
+        assertEquals(5, VList.of(1, 2, 3, 4, 5).size)
+        assertEquals(55, VList((1..55).toList()).size)
+    }
+
+    @Test
+    fun cons() {
+        val vlist = VList<Int>()
+        assertEquals(0, vlist.size)
+
+        assertEquals(VList(arrayOf(1)), vlist.cons(1))
+        assertEquals(VList(arrayOf(2, 1)), vlist.cons(1).cons(2))
+        assertEquals(VList(arrayOf(3, 2, 1)), vlist.cons(1).cons(2).cons(3))
+    }
+
+    @Test
+    fun cdr() {
+        assertEquals(VList<Int>(), VList<Int>().cdr)
+        assertEquals(VList.of(1), VList.of(2, 1).cdr)
+        assertEquals(VList(2..5), VList(1..5).cdr)
+    }
+
+    @Test
+    fun car() {
+        assertThrows(NoSuchElementException::class.java) { VList.of<Int>().car }
+        assertEquals(1, VList.of(1).car)
+        assertEquals(2, VList.of(2, 1).car)
+        assertEquals((0..99).first(), VList(0..99).car)
+        assertEquals(5, VList.of(1, 2, 3, 4).cons(5).car)
+
+        assertThrows(NoSuchElementException::class.java) { VList.of<Int>().first() }
+        assertEquals(1, VList.of(1).first())
+        assertEquals(2, VList.of(2, 1).first())
+        assertEquals((0..99).first(), VList(0..99).first())
+        assertEquals(5, VList.of(1, 2, 3, 4).cons(5).first())
+    }
+
+    @Test
+    fun contains() {
+        assertFalse(VList<Int>().contains(1))
+        assertFalse(VList<String>().contains(""))
+        assertFalse(VList<Int>(listOf()).contains(1))
+        assertFalse(VList(listOf(2, 1, 3)).contains(5))
+
+        assertTrue(VList(listOf(1)).contains(1))
+        assertTrue(VList(listOf(2, 1, 3)).contains(1))
+    }
+
+    @Test
+    fun containsAll() {
+        assertTrue(VList<Int>().containsAll(listOf()))
+
+        assertFalse(VList<Int>().containsAll(listOf(1)))
+        assertFalse(VList<String>().containsAll(listOf("")))
+        assertFalse(VList<Int>(listOf()).containsAll(listOf(1)))
+        assertFalse(VList(listOf(2, 1, 3)).containsAll(listOf(5)))
+
+        assertTrue(VList(listOf(1)).containsAll(listOf(1)))
+        assertTrue(VList(listOf(2, 1, 3)).containsAll(listOf(1)))
+
+        assertTrue(VList(0..99).containsAll(listOf(10, 20, 30, 50, 60, 70, 80, 90)))
+        assertTrue(VList(0..99).containsAll(setOf(10, 20, 30, 50, 60, 70, 80, 90)))
+        assertTrue(VList(0..99).containsAll(VList.of(10, 20, 30, 50, 60, 70, 80, 90)))
+    }
+
+    @Test
+    fun get() {
+        assertThrows(IndexOutOfBoundsException::class.java) { VList.of<Int>()[0] }
+        assertThrows(IndexOutOfBoundsException::class.java) { VList.of(1)[1] }
+        assertThrows(IndexOutOfBoundsException::class.java) { VList.of(1, 2, 3, 4, 5)[10] }
+
+        assertEquals(1, VList.of(1)[0])
+        assertEquals(2, VList.of(2, 1)[0])
+        assertEquals((0..99).first(), VList(0..99)[0])
+        assertEquals(5, VList.of(1, 2, 3, 4).cons(5)[0])
+
+        assertEquals(2, VList.of(3, 2, 1)[1])
+        assertEquals(1, VList.of(3, 2, 1)[2])
+        assertEquals(5, VList.of(1, 2, 3, 4).cons(5)[0])
+        assertEquals(50, VList(0..99)[50])
+    }
+
+    @Test
+    fun isEmpty() {
+        assertTrue(VList<Int>().isEmpty())
+        assertTrue(VList<String>().isEmpty())
+        assertTrue(VList<Int>(listOf()).isEmpty())
+        assertTrue(VList(listOf(1)).cdr.isEmpty())
+
+        assertFalse(VList<Int>().cons(1).isEmpty())
+        assertFalse(VList<Int>().cons(1).cons(2).isEmpty())
+        assertFalse(VList<Int>().cons(1).cons(2).cons(3).isEmpty())
+        assertFalse(VList(listOf(2, 1, 3)).isEmpty())
+
+        assertFalse(VList<Int>().isNotEmpty())
+        assertFalse(VList<String>().isNotEmpty())
+        assertFalse(VList<Int>(listOf()).isNotEmpty())
+        assertFalse(VList(listOf(1)).cdr.isNotEmpty())
+
+        assertTrue(VList<Int>().cons(1).isNotEmpty())
+        assertTrue(VList<Int>().cons(1).cons(2).isNotEmpty())
+        assertTrue(VList<Int>().cons(1).cons(2).cons(3).isNotEmpty())
+        assertTrue(VList(listOf(2, 1, 3)).isNotEmpty())
+    }
+
+    @Test
+    fun indexOf() {
+        assertEquals(-1, VList.of(1).indexOf(0))
+        assertEquals(-1, VList(listOf(2, 1, 3, 2, 1, 3)).indexOf(4))
+        assertEquals(0, VList.of(1).indexOf(1))
+        assertEquals(0, VList.of<Int>().cons(1).indexOf(1))
+        assertEquals(2, VList(listOf(2, 1, 3)).indexOf(3))
+        assertEquals(2, VList(listOf(2, 1, 3, 2, 1, 3)).indexOf(3))
+        assertEquals(2, VList(listOf(2, 1, 3, 2, 1, 3, 15)).indexOf(3))
+        assertEquals(0, VList(listOf(1, 1, 1, 1, 1, 1)).indexOf(1))
+    }
+
+    @Test
+    fun lastIndexOf() {
+        assertEquals(-1, VList.of(1).lastIndexOf(0))
+        assertEquals(-1, VList(listOf(2, 1, 3, 2, 1, 3)).lastIndexOf(4))
+        assertEquals(0, VList.of(1).lastIndexOf(1))
+        assertEquals(0, VList.of<Int>().cons(1).lastIndexOf(1))
+        assertEquals(2, VList(listOf(2, 1, 3)).lastIndexOf(3))
+        assertEquals(5, VList(listOf(2, 1, 3, 2, 1, 3)).lastIndexOf(3))
+        assertEquals(5, VList(listOf(2, 1, 3, 2, 1, 3, 15)).lastIndexOf(3))
+        assertEquals(5, VList(listOf(1, 1, 1, 1, 1, 1)).lastIndexOf(1))
+    }
+
+    @Test
+    fun iterator() {
+        run {
+            var counter = 0
+            for (e in VList<Int>()) {
+                counter++
+            }
+            assertEquals(0, counter)
+        }
+        run {
+            var counter = 0
+            for (e in VList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))) {
+                counter++
+            }
+            assertEquals(10, counter)
+        }
+        run {
+            var counter = 0
+            VList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).forEach { _ -> counter++ }
+            assertEquals(10, counter)
+        }
+
+        run {
+            val iterator = VList.of(1, 2, 3, 4, 5).iterator()
+            var sum = 0
+            while (iterator.hasNext()) {
+                sum += iterator.next()
+            }
+            assertEquals(15, sum)
+        }
+
+        assertEquals(15, VList.of(1, 2, 3, 4, 5).sum())
+        assertEquals(15, VList.of(1, 2, 3, 4, 5).fold(0, Int::plus))
+        assertEquals(15, VList.of(1, 2, 3, 4, 5).foldRight(0, Int::plus))
+        assertEquals(15, VList.of(1, 2, 3, 4, 5).reduce(Int::plus))
+    }
+
+    @Test
+    fun listIterator() {
+        run {
+            var counter = 0
+            for (e in VList<Int>().listIterator()) {
+                counter++
+            }
+            assertEquals(0, counter)
+        }
+        run {
+            var counter = 0
+            for (e in VList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).listIterator()) {
+                counter++
+            }
+            assertEquals(10, counter)
+        }
+        run {
+            var counter = 0
+            VList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).listIterator().forEach { _ -> counter++ }
+            assertEquals(10, counter)
+        }
+
+        run {
+            val iterator = VList.of(1, 2, 3, 4, 5).listIterator()
+            var sum = 0
+            while (iterator.hasNext()) {
+                sum += iterator.next()
+            }
+            assertEquals(15, sum)
+        }
+    }
+
+    @Test
+    fun subList() {
+        assertThrows(IndexOutOfBoundsException::class.java) { VList.of<Int>().subList(3, 6).size }
+        assertEquals(3, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
+    }
+
+    @Test
+    fun toMutableList() {
+        assertTrue(VList<Int>().toMutableList() is MutableList<Int>)
+        assertTrue(VList<Int>().toMutableList().isEmpty())
+        assertEquals(5, VList.of(1, 2, 3, 4, 5).toMutableList().size)
+    }
+
+    @Test
+    fun reversed() {
+        assertEquals(VList.of<Int>(), VList.of<Int>().reversed())
+        assertEquals(VList.of(1,2,3), VList.of(3,2,1).reversed())
+        assertEquals(VList.of(1,2,3), VList.of<Int>().cons(1).cons(2).cons(3).reversed())
+    }
+
+    @Test
+    fun getSegments() {
+        assertEquals(listOf<List<Int>>(), VList.of<Int>().getSegments())
+        assertEquals(listOf(listOf(1)), VList.of(1).getSegments())
+        assertEquals(listOf(listOf(1,2),listOf(3)), VList.of(1,2,3).getSegments())
+        assertEquals(listOf(listOf(null,1),listOf(2)), VList.of(1,2).getSegments())
+        assertEquals(listOf(listOf(1)), VList.of<Int>().cons(1).getSegments())
+        assertEquals(listOf(listOf(null,1),listOf(2)), VList.of<Int>().cons(2).cons(1).getSegments())
+        assertEquals(listOf(listOf(1,2),listOf(3)), VList.of<Int>().cons(3).cons(2).cons(1).getSegments())
+    }
+
+    @Test
+    fun map() {
+        assertTrue(VList.of<Int>().map{it} is VList<Int>)
+        assertEquals(VList.of(1,2,3), VList.of(1,2,3).map{it})
+        assertEquals(VList.of(2,3,4), VList.of(1,2,3).map{it+1})
+    }
+}

@@ -30,7 +30,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
             is FloatArray -> tryEncoder(obj) ?: encode(obj.toList())
             is DoubleArray -> tryEncoder(obj) ?: encode(obj.toList())
             is Array<*> -> tryEncoder(obj) ?: encode(obj.toList())
-            is List<*> -> TODO()
+            is List<*> -> tryEncoder(obj) ?: encode(obj.toList())
             is Set<*> -> TODO()
             is Map<*, *> -> TODO()
             is Iterable<*> -> TODO()
