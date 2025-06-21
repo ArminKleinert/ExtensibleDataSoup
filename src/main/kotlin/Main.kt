@@ -1,4 +1,8 @@
-import kleinert.soap.*
+import kleinert.soap.EDNSoapOptions
+import kleinert.soap.EDNSoapReader
+import kleinert.soap.EDNSoapWriter
+import kleinert.soap.VList
+import java.util.*
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -82,5 +86,11 @@ fun main(args: Array<String>) {
         println(vl is VList<*>)
         println(vl)
         println(EDNSoapWriter.encode(vl))
+    }
+    val al = ArrayList(listOf(1, 2, 3))
+    al.component1()
+
+    run {
+        println(BitSet.valueOf(longArrayOf(42, 12)))
     }
 }

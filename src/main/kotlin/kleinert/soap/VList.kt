@@ -94,6 +94,8 @@ class VList<T> : List<T> {
         this.size = calcSize()
     }
 
+    fun split() = car to cdr
+
     private fun calcSize(): Int {
         if (base == null) return 0
         var counter = -offset

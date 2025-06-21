@@ -227,7 +227,9 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
             if (elem != NOTHING) add(elem)
         } while (true)
-    }.toList()
+    }.toList().let {
+        if (options.forceImmutableCollections) Collections.unmodifiableList(it) else it
+    }
 
     private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int): Map<*, *> = buildMap {
         do {
@@ -255,23 +257,34 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
             put(key, value)
         } while (true)
-    }.toMap()
+    }.toMap().let {
+        if (options.forceImmutableCollections) Collections.unmodifiableMap(it) else it
+    }
 
-    private fun parseSet(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Set<*> = buildSet {
-        do {
-            cpi.skipWhile(::isWhitespace)
-            if (!cpi.hasNext())
-                throw EdnReaderException("Unclosed set. Expected '${Char(separator)}', got EOF.")
-            if (cpi.peek() == separator) {
-                cpi.nextInt()
-                break
+    private fun parseSet(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Set<*> {
+        val temp = if (options.useFasterSetConstruction) {
+            parseVector(cpi, level, separator)
+        } else {
+            buildSet {
+                do {
+                    cpi.skipWhile(::isWhitespace)
+                    if (!cpi.hasNext())
+                        throw EdnReaderException("Unclosed set. Expected '${Char(separator)}', got EOF.")
+                    if (cpi.peek() == separator) {
+                        cpi.nextInt()
+                        break
+                    }
+
+                    val elem = readForm(cpi, level + 1, true)
+                    if (contains(elem)) throw EdnReaderException("Illegal set. Duplicate element $elem.")
+                    if (elem != NOTHING) add(elem)
+                } while (true)
             }
-
-            val elem = readForm(cpi, level + 1, true)
-            if (contains(elem)) throw EdnReaderException("Illegal set. Duplicate element $elem.")
-            if (elem != NOTHING) add(elem)
-        } while (true)
-    }.toSet()
+        }
+        return temp.toSet().let {
+            if (options.forceImmutableCollections) Collections.unmodifiableSet(it) else it
+        }
+    }
 
     private fun parseChar(cpi: CodePointIterator): Char {
         val token = readToken(cpi, ::isNotBreakingSymbol)

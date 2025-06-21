@@ -2,6 +2,7 @@ package kleinert.soap
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.*
 
 object ExtendedEDNDecoders {
     private fun ensureAllIntegral(iterable: Iterable<*>): Boolean {
@@ -57,7 +58,7 @@ object ExtendedEDNDecoders {
     }
 
     private fun vectorToFloatyArray(it: Any?, typeId: Int): Any {
-        requireType<List<*>>(it, "Vector")
+        requireType<List<*>>(it, "Vector or List")
         it as List<*>
         requireAllType<Number>(it, "Number")
         return when (typeId) {
@@ -97,15 +98,26 @@ object ExtendedEDNDecoders {
         require(temp is Array<*> && temp.isArrayOf<BigDecimal>())
         return temp
     }
+
     fun vectorToStringArray(it: Any?): Any {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
-        return it.map{it.toString()}.toTypedArray()
+        return it.map { it.toString() }.toTypedArray()
     }
+
     fun vectorToArray(it: Any?): Any {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
         return it.toTypedArray()
+    }
+
+    fun setToBitSet(it: Any?): Any {
+        requireType<Set<*>>(it, "Set")
+        require(it is Set<*>)
+        return BitSet.valueOf(LongArray(it.size).apply {
+            for ((index, num) in it.withIndex())
+                this[index] = (num as Number).toLong()
+        })
     }
 
     val arrayDecoders: Map<String, (Any?) -> Any?>
@@ -120,6 +132,7 @@ object ExtendedEDNDecoders {
             "bigdecimalarray" to ::vectorToBigDecimalArray,
             "stringarray" to ::vectorToStringArray,
             "array" to ::vectorToArray,
+            "bitset" to ::setToBitSet,
         )
 
     val prettyDecoders: Map<String, (Any?) -> Any?>
@@ -138,6 +151,8 @@ data class EDNSoapOptions(
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
     val useVListForSequences: Boolean = true,
+    val useFasterSetConstruction: Boolean = false,
+    val forceImmutableCollections: Boolean = true,
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions
@@ -152,6 +167,8 @@ data class EDNSoapOptions(
                 allowMoreEncoderDecoderNames = false,
                 decodingSequenceSeparator = ", ",
                 useVListForSequences = true,
+                forceImmutableCollections = true,
+                useFasterSetConstruction = false,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = mapOf(),
             )
@@ -165,6 +182,8 @@ data class EDNSoapOptions(
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
                 useVListForSequences = true,
+                forceImmutableCollections = true,
+                useFasterSetConstruction = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf(),
             )
@@ -178,6 +197,8 @@ data class EDNSoapOptions(
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
                 useVListForSequences = true,
+                forceImmutableCollections = true,
+                useFasterSetConstruction = false,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = ednClassEncoders,
             )

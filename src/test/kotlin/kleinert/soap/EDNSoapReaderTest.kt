@@ -295,6 +295,25 @@ class EDNSoapReaderTest {
     }
 
     @Test
+    fun parseSetFastSimple() {
+        EDNSoapReader.readString("#{\\a \\b}", EDNSoapOptions.extendedOptions.copy(useFasterSetConstruction = true))
+            .let {
+                assertTrue(it is Set<*>)
+                assertEquals(setOf('a', 'b'), (it as Set<*>))
+            }
+        EDNSoapReader.readString("#{ \\a }", EDNSoapOptions.extendedOptions.copy(useFasterSetConstruction = true))
+            .let {
+                assertTrue(it is Set<*>)
+                assertEquals(setOf('a'), (it as Set<*>))
+            }
+        EDNSoapReader.readString("#{\\a #{}}", EDNSoapOptions.extendedOptions.copy(useFasterSetConstruction = true))
+            .let {
+                assertTrue(it is Set<*>)
+                assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
+            }
+    }
+
+    @Test
     fun parseMapSimple() {
         soap("{\\a \\b}").let {
             assertTrue(it is Map<*, *>)
