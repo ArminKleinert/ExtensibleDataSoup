@@ -237,25 +237,62 @@ class VListTest {
     @Test
     fun reversed() {
         assertEquals(VList.of<Int>(), VList.of<Int>().reversed())
-        assertEquals(VList.of(1,2,3), VList.of(3,2,1).reversed())
-        assertEquals(VList.of(1,2,3), VList.of<Int>().cons(1).cons(2).cons(3).reversed())
+        assertEquals(VList.of(1, 2, 3), VList.of(3, 2, 1).reversed())
+        assertEquals(VList.of(1, 2, 3), VList.of<Int>().cons(1).cons(2).cons(3).reversed())
     }
 
     @Test
     fun getSegments() {
         assertEquals(listOf<List<Int>>(), VList.of<Int>().getSegments())
         assertEquals(listOf(listOf(1)), VList.of(1).getSegments())
-        assertEquals(listOf(listOf(1,2),listOf(3)), VList.of(1,2,3).getSegments())
-        assertEquals(listOf(listOf(null,1),listOf(2)), VList.of(1,2).getSegments())
+        assertEquals(listOf(listOf(1, 2), listOf(3)), VList.of(1, 2, 3).getSegments())
+        assertEquals(listOf(listOf(null, 1), listOf(2)), VList.of(1, 2).getSegments())
         assertEquals(listOf(listOf(1)), VList.of<Int>().cons(1).getSegments())
-        assertEquals(listOf(listOf(null,1),listOf(2)), VList.of<Int>().cons(2).cons(1).getSegments())
-        assertEquals(listOf(listOf(1,2),listOf(3)), VList.of<Int>().cons(3).cons(2).cons(1).getSegments())
+        assertEquals(listOf(listOf(null, 1), listOf(2)), VList.of<Int>().cons(2).cons(1).getSegments())
+        assertEquals(listOf(listOf(1, 2), listOf(3)), VList.of<Int>().cons(3).cons(2).cons(1).getSegments())
     }
 
     @Test
     fun map() {
-        assertTrue(VList.of<Int>().map{it} is VList<Int>)
-        assertEquals(VList.of(1,2,3), VList.of(1,2,3).map{it})
-        assertEquals(VList.of(2,3,4), VList.of(1,2,3).map{it+1})
+        assertTrue(VList.of<Int>().map { it } is VList<Int>)
+        assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).map { it })
+        assertEquals(VList.of(2, 3, 4), VList.of(1, 2, 3).map { it + 1 })
+    }
+
+    @Test
+    fun drop() {
+        assertEquals(VList.of<Int>(), VList.of<Int>().drop(-10))
+        assertEquals(VList.of<Int>(), VList.of<Int>().drop(0))
+        assertEquals(VList.of<Int>(), VList.of<Int>().drop(10))
+
+        assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).drop(-10))
+        assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).drop(0))
+        assertEquals(VList.of<Int>(), VList.of(1, 2, 3).drop(10))
+
+        assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).drop(-10))
+        assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).drop(0))
+        assertEquals(VList.of<Int>(), VList.of(1, 2, 3).drop(10))
+    }
+
+    @Test
+    fun mapSegments() {
+        assertEquals(listOf<List<Int>>(), VList.of<Int>().mapSegments { it })
+
+        assertEquals(
+            listOf(listOf(2), listOf(3)),
+            VList.of(1, 2).mapSegments { it+1 }
+        )
+        assertEquals(
+            listOf(listOf(2, 3), listOf(4)),
+            VList.of(1, 2, 3).mapSegments { it+1 }
+        )
+        assertEquals(
+            listOf(listOf(2, 3, 4, 5), listOf(6, 7), listOf(8)),
+            VList.of(1, 2, 3, 4, 5, 6, 7).mapSegments { it+1 }
+        )
+        assertEquals(
+            listOf(listOf(1), listOf(2, 3, 4, 5), listOf(6, 7), listOf(8)),
+            VList.of(0, 1, 2, 3, 4, 5, 6, 7).mapSegments { it+1 }
+        )
     }
 }

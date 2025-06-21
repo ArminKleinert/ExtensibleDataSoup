@@ -5,7 +5,6 @@ import java.math.BigInteger
 import java.math.MathContext
 
 data class Ratio private constructor(var num: BigInteger, val den: BigInteger) : Number() {
-
     companion object {
         private val ZERO: Ratio = Ratio(BigInteger.ZERO, BigInteger.ONE)
 

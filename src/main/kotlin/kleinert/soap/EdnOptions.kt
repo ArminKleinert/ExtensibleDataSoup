@@ -136,6 +136,8 @@ data class EDNSoapOptions(
     val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
+    val decodingSequenceSeparator: String = ", ",
+    val useVListForSequences: Boolean = true,
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions
@@ -148,6 +150,8 @@ data class EDNSoapOptions(
                 allowTimeDispatch = false,
                 allowNumericSuffixes = false,
                 allowMoreEncoderDecoderNames = false,
+                decodingSequenceSeparator = ", ",
+                useVListForSequences = true,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = mapOf(),
             )
@@ -159,6 +163,8 @@ data class EDNSoapOptions(
                 allowTimeDispatch = true,
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
+                decodingSequenceSeparator = ", ",
+                useVListForSequences = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf(),
             )
@@ -170,6 +176,8 @@ data class EDNSoapOptions(
                 allowTimeDispatch = true,
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
+                decodingSequenceSeparator = ", ",
+                useVListForSequences = true,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = ednClassEncoders,
             )

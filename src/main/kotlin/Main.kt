@@ -1,6 +1,4 @@
-import kleinert.soap.EDNSoapOptions
-import kleinert.soap.EDNSoapReader
-import kleinert.soap.Symbol
+import kleinert.soap.*
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -73,6 +71,16 @@ fun main(args: Array<String>) {
 //    println(EDNSoapReader.readString("#{#_\\a}"))
 //    println(EDNSoapReader.readString("{1 #_\\a}"))
 
-    val regex = Regex("[A-Za-z0-9_]")
-    println(regex.matches("\uD83C\uDF81"))
+    run {
+        val vl = EDNSoapReader.readString("(1 2 3)")
+        println(vl is VList<*>)
+        println(vl)
+        println(EDNSoapWriter.encode(vl))
+    }
+    run {
+        val vl = EDNSoapReader.readString("(\"ab\" \"cd\")")
+        println(vl is VList<*>)
+        println(vl)
+        println(EDNSoapWriter.encode(vl))
+    }
 }

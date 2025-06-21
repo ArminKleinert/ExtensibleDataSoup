@@ -206,7 +206,9 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseList(cpi: CodePointIterator, level: Int): Iterable<*> {
-        return parseVector(cpi, level, ')'.code)
+        val temp = parseVector(cpi, level, ')'.code)
+        if (options.useVListForSequences) return VList(temp)
+        return temp.asIterable()
     }
 
     private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {

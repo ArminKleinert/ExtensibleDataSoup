@@ -226,6 +226,7 @@ class VList<T> : List<T> {
     }
 
     override fun iterator(): Iterator<T> = VListIterator(this)
+
     override fun listIterator(): ListIterator<T> = toList().listIterator()
 
     override fun listIterator(index: Int): ListIterator<T> = toList().listIterator(index)
@@ -242,6 +243,28 @@ class VList<T> : List<T> {
             counter++
         }
         return index
+    }
+
+    fun drop(n: Int): VList<T> {
+        if (n > size) return of()
+
+        var rest = this
+        var restN = n
+
+        while (rest.isNotEmpty()) {
+            if (restN <= 0)
+                return rest
+            if (rest.base == null)
+                return rest
+            if (restN < rest.base!!.elements.size - offset)
+                return VList(base, offset + restN, size - restN)
+
+            val segmentSizeDiff = rest.base!!.elements.size - offset
+            rest = VList(rest.base!!.next, 0, size - segmentSizeDiff)
+            restN -= segmentSizeDiff
+        }
+
+        return rest
     }
 
     fun toMutableList(): MutableList<T> {
@@ -287,8 +310,11 @@ class VList<T> : List<T> {
         var segment = base
         var offset = offset
         while (segment != null) {
-            for (i in offset..segment.elements.lastIndex)
-                res.add((segment.elements as Array<T>).map(f))
+            val tempList = mutableListOf<R>()
+            val elems = segment.elements as Array<T>
+            for (i in offset..elems.lastIndex)
+                tempList.add(f(elems[i]))
+            res.add(tempList.toList())
             segment = segment.next
             offset = 0
         }
@@ -318,9 +344,9 @@ class VList<T> : List<T> {
     }
 
     override fun toString(): String = StringBuilder()
-        .append('(')
+        .append('[')
         .append(joinToString(", "))
-        .append(")").toString()
+        .append("]").toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
