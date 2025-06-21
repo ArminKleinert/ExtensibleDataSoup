@@ -30,14 +30,13 @@ An EDN library for Kotlin.
 ## Known bugs
 
 - If an input contains more than one expression, the reader just returns the first expression. For example, `EDNSoapReader.readString("1 2")` should fail, but does not. It just returns `1`.
-- Discard tags (`#_`) do not work in vectors, lists, sets, and maps.
 
 ## Not implemented
 ☐ Metadata  
 - Why not? I don't see a use for this yet.
 - Ideas: May return a `data class` which can be split with `componentN` methods.
 
-☐ `@`, `'` and backtick prefixes, `#` prefix for lists.
+☐ `@`, `'`, `~` and backtick prefixes, `#` prefix for lists.
 - Why not? I don't see a use for them in this context.
 
 ## Non-standard

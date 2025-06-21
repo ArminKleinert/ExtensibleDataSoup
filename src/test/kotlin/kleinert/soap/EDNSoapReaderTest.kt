@@ -104,6 +104,11 @@ class EDNSoapReaderTest {
     }
 
     @Test
+    fun parseDiscardSimpleTest() {
+        soap("#_1 2").let { assertEquals(2L, it) }
+    }
+
+    @Test
     fun parseDiscardTest() {
         soap("#_1 2").let { assertEquals(2L, it) }
 
@@ -114,15 +119,18 @@ class EDNSoapReaderTest {
         // Discard ignores newlines
         soap("#_\n1 2").let { assertEquals(2L, it) }
 
-        // Discard is right-associative
-        soap("#_ #_ 1 2 3").let { assertEquals(3L, it) }
-
         // Discard ignores comments
         soap("#_ ; abc\n 1 2").let { assertEquals(2L, it) }
 
         // Discard in strings does nothing
         soap("\"#_\"").let { assertEquals("#_", it) }
         soap("\"#_1\"").let { assertEquals("#_1", it) }
+    }
+
+    @Test
+    fun parseDiscardAssociativityTest() {
+        // Discard is right-associative
+        soap("#_ #_ 1 2 3").let { assertEquals(3L, it) }
     }
 
     @Test
@@ -141,8 +149,8 @@ class EDNSoapReaderTest {
             assertTrue((it as Set<*>).isEmpty())
         }
         soap("{#_1 #_1 #_1}").let {
-            assertTrue(it is Map<*,*>)
-            assertTrue((it as Map<*,*>).isEmpty())
+            assertTrue(it is Map<*, *>)
+            assertTrue((it as Map<*, *>).isEmpty())
         }
     }
 
@@ -219,22 +227,22 @@ class EDNSoapReaderTest {
     fun parseEmptyMap() {
         // Normal
         soap("{}").let {
-            assertTrue(it is Map<*,*>)
-            assertTrue((it as Map<*,*>).isEmpty())
+            assertTrue(it is Map<*, *>)
+            assertTrue((it as Map<*, *>).isEmpty())
         }
 
         // Whitespace does not matter
         soap("{  }").let {
-            assertTrue(it is Map<*,*>)
-            assertTrue((it as Map<*,*>).isEmpty())
+            assertTrue(it is Map<*, *>)
+            assertTrue((it as Map<*, *>).isEmpty())
         }
         soap("{\t \n}").let {
-            assertTrue(it is Map<*,*>)
-            assertTrue((it as Map<*,*>).isEmpty())
+            assertTrue(it is Map<*, *>)
+            assertTrue((it as Map<*, *>).isEmpty())
         }
         soap("{\n}").let {
-            assertTrue(it is Map<*,*>)
-            assertTrue((it as Map<*,*>).isEmpty())
+            assertTrue(it is Map<*, *>)
+            assertTrue((it as Map<*, *>).isEmpty())
         }
     }
 
@@ -248,7 +256,7 @@ class EDNSoapReaderTest {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf('a', 'b'), (it as Iterable<*>).toList())
         }
-        soap("(()))").let {
+        soap("(())").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf(listOf<Any?>()), (it as Iterable<*>).toList())
         }
@@ -267,36 +275,38 @@ class EDNSoapReaderTest {
         soap("[[]]").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf(listOf<Any?>()), (it as List<*>))
-        }}
+        }
+    }
 
     @Test
-    fun parseSetSimple(){
+    fun parseSetSimple() {
         soap("#{\\a \\b}").let {
-            println(it?.javaClass)
             assertTrue(it is Set<*>)
             assertEquals(setOf('a', 'b'), (it as Set<*>))
         }
-    soap("#{ \\a }").let {
-        assertTrue(it is Set<*>)
-        assertEquals(setOf('a'), (it as Set<*>))
+        soap("#{ \\a }").let {
+            assertTrue(it is Set<*>)
+            assertEquals(setOf('a'), (it as Set<*>))
+        }
+        soap("#{\\a #{}}").let {
+            assertTrue(it is Set<*>)
+            assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
+        }
     }
-    soap("#{\\a #{}}").let {
-        assertTrue(it is Set<*>)
-        assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
-    }}
 
     @Test
     fun parseMapSimple() {
         soap("{\\a \\b}").let {
-            assertTrue(it is Map<*,*>)
-            assertEquals(mapOf('a' to 'b').entries, (it as Map<*,*>).entries)
+            assertTrue(it is Map<*, *>)
+            assertEquals(mapOf('a' to 'b').entries, (it as Map<*, *>).entries)
         }
         soap("{\\a {}}").let {
-            assertTrue(it is Map<*,*>)
-            assertEquals(mapOf('a' to mapOf<Any?,Any?>()).entries, (it as Map<*,*>).entries)
+            assertTrue(it is Map<*, *>)
+            assertEquals(mapOf('a' to mapOf<Any?, Any?>()).entries, (it as Map<*, *>).entries)
         }
         soap("{{} {}}").let {
-            assertTrue(it is Map<*,*>)
-            assertEquals(mapOf<Any?, Any?>(mapOf<Any?, Any?>() to mapOf<Any?, Any?>()), (it as Map<*,*>))
-        }}
+            assertTrue(it is Map<*, *>)
+            assertEquals(mapOf<Any?, Any?>(mapOf<Any?, Any?>() to mapOf<Any?, Any?>()), (it as Map<*, *>))
+        }
+    }
 }

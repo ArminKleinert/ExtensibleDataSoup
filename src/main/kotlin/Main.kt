@@ -68,8 +68,11 @@ fun examples2() {
 fun main(args: Array<String>) {
     //examples1()
     //examples2()
-    println(EDNSoapReader.readString("(#_\\a)"))
-    println(EDNSoapReader.readString("[#_\\a]"))
-    println(EDNSoapReader.readString("#{#_\\a}"))
-    println(EDNSoapReader.readString("{1 #_\\a}"))
+//    println(EDNSoapReader.readString("(#_\\a)"))
+//    println(EDNSoapReader.readString("[#_\\a]"))
+//    println(EDNSoapReader.readString("#{#_\\a}"))
+//    println(EDNSoapReader.readString("{1 #_\\a}"))
+
+    val regex = Regex("[A-Za-z0-9_]")
+    println(regex.matches("\uD83C\uDF81"))
 }

@@ -7,69 +7,11 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
 import java.util.*
 
-open class EdnReaderException(text: String, cause: Throwable? = null) : Exception(text, cause) {
-    class EdnClassConversionError(text: String) : Exception(text)
-    class EdnEmptyInputException(text: String) : Exception(text)
-}
-
-class EdnWriterException(text: String) : Exception(text)
-
-data class EDNSoapOptions(
-    val allowSchemeUTF32Codes: Boolean = false,
-    val allowDispatchChars: Boolean = false,
-    val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
-    val ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(),
-    val allowTimeDispatch: Boolean = false,
-    val allowNumericSuffixes: Boolean = false,
-    val allowMoreEncoderDecoderNames: Boolean = false,
-) {
-
-    companion object {
-        private const val NULL_CHAR = '\u0000'
-
-        val extendedOptions: EDNSoapOptions
-            get() = extendedReaderOptions(mapOf())
-
-        val defaultOptions: EDNSoapOptions
-            get() = EDNSoapOptions(
-                allowSchemeUTF32Codes = false,
-                allowDispatchChars = false,
-                allowTimeDispatch = false,
-                allowNumericSuffixes = false,
-                allowMoreEncoderDecoderNames = false,
-                ednClassDecoders = mapOf(),
-                ednClassEncoders = mapOf(),
-            )
-
-        fun extendedReaderOptions(ednClassDecoder: Map<String, (Any?) -> Any?>) =
-            EDNSoapOptions(
-                allowSchemeUTF32Codes = true,
-                allowDispatchChars = true,
-                allowTimeDispatch = true,
-                allowNumericSuffixes = true,
-                allowMoreEncoderDecoderNames = true,
-                ednClassDecoders = ednClassDecoder,
-                ednClassEncoders = mapOf()
-            )
-
-        fun extendedWriterOptions(ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?>) =
-            EDNSoapOptions(
-                allowSchemeUTF32Codes = true,
-                allowDispatchChars = true,
-                allowTimeDispatch = true,
-                allowNumericSuffixes = true,
-                allowMoreEncoderDecoderNames = true,
-                ednClassDecoders = mapOf(),
-                ednClassEncoders = ednClassEncoders
-            )
-    }
-}
-
 class EDNSoapReader private constructor(private val options: EDNSoapOptions = EDNSoapOptions.extendedOptions) {
     companion object {
         private const val NULL_CHAR = '\u0000'
 
-        private val NOTHING = object{}
+        private val NOTHING = object {}
 
         @Throws(EdnReaderException::class)
         fun readString(input: String, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
@@ -77,7 +19,8 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
     }
 
-    init {ensureValidDecoderNames()
+    init {
+        ensureValidDecoderNames()
     }
 
     /*
@@ -110,16 +53,14 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         if (!codePointIterator.hasNext())
             throw EdnReaderException("Empty input string.")
         val data = readForm(codePointIterator, 0)
-        return data
-        //throw EdnReaderException("The string should only contain one expression, but there are multiple.")
+        if ((data as Collection<*>).size != 1)
+            throw EdnReaderException("The string should only contain one expression, but there are multiple.")
+        return data.first()
     }
 
     private fun parseNumber(cpi: CodePointIterator, negate: Boolean = false): Number {
         fun negateIfNegative(number: BigDecimal) = if (negate) number.negate() else number
         fun negateIfNegative(number: BigInteger) = if (negate) number.negate() else number
-        fun negateIfNegative(number: Byte) = if (negate) (-number).toByte() else number
-        fun negateIfNegative(number: Short) = if (negate) (-number).toShort() else number
-        fun negateIfNegative(number: Int) = if (negate) -number else number
         fun negateIfNegative(number: Long) = if (negate) -number else number
         fun negateIfNegative(number: Double) = if (negate) -number else number
         fun negateIfNegative(number: Ratio) = if (negate) number.negate() else number
@@ -127,13 +68,13 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             return when (val n = parseNumberHelper(cpi, negate)) {
                 is BigDecimal -> negateIfNegative(n)
                 is BigInteger -> negateIfNegative(n)
-                is Byte -> negateIfNegative(n)
-                is Short -> negateIfNegative(n)
-                is Int -> negateIfNegative(n)
+                is Byte -> negateIfNegative(n.toLong()).toByte()
+                is Short -> negateIfNegative(n.toLong()).toShort()
+                is Int -> negateIfNegative(n.toLong()).toInt()
                 is Long -> negateIfNegative(n)
                 is Double -> negateIfNegative(n)
                 is Ratio -> negateIfNegative(n)
-                else -> throw EdnReaderException("Could not negate number $n of type ${n!!.javaClass.name}")
+                else -> throw EdnReaderException("Could not negate number $n of type ${n.javaClass.name}")
             }
         } catch (ex: NumberFormatException) {
             // For UUID.fromString
@@ -182,7 +123,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 'o' -> 8
                 'b' -> 2
                 else -> {
-                    startIndex-=2 // Reset start index
+                    startIndex -= 2 // Reset start index
                     8
                 }
             }
@@ -270,7 +211,6 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {
         do {
-            println(level)
             cpi.skipWhile(::isWhitespace)
 
             if (!cpi.hasNext())
@@ -281,7 +221,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 break
             }
 
-            val elem = readForm(cpi, level + 1)
+            val elem = readForm(cpi, level + 1, true)
 
             if (elem != NOTHING) add(elem)
         } while (true)
@@ -297,7 +237,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 break
             }
 
-            val key: Any? = readForm(cpi, level + 1)
+            val key: Any? = readForm(cpi, level + 1, true)
             if (key == NOTHING) continue
 
             if (contains(key))
@@ -307,7 +247,9 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 throw EdnReaderException("Odd number of elements in map. Last key was $key.")
 
             var value: Any?
-            do { value = readForm(cpi, level + 1) } while (value == NOTHING)
+            do {
+                value = readForm(cpi, level + 1, true)
+            } while (value == NOTHING)
 
             put(key, value)
         } while (true)
@@ -323,7 +265,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 break
             }
 
-            val elem = readForm(cpi, level + 1)
+            val elem = readForm(cpi, level + 1, true)
             if (contains(elem)) throw EdnReaderException("Illegal set. Duplicate element $elem.")
             if (elem != NOTHING) add(elem)
         } while (true)
@@ -485,7 +427,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
     }
 
-    private fun readForm(cpi: CodePointIterator, level: Int): Any? {
+    private fun readForm(cpi: CodePointIterator, level: Int, stopAfterOne: Boolean = false): Any? {
         val res = mutableListOf<Any?>()
         do {
             cpi.skipWhile(::isWhitespace)
@@ -509,8 +451,11 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 '#'.code -> {
                     if (cpi.hasNext() && cpi.peek() == '_'.code) {
                         cpi.nextInt()
-                        readForm(cpi, level + 1)
-                        return NOTHING
+                        do {
+                            val temp = readForm(cpi, level + 1, true)
+                        } while (temp == NOTHING)
+                        //res.add(readForm(cpi, level))
+                        if (stopAfterOne) return NOTHING
                     } else {
                         res.add(parseDispatch(cpi, level + 1))
                     }
@@ -537,13 +482,14 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 else -> res.add(parseOther(cpi.unread(codePoint), level + 1))
             }
 
-            if (level > 0 || res.isNotEmpty()) {
+            if (stopAfterOne && res.isNotEmpty()) {
                 return res[0]
             }
         } while (true)
 
-        if (res.size != 1)
+        if (res.size != 1) {
             throw EdnReaderException("Reader requires exactly one expression, but got ${res.size}.")
+        }
         return res
     }
 
@@ -589,4 +535,6 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         in 'a'..'f', in 'A'..'F', in '0'..'9' -> true
         else -> false
     }
+
+
 }
