@@ -71,34 +71,31 @@ class VList<T> : Cons<T> {
             return VList(base, offset + 1)
         }
 
-    private constructor(segment: Segment?, offset: Int) {
+    private constructor(segment: Segment?, offset: Int): super() {
         base = segment
         this.offset = offset
     }
 
-    constructor() {
+    constructor(vlist: VList<T>): this(vlist.base, vlist.offset)
+
+    constructor(): super() {
         this.base = null
         this.offset = 0
     }
 
-    constructor(coll: Iterable<T>) {
+    constructor(coll: Iterable<T>): super() {
         val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll)
         this.base = baseSegment
         this.offset = offset
     }
 
-    constructor(coll: Array<T>) {
+    constructor(coll: Array<T>): super() {
         val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.asIterable())
         this.base = baseSegment
         this.offset = offset
     }
 
-    constructor(vlist: VList<T>) {
-        this.base = vlist.base
-        this.offset = vlist.offset
-    }
-
-    constructor(coll: List<T>) {
+    constructor(coll: List<T>): super() {
         val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll)
         this.base = baseSegment
         this.offset = offset
@@ -198,10 +195,11 @@ class VList<T> : Cons<T> {
 
     override fun iterator(): Iterator<T> = VListIterator(this)
 
-    override fun subList(fromIndex: Int, toIndex: Int): List<T> = VList(toList().subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): VList<T> = VList(toList().subList(fromIndex, toIndex))
 
     override fun drop(n: Int): VList<T> {
-        if (n <= 0 || isEmpty()) return this
+        require(n >= 0) { "Requested element count $n is less than zero." }
+        if (n == 0 || isEmpty()) return this
         if (n >= size) return of()
 
         val baseElementNum = base!!.elements.size - offset

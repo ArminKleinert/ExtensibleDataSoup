@@ -4,8 +4,11 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
     private val backingList: List<T>
     private val offset: Int
 
+    private val actualList: List<T>
+        get() = if (offset == 0) backingList else backingList.drop(offset)
+
     companion object {
-        fun <T> of(vararg elements: T) = CdrCodedList(elements)
+        fun <T> of(vararg elements: T): CdrCodedList<T> = CdrCodedList(elements.toList())
     }
 
     constructor(lst: List<T>, isSafe: Boolean, offset: Int = 0) {
@@ -43,31 +46,35 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
 
     @get:Throws(NoSuchElementException::class)
     override val car: T
-        get() = backingList[0]
+        get() = if (isEmpty()) throw NoSuchElementException() else backingList[offset]
 
     override val cdr: CdrCodedList<T>
-        get() = CdrCodedList(backingList.subList(1, backingList.size))
+        get() = if (isEmpty()) this else CdrCodedList(backingList, true, offset+1)
 
     override val size: Int
-        get() = backingList.size
+        get() = backingList.size - offset
 
     override fun isEmpty(): Boolean = size == 0
 
-    override fun iterator(): Iterator<T> = backingList.iterator()
+    override fun iterator(): Iterator<T> = actualList.iterator()
 
     override fun cleared(): Cons<T> = CdrCodedList()
 
     override fun <R> sameTypeFromList(list: List<R>): CdrCodedList<R> = CdrCodedList(list)
 
-    override fun cons(element: T): Cons<T> = CdrCodedList(listOf(element) + backingList, true)
+    override fun cons(element: T): Cons<T> = CdrCodedList(listOf(element) + actualList, true)
 
-    override fun asIterable() = backingList
+    override fun asIterable() = actualList
 
-    override fun reversed(): CdrCodedList<T> = CdrCodedList(backingList.asReversed())
+    override fun toList(): List<T> = actualList
+
+    override fun asSequence() = actualList.asSequence()
+
+    override fun reversed(): CdrCodedList<T> = CdrCodedList(actualList.asReversed())
 
     override fun toString(): String = commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)
     override fun hashCode(): Int {
-        return backingList.hashCode()
+        return actualList.hashCode()
     }
 }

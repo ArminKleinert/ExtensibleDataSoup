@@ -50,8 +50,8 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
             is Map<*, *> -> tryEncoder(obj) ?: encodeMap(obj)
             is Iterable<*> -> tryEncoder(obj) ?: encodeOtherIterable(obj)
             is Sequence<*> -> tryEncoder(obj) ?: encodeOtherIterable(obj.toList())
-            is UUID -> "#uuid ${(obj as UUID).toString()}"
-            is Instant -> "#inst ${(obj as Instant).toString()}"
+            is UUID -> "#uuid $obj"
+            is Instant -> "#inst $obj"
             else -> tryEncoder(obj) ?: obj.toString()
         }
     }
