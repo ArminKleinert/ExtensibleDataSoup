@@ -1,6 +1,5 @@
 import kleinert.soap.*
-import java.util.*
-import kotlin.collections.shuffled
+import kleinert.soap.cons.VList
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -92,27 +91,33 @@ fun main(args: Array<String>) {
 //        println(BitSet.valueOf(longArrayOf(42, 12)))
 //    }
 
-    run {
-        val vl = VList.of<Int>(1, 2, 3, 4, 5, 6)
-        val vld = vl.drop(2)
-        println("$vl $vld")
-    }
+//    run {
+//        val vl = VList.of<Int>(1, 2, 3, 4, 5, 6)
+//        val vld = vl.drop(2)
+//        println("$vl $vld")
+//    }
+//
+//    run {
+//        val vl = VList.of(1, 2, 3, 4, 5)
+//        val vld = vl.reversed()
+//        println("$vl $vld ${vld.javaClass}")
+//    }
+//
+//    run {
+//        val vl: Cons<Int> = VList.of(1, 2, 3, 4, 5)
+//        val vld = vl.reversed()
+//        println("$vl $vld ${vld.javaClass}")
+//    }
+//
+//    run {
+//        val vl: List<Int> = VList.of(1, 2, 3, 4, 5)
+//        val vld = vl.reversed()
+//        println("$vl $vld ${vld.javaClass}")
+//    }
 
     run {
-        val vl = VList.of(1, 2, 3, 4, 5)
-        val vld = vl.reversed()
-        println("$vl $vld ${vld.javaClass}")
-    }
-
-    run {
-        val vl: Cons<Int> = VList.of(1, 2, 3, 4, 5)
-        val vld = vl.reversed()
-        println("$vl $vld ${vld.javaClass}")
-    }
-
-    run {
-        val vl: List<Int> = VList.of(1, 2, 3, 4, 5)
-        val vld = vl.reversed()
-        println("$vl $vld ${vld.javaClass}")
+        val vl = VList.of(1, 2, 3)
+        val vln = vl.prepend(listOf(6, 7))
+        println("$vl $vln ${vln.javaClass}")
     }
 }

@@ -1,8 +1,9 @@
-package kleinert.soap
+package kleinert.soap.cons
 
+import java.util.*
 import kotlin.random.Random
 
-interface Cons<T> : List<T>, Iterable<T> {
+sealed interface Cons<T> : List<T>, Iterable<T> {
     companion object {
         fun <T> of(vararg elements: T) = VList(elements.toList())
 
@@ -14,7 +15,6 @@ interface Cons<T> : List<T>, Iterable<T> {
     val car: T
 
     val cdr: Cons<T>
-
 
     override val size: Int
 
@@ -40,7 +40,7 @@ interface Cons<T> : List<T>, Iterable<T> {
     // Clojure style
     fun rest(): Cons<T> = cdr
 
-    fun cons(element: T): Cons<T>
+    fun cons(element: T): Cons<T> = ConsHead(element, this)
 
     override fun isEmpty(): Boolean
 
@@ -155,12 +155,15 @@ interface Cons<T> : List<T>, Iterable<T> {
         return res
     }
 
-    fun plus(element: T): Cons<T> = sameTypeFromList(toList() + element)
-    fun plus(other: Iterable<T>): Cons<T> = sameTypeFromList(toList() + other)
-
+    fun plus(element: T): Cons<T> = ConsSeq.concat(this, ConsHead(element, EmptyCons()))
+    fun plus(other: Iterable<T>): Cons<T> = ConsSeq.concat(this, Cons(other))
+    fun plus(other: List<T>): Cons<T> = ConsSeq.concat(this, CdrCodedList(other))
+    fun plus(other: Cons<T>): Cons<T> = ConsSeq.concat(this, other)
+    fun plus(other: VList<T>): Cons<T> = other.prepend(this)
 
     fun reversed(): Cons<T> {
-        if (isEmpty()) return this
+        if (isEmpty())
+            return this
 
         var res = cleared()
         for (it in this) {
@@ -169,12 +172,12 @@ interface Cons<T> : List<T>, Iterable<T> {
         return res
     }
 
-    fun basicToString(): String = StringBuilder()
+    fun commonToString(): String = StringBuilder()
         .append('[')
         .append(joinToString(", "))
         .append("]").toString()
 
-    fun basicEqual(other: Any?): Boolean {
+    fun commonEqualityCheck(other: Any?): Boolean {
         if (this === other) return true
         if (other !is List<Any?>) return false
 
@@ -190,4 +193,10 @@ interface Cons<T> : List<T>, Iterable<T> {
     }
 
     fun <R> sameTypeFromList(list: List<R>): Cons<R>
+
+    fun asIterable(): Iterable<T> = this
+
+    fun toMutableList(): MutableList<T> = asIterable().toMutableList()
+
+    fun toList(): List<T> = Collections.unmodifiableList(toMutableList())
 }

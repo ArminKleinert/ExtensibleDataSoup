@@ -1,5 +1,6 @@
 package kleinert.soap
 
+import kleinert.soap.cons.Cons
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

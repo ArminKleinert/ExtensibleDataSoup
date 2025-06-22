@@ -1,6 +1,6 @@
-package kleinert.soap
+package kleinert.soap.cons
 
-import kotlin.random.Random
+import kleinert.soap.cons.Cons
 
 class VList<T> : List<T>, Cons<T> {
     private class Segment(val next: Segment?, val elements: Array<Any?>) {
@@ -126,22 +126,54 @@ class VList<T> : List<T>, Cons<T> {
     }
 
     override fun cons(element: T): VList<T> {
-        require(offset >= 0)
+//        require(offset >= 0)
+//
+//        if (offset == 0 || base == null) {
+//            val nextSegmentSize =
+//                if (base == null) 1 else base.elements.size * 2
+//            val nextOffset = nextSegmentSize - 1
+//            val nextElements = arrayOfNulls<Any?>(nextSegmentSize)
+//            nextElements[nextOffset] = element //as T
+//            val newSegment = Segment(base, nextElements)
+//            return VList(newSegment, nextOffset)
+//        }
+//
+//        val newElements = base.elements.copyOf()
+//        newElements[offset - 1] = element
+//        val newSegment = Segment(base.next, newElements)
+//        return VList(newSegment, offset - 1)
+        return prepend(listOf(element))
+    }
 
-        if (offset == 0 || base == null) {
-            val nextSegmentSize =
-                if (base == null) 1 else base.elements.size * 2
-            val nextOffset = nextSegmentSize - 1
-            val nextElements = arrayOfNulls<Any?>(nextSegmentSize)
-            nextElements[nextOffset] = element //as T
-            val newSegment = Segment(base, nextElements)
-            return VList(newSegment, nextOffset)
+    fun prepend(elements: Iterable<T>): VList<T> {
+        if (isEmpty())
+            return VList(elements)
+        base!!
+
+        if (elements is List<T> && elements.isEmpty())
+            return this
+
+        val reversedElementsIterator =
+            when (elements) {
+                is Cons<T> -> elements.toList()
+                is List<T> -> elements
+                else -> elements.toList()
+            }.asReversed().iterator()
+
+        var newBase = Segment(base.next, base.elements.copyOf())
+        var newOffset = offset
+        while (reversedElementsIterator.hasNext()) {
+            if (newOffset > 0) {
+                newBase.elements[newOffset - 1] = reversedElementsIterator.next()
+                newOffset--
+            } else {
+                val nextSize = newBase.elements.size * 2
+                newBase = Segment(newBase, arrayOfNulls(nextSize))
+                newOffset = nextSize - 1
+                newBase.elements[newOffset] = reversedElementsIterator.next()
+            }
         }
-
-        val newElements = base.elements.copyOf()
-        newElements[offset - 1] = element
-        val newSegment = Segment(base.next, newElements)
-        return VList(newSegment, offset - 1)
+        return VList(newBase, newOffset)
     }
 
     override val car: T
@@ -215,7 +247,7 @@ class VList<T> : List<T>, Cons<T> {
 
     override fun <R> sameTypeFromList(list: List<R>): VList<R> = VList(list)
 
-    fun toMutableList(): MutableList<T> {
+    override fun toMutableList(): MutableList<T> {
         val res = baseElementsAsMutableList()
 
         if (base == null) return res
@@ -276,9 +308,8 @@ class VList<T> : List<T>, Cons<T> {
         return res
     }
 
-    override fun toString(): String = basicToString()
-
-    override fun equals(other: Any?): Boolean = basicEqual(other)
+    override fun toString(): String = commonToString()
+    override fun equals(other: Any?): Boolean = commonEqualityCheck(other)
 
     override fun hashCode(): Int {
         var result = base?.hashCode() ?: 0

@@ -1,5 +1,6 @@
 package kleinert.soap
 
+import kleinert.soap.cons.VList
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant

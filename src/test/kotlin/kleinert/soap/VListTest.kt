@@ -1,5 +1,6 @@
 package kleinert.soap
 
+import kleinert.soap.cons.EmptyCons
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -374,23 +375,23 @@ class VListTest {
 
     @Test
     fun cddr() {
-        assertEquals(EmptyList<Int>(), VList.of<Int>().cddr)
-        assertEquals(EmptyList<Int>(), VList.of(1).cddr)
+        assertEquals(EmptyCons<Int>(), VList.of<Int>().cddr)
+        assertEquals(EmptyCons<Int>(), VList.of(1).cddr)
         assertEquals(VList.of(3, 4, 5), VList.of(1, 2, 3, 4, 5).cddr)
         assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr, VList.of(1, 2, 3, 4, 5).cddr)
     }
 
     @Test
     fun cdddr() {
-        assertEquals(EmptyList<Int>(), VList.of<Int>().cdddr)
-        assertEquals(EmptyList<Int>(), VList.of(1).cdddr)
+        assertEquals(EmptyCons<Int>(), VList.of<Int>().cdddr)
+        assertEquals(EmptyCons<Int>(), VList.of(1).cdddr)
         //assertEquals(VList.of(4, 5), VList.of(1, 2, 3, 4, 5).cdddr)
         assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr, VList.of(1, 2, 3, 4, 5).cdddr)}
 
     @Test
     fun cddddr() {
-        assertEquals(EmptyList<Int>(), VList.of<Int>().cddddr)
-        assertEquals(EmptyList<Int>(), VList.of(1).cddddr)
+        assertEquals(EmptyCons<Int>(), VList.of<Int>().cddddr)
+        assertEquals(EmptyCons<Int>(), VList.of(1).cddddr)
         //assertEquals(VList.of(5), VList.of(1, 2, 3, 4, 5).cddddr)
         assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.cdr, VList.of(1, 2, 3, 4, 5).cddddr)}
 }
