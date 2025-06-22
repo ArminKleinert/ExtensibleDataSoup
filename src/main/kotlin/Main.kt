@@ -1,8 +1,6 @@
-import kleinert.soap.EDNSoapOptions
-import kleinert.soap.EDNSoapReader
-import kleinert.soap.EDNSoapWriter
-import kleinert.soap.VList
+import kleinert.soap.*
 import java.util.*
+import kotlin.collections.shuffled
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -98,5 +96,23 @@ fun main(args: Array<String>) {
         val vl = VList.of<Int>(1, 2, 3, 4, 5, 6)
         val vld = vl.drop(2)
         println("$vl $vld")
+    }
+
+    run {
+        val vl = VList.of(1, 2, 3, 4, 5)
+        val vld = vl.reversed()
+        println("$vl $vld ${vld.javaClass}")
+    }
+
+    run {
+        val vl: Cons<Int> = VList.of(1, 2, 3, 4, 5)
+        val vld = vl.reversed()
+        println("$vl $vld ${vld.javaClass}")
+    }
+
+    run {
+        val vl: List<Int> = VList.of(1, 2, 3, 4, 5)
+        val vld = vl.reversed()
+        println("$vl $vld ${vld.javaClass}")
     }
 }

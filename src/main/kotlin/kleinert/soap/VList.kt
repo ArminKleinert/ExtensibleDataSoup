@@ -159,27 +159,7 @@ class VList<T> : List<T>, Cons<T> {
             return VList(base, offset + 1)
         }
 
-    override fun contains(element: T): Boolean {
-        val iterator = iterator()
-        while (iterator.hasNext()) {
-            val temp = iterator.next()
-            if (temp == element) return true
-        }
-        return false
-    }
-
-    override fun containsAll(elements: Collection<T>): Boolean {
-        val iterator: Iterator<T> = elements.iterator()
-
-        var element: T
-        do {
-            if (!iterator.hasNext())
-                return true
-            element = iterator.next()
-        } while (contains(element))
-
-        return false
-    }
+    override fun cleared(): VList<T> = VList()
 
     override operator fun get(index: Int): T {
         if (index < 0 || index >= size)
@@ -202,36 +182,9 @@ class VList<T> : List<T>, Cons<T> {
 
     override fun isEmpty(): Boolean = base == null
 
-    override fun indexOf(element: T): Int {
-        val iterator = iterator()
-        var index = 0
-        while (iterator.hasNext()) {
-            val temp = iterator.next()
-            if (temp == element) return index
-            index++
-        }
-        return -1
-    }
-
     override fun iterator(): Iterator<T> = VListIterator(this)
 
-    override fun listIterator(): ListIterator<T> = toList().listIterator()
-
-    override fun listIterator(index: Int): ListIterator<T> = toList().listIterator(index)
-
     override fun subList(fromIndex: Int, toIndex: Int): List<T> = VList(toList().subList(fromIndex, toIndex))
-
-    override fun lastIndexOf(element: T): Int {
-        val iterator = iterator()
-        var counter = 0
-        var index = -1
-        while (iterator.hasNext()) {
-            val temp = iterator.next()
-            if (temp == element) index = counter
-            counter++
-        }
-        return index
-    }
 
     override fun drop(n: Int): VList<T> {
         if (n <= 0 || isEmpty()) return this
@@ -258,22 +211,9 @@ class VList<T> : List<T>, Cons<T> {
         }
 
         return VList()
-
-//        while (rest.isNotEmpty()) {
-//            if (restN <= 0)
-//                return rest
-//            if (rest.base == null)
-//                return rest
-//            if (restN < rest.base!!.elements.size - offset)
-//                return VList(base, offset + restN, size - restN)
-//
-//            val segmentSizeDiff = rest.base!!.elements.size - offset
-//            rest = VList(rest.base!!.next, 0, size - segmentSizeDiff)
-//            restN -= segmentSizeDiff
-//        }
-
-
     }
+
+    override fun <R> sameTypeFromList(list: List<R>): VList<R> = VList(list)
 
     fun toMutableList(): MutableList<T> {
         val res = baseElementsAsMutableList()
@@ -289,16 +229,6 @@ class VList<T> : List<T>, Cons<T> {
         return res
     }
 
-    fun reversed(): VList<T> {
-        if (base == null) return this
-
-        var res = VList<T>(null, 0)
-        for (it in this) {
-            res = res.cons(it)
-        }
-        return res
-    }
-
     fun getSegments(): List<List<T?>> {
         if (base == null) return listOf()
 
@@ -310,38 +240,6 @@ class VList<T> : List<T>, Cons<T> {
         }
         return res
     }
-
-    fun shuffled(random: Random = Random.Default) = VList(asIterable().shuffled(random))
-
-    override fun <R> map(f: (T) -> R): VList<R> = VList(asIterable().map(f))
-    override fun filter(pred: (T) -> Boolean): VList<T> = VList(asIterable().filter(pred))
-    override fun filterNot(pred: (T) -> Boolean): VList<T> = VList(asIterable().filterNot(pred))
-    override fun <R> mapIndexed(f: (Int, T) -> R): VList<R> = VList(asIterable().mapIndexed(f))
-    fun <R> flatMap(f: (T) -> Iterable<R>): VList<R> = VList(asIterable().flatMap(f))
-    fun <T : Comparable<T>> VList<T>.sorted(): VList<T> = VList(asIterable().sorted())
-
-
-    fun take(n: Int): VList<T> = VList(asIterable().take(n))
-    fun takeWhile(predicate: (T) -> Boolean): VList<T> = VList(asIterable().takeWhile(predicate))
-    fun dropWhile(predicate: (T) -> Boolean): VList<T> = VList(asIterable().dropWhile(predicate))
-
-    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): VList<T> = VList(asIterable().sortedBy(selector))
-    fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): VList<T> = VList(asIterable().sortedByDescending(selector))
-    fun sortedWith(comparator: Comparator<in T>): List<T> = VList(asIterable().sortedWith(comparator))
-
-
-
-    fun distinct(): VList<T> = VList(asIterable().distinct())
-
-
-
-
-
-
-
-
-
-
 
     override fun asSequence() = sequence {
         var segment = base
@@ -378,39 +276,9 @@ class VList<T> : List<T>, Cons<T> {
         return res
     }
 
-    operator fun plus(other: List<T>): VList<T> {
-        if (other is VList<T> && size <= other.offset) {
-            var res: VList<T> = other
-            for (e in this)
-                res = res.cons(e)
-            return res
-        }
-        return VList(toList() + other)
-    }
+    override fun toString(): String = basicToString()
 
-    operator fun plus(other: Iterable<T>): VList<T> {
-        return VList(toList() + other)
-    }
-
-    override fun toString(): String = StringBuilder()
-        .append('[')
-        .append(joinToString(", "))
-        .append("]").toString()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is List<Any?>) return false
-
-        val iter = iterator()
-        val otherIter = other.iterator()
-
-        while (iter.hasNext()) {
-            if (!otherIter.hasNext()) return false
-            if (iter.next() != otherIter.next()) return false
-        }
-
-        return !otherIter.hasNext()
-    }
+    override fun equals(other: Any?): Boolean = basicEqual(other)
 
     override fun hashCode(): Int {
         var result = base?.hashCode() ?: 0

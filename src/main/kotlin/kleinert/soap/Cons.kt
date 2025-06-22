@@ -1,57 +1,52 @@
 package kleinert.soap
 
-import kleinert.soap.EmptyList
+import kotlin.random.Random
 
 interface Cons<T> : List<T>, Iterable<T> {
     companion object {
-        fun <T> toCells(coll: Iterable<T>): Cons<T> {
-            if (coll is Cons<T>) return coll
-            if (!coll.iterator().hasNext()) return EmptyList()
+        fun <T> of(vararg elements: T) = VList(elements.toList())
 
-            var res: Cons<T> = EmptyList()
-            for (e in coll.reversed()) {
-                res = ConsCell(e, res)
-            }
-            return res
-        }
-
-        fun <T> of(vararg elements: T): Cons<T> {
-            if (elements.isEmpty())
-                return EmptyList()
-
-            var res: Cons<T> = EmptyList()
-            for (e in elements.reversed()) {
-                res = ConsCell(e, res)
-            }
-            return res
-        }
-
-        operator fun <T> invoke(collection: Collection<T>) = toCells(collection.asIterable())
-        operator fun <T> invoke(collection: Iterable<T>) = toCells(collection)
-        operator fun <T> invoke(arr: Array<T>) = toCells(arr.asIterable())
-        operator fun <T> invoke() = EmptyList<T>()
+        operator fun <T> invoke(coll: Iterable<T>) = if (coll is Cons<T>) coll else VList(coll)
+        operator fun <T> invoke(arr: Array<T>) = VList(arr)
+        operator fun <T> invoke() = VList.of<T>()
     }
 
     val car: T
 
     val cdr: Cons<T>
 
-    fun first(): T = car
-
-    fun cons(element: T): Cons<T> = ConsCell(element, this)
 
     override val size: Int
-        get() {
-            var count = 0
-            for (ignored in this) {
-                count++
-            }
-            return count
-        }
+
+    // Haskell style
+    fun head(): T = car
+
+    // Haskell style
+    fun tail(): Cons<T> = cdr
+
+    // Clojure & Logo language style
+    fun first(): T = car
+
+    // Logo language style
+    fun butfirst(): Cons<T> = cdr
+
+    // Clojure style
+    fun next(): Cons<T>? {
+        val r = cdr
+        if (r.isEmpty()) return null
+        return r
+    }
+
+    // Clojure style
+    fun rest(): Cons<T> = cdr
+
+    fun cons(element: T): Cons<T>
 
     override fun isEmpty(): Boolean
 
     override fun iterator(): Iterator<T>
+
+    fun cleared(): Cons<T>
 
     override fun get(index: Int): T = try {
         when {
@@ -71,16 +66,24 @@ interface Cons<T> : List<T>, Iterable<T> {
     override fun subList(fromIndex: Int, toIndex: Int): List<T> = toList().subList(fromIndex, toIndex)
 
     override fun lastIndexOf(element: T): Int {
-        var indexFound = -1
-        for ((index, t) in withIndex()) {
-            if (t == element) indexFound = index
+        val iterator = iterator()
+        var counter = 0
+        var index = -1
+        while (iterator.hasNext()) {
+            val temp = iterator.next()
+            if (temp == element) index = counter
+            counter++
         }
-        return indexFound
+        return index
     }
 
     override fun indexOf(element: T): Int {
-        for ((index, t) in withIndex()) {
-            if (t == element) return index
+        val iterator = iterator()
+        var index = 0
+        while (iterator.hasNext()) {
+            val temp = iterator.next()
+            if (temp == element) return index
+            index++
         }
         return -1
     }
@@ -91,7 +94,14 @@ interface Cons<T> : List<T>, Iterable<T> {
         return true
     }
 
-    override fun contains(element: T): Boolean = indexOf(element) != -1
+    override fun contains(element: T): Boolean {
+        val iterator = iterator()
+        while (iterator.hasNext()) {
+            val temp = iterator.next()
+            if (temp == element) return true
+        }
+        return false
+    }
 
     val cadr: T
         get() = cdr.car
@@ -106,10 +116,26 @@ interface Cons<T> : List<T>, Iterable<T> {
     val cddddr: List<T>
         get() = drop(4)
 
-    fun <R> map(f: (T) -> R) = if (isEmpty()) this else Cons(asIterable().map(f))
-    fun filter(pred: (T) -> Boolean): Cons<T> = Cons(asIterable().filter(pred))
-    fun filterNot(pred: (T) -> Boolean): Cons<T> = Cons(asIterable().filterNot(pred))
-    fun <R> mapIndexed(f: (Int, T) -> R): Cons<R> = Cons(asIterable().mapIndexed(f))
+    fun <R> map(f: (T) -> R): Cons<R> = sameTypeFromList(asIterable().map(f))
+    fun filter(pred: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().filter(pred))
+    fun filterNot(pred: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().filterNot(pred))
+    fun <R> mapIndexed(f: (Int, T) -> R): Cons<R> = sameTypeFromList(asIterable().mapIndexed(f))
+    fun <R> flatMap(f: (T) -> Iterable<R>): Cons<R> = sameTypeFromList(asIterable().flatMap(f))
+    fun <T : Comparable<T>> Cons<T>.sorted(): Cons<T> = sameTypeFromList(asIterable().sorted())
+
+    fun take(n: Int): Cons<T> = sameTypeFromList(asIterable().take(n))
+    fun takeWhile(predicate: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().takeWhile(predicate))
+    fun dropWhile(predicate: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().dropWhile(predicate))
+
+    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): Cons<T> = sameTypeFromList(asIterable().sortedBy(selector))
+    fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): Cons<T> =
+        sameTypeFromList(asIterable().sortedByDescending(selector))
+
+    fun sortedWith(comparator: Comparator<in T>): Cons<T> = sameTypeFromList(asIterable().sortedWith(comparator))
+
+    fun distinct(): Cons<T> = sameTypeFromList(asIterable().distinct())
+
+    fun shuffled(random: Random = Random.Default): Cons<T> = sameTypeFromList(toList().shuffled(random))
 
     fun asSequence() = sequence {
         var cell = this@Cons.cdr
@@ -128,4 +154,40 @@ interface Cons<T> : List<T>, Iterable<T> {
         }
         return res
     }
+
+    fun plus(element: T): Cons<T> = sameTypeFromList(toList() + element)
+    fun plus(other: Iterable<T>): Cons<T> = sameTypeFromList(toList() + other)
+
+
+    fun reversed(): Cons<T> {
+        if (isEmpty()) return this
+
+        var res = cleared()
+        for (it in this) {
+            res = res.cons(it)
+        }
+        return res
+    }
+
+    fun basicToString(): String = StringBuilder()
+        .append('[')
+        .append(joinToString(", "))
+        .append("]").toString()
+
+    fun basicEqual(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is List<Any?>) return false
+
+        val iter = iterator()
+        val otherIter = other.iterator()
+
+        while (iter.hasNext()) {
+            if (!otherIter.hasNext()) return false
+            if (iter.next() != otherIter.next()) return false
+        }
+
+        return !otherIter.hasNext()
+    }
+
+    fun <R> sameTypeFromList(list: List<R>): Cons<R>
 }
