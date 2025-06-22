@@ -58,7 +58,7 @@ class VList<T> : List<T>, Cons<T> {
     override val size: Int
         get() = if (base == null) 0 else base.elements.size * 2 - 1 - offset
 
-    private constructor(segment: Segment?, offset: Int, size: Int = -1) {
+    private constructor(segment: Segment?, offset: Int) {
         base = segment
         this.offset = offset
     }
@@ -94,7 +94,7 @@ class VList<T> : List<T>, Cons<T> {
     fun split() = car to cdr
 
     companion object {
-        fun <T> of(vararg elements: T) = VList<T>(elements.toList())
+        fun <T> of(vararg elements: T) = VList(elements.toList())
 
         private fun <T> segmentsAndOffsetFromReversedList(inputList: Iterable<T>): Pair<Segment?, Int> {
             var reversedList =
@@ -135,13 +135,13 @@ class VList<T> : List<T>, Cons<T> {
             val nextElements = arrayOfNulls<Any?>(nextSegmentSize)
             nextElements[nextOffset] = element //as T
             val newSegment = Segment(base, nextElements)
-            return VList(newSegment, nextOffset, size + 1)
+            return VList(newSegment, nextOffset)
         }
 
         val newElements = base.elements.copyOf()
         newElements[offset - 1] = element
         val newSegment = Segment(base.next, newElements)
-        return VList(newSegment, offset - 1, size + 1)
+        return VList(newSegment, offset - 1)
     }
 
     override val car: T
@@ -155,8 +155,8 @@ class VList<T> : List<T>, Cons<T> {
     override val cdr: VList<T>
         get() {
             if (base == null) return this
-            if (offset == base.elements.size - 1) return VList(base.next, 0, size - 1)
-            return VList(base, offset + 1, size - 1)
+            if (offset == base.elements.size - 1) return VList(base.next, 0)
+            return VList(base, offset + 1)
         }
 
     override fun contains(element: T): Boolean {
@@ -237,8 +237,6 @@ class VList<T> : List<T>, Cons<T> {
         if (n <= 0 || isEmpty()) return this
         if (n >= size) return of()
 
-        println("HERE")
-
         val baseElementNum = base!!.elements.size - offset
         if (n < baseElementNum) return VList(base, offset + n)
         if (n == baseElementNum) return VList(base.next, 0)
@@ -294,7 +292,7 @@ class VList<T> : List<T>, Cons<T> {
     fun reversed(): VList<T> {
         if (base == null) return this
 
-        var res = VList<T>(null, 0, 0)
+        var res = VList<T>(null, 0)
         for (it in this) {
             res = res.cons(it)
         }
@@ -320,7 +318,6 @@ class VList<T> : List<T>, Cons<T> {
     override fun filterNot(pred: (T) -> Boolean): VList<T> = VList(asIterable().filterNot(pred))
     override fun <R> mapIndexed(f: (Int, T) -> R): VList<R> = VList(asIterable().mapIndexed(f))
     fun <R> flatMap(f: (T) -> Iterable<R>): VList<R> = VList(asIterable().flatMap(f))
-    fun <R> flatMap(f: (T) -> Sequence<R>): VList<R> = VList(asIterable().flatMap(f))
     fun <T : Comparable<T>> VList<T>.sorted(): VList<T> = VList(asIterable().sorted())
 
 
@@ -418,7 +415,6 @@ class VList<T> : List<T>, Cons<T> {
     override fun hashCode(): Int {
         var result = base?.hashCode() ?: 0
         result = 31 * result + offset
-        result = 31 * result + size
         return result
     }
 }
