@@ -107,6 +107,17 @@ interface Cons<T> : List<T>, Iterable<T> {
         get() = drop(4)
 
     fun <R> map(f: (T) -> R) = if (isEmpty()) this else Cons(asIterable().map(f))
+    fun filter(pred: (T) -> Boolean): Cons<T> = Cons(asIterable().filter(pred))
+    fun filterNot(pred: (T) -> Boolean): Cons<T> = Cons(asIterable().filterNot(pred))
+    fun <R> mapIndexed(f: (Int, T) -> R): Cons<R> = Cons(asIterable().mapIndexed(f))
+
+    fun asSequence() = sequence {
+        var cell = this@Cons.cdr
+        while (cell.isEmpty()) {
+            yield(cell.car)
+            cell = cell.cdr
+        }
+    }
 
     fun drop(n: Int): Cons<T> {
         var res = this

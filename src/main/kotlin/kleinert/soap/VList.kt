@@ -1,5 +1,7 @@
 package kleinert.soap
 
+import kotlin.random.Random
+
 class VList<T> : List<T>, Cons<T> {
     private class Segment(val next: Segment?, val elements: Array<Any?>) {
         override fun toString(): String {
@@ -67,13 +69,13 @@ class VList<T> : List<T>, Cons<T> {
     }
 
     constructor(coll: Iterable<T>) {
-        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.reversed())
+        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll)
         this.base = baseSegment
         this.offset = offset
     }
 
     constructor(coll: Array<T>) {
-        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.reversed())
+        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.asIterable())
         this.base = baseSegment
         this.offset = offset
     }
@@ -84,7 +86,7 @@ class VList<T> : List<T>, Cons<T> {
     }
 
     constructor(coll: List<T>) {
-        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.asReversed())
+        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll)
         this.base = baseSegment
         this.offset = offset
     }
@@ -94,8 +96,10 @@ class VList<T> : List<T>, Cons<T> {
     companion object {
         fun <T> of(vararg elements: T) = VList<T>(elements.toList())
 
-        private fun <T> segmentsAndOffsetFromReversedList(reversedList: List<T>): Pair<Segment?, Int> {
-            var reversedList = reversedList
+        private fun <T> segmentsAndOffsetFromReversedList(inputList: Iterable<T>): Pair<Segment?, Int> {
+            var reversedList =
+                if (inputList is List<*> && inputList is RandomAccess) inputList.asReversed()
+                else inputList.reversed()
             var nextSegmentSize = 1
             var segment: Segment? = null
             var offset = 0
@@ -309,7 +313,49 @@ class VList<T> : List<T>, Cons<T> {
         return res
     }
 
-    override inline fun <R> map(f: (T) -> R): VList<R> = VList(asIterable().map(f))
+    fun shuffled(random: Random = Random.Default) = VList(asIterable().shuffled(random))
+
+    override fun <R> map(f: (T) -> R): VList<R> = VList(asIterable().map(f))
+    override fun filter(pred: (T) -> Boolean): VList<T> = VList(asIterable().filter(pred))
+    override fun filterNot(pred: (T) -> Boolean): VList<T> = VList(asIterable().filterNot(pred))
+    override fun <R> mapIndexed(f: (Int, T) -> R): VList<R> = VList(asIterable().mapIndexed(f))
+    fun <R> flatMap(f: (T) -> Iterable<R>): VList<R> = VList(asIterable().flatMap(f))
+    fun <R> flatMap(f: (T) -> Sequence<R>): VList<R> = VList(asIterable().flatMap(f))
+    fun <T : Comparable<T>> VList<T>.sorted(): VList<T> = VList(asIterable().sorted())
+
+
+    fun take(n: Int): VList<T> = VList(asIterable().take(n))
+    fun takeWhile(predicate: (T) -> Boolean): VList<T> = VList(asIterable().takeWhile(predicate))
+    fun dropWhile(predicate: (T) -> Boolean): VList<T> = VList(asIterable().dropWhile(predicate))
+
+    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): VList<T> = VList(asIterable().sortedBy(selector))
+    fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): VList<T> = VList(asIterable().sortedByDescending(selector))
+    fun sortedWith(comparator: Comparator<in T>): List<T> = VList(asIterable().sortedWith(comparator))
+
+
+
+    fun distinct(): VList<T> = VList(asIterable().distinct())
+
+
+
+
+
+
+
+
+
+
+
+    override fun asSequence() = sequence {
+        var segment = base
+        var offset = offset
+        while (segment != null) {
+            for (i in offset..<segment.elements.size)
+                yield(segment.elements[i] as T)
+            segment = segment.next
+            offset = 0
+        }
+    }
 
     fun <R> mapSegments(f: (T) -> R): List<List<R>> {
         val res = mutableListOf<List<R>>()

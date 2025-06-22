@@ -254,9 +254,48 @@ class VListTest {
 
     @Test
     fun map() {
-        assertTrue(VList.of<Int>().map { it } is VList<Int>)
+        assertEquals(VList<Int>().javaClass, VList.of<Int>().map { it }.javaClass)
+        assertEquals(VList.of(1).javaClass, VList.of<Int>(1).map { it }.javaClass)
+        assertEquals(VList.of(1), VList.of(1).map { it })
+        assertEquals(VList.of(1, 2), VList.of(1, 2).map { it })
+        assertEquals(VList.of(2, 3), VList.of(1, 2).map { it+1 })
         assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).map { it })
         assertEquals(VList.of(2, 3, 4), VList.of(1, 2, 3).map { it + 1 })
+    }
+
+    @Test
+    fun mapIndexed() {
+        assertEquals(VList<Int>().javaClass, VList.of<Int>().mapIndexed { _, elem -> elem }.javaClass)
+        assertEquals(VList.of(1).javaClass, VList.of(1).mapIndexed { _, elem -> elem }.javaClass)
+        assertEquals(VList.of(1), VList.of(1).mapIndexed { _, elem -> elem })
+        assertEquals(VList.of(1, 2), VList.of(1, 2).mapIndexed { _, elem -> elem })
+        assertEquals(VList.of(0, 1), VList.of(1, 2).mapIndexed { i, _ -> i })
+        assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).mapIndexed { _, elem -> elem })
+        assertEquals(VList.of(2, 3, 4), VList.of(1, 2, 3).mapIndexed { _, elem -> elem + 1 })
+        assertEquals(VList.of(1, 3, 5), VList.of(1, 2, 3).mapIndexed { i, elem -> elem + i })
+        assertEquals(VList.of(1, 2, 3, 4), VList.of(1, 2, 3, 4).mapIndexed { _, elem -> elem })
+        assertEquals(VList.of(2, 3, 4, 5), VList.of(1, 2, 3, 4).mapIndexed { _, elem -> elem + 1 })
+        assertEquals(VList.of(1, 3, 5, 7), VList.of(1, 2, 3, 4).mapIndexed { i, elem -> elem + i })
+    }
+
+    @Test
+    fun filter() {
+        assertEquals(VList<Int>().javaClass, VList.of<Int>().filter { true }.javaClass)
+        assertEquals(VList.of(1).javaClass, VList.of<Int>(1).filter { true }.javaClass)
+        assertEquals(VList.of(1, 2), VList.of(1, 2).filter { true })
+        assertEquals(VList.of<Int>(), VList.of(1, 2).filter { false })
+        assertEquals(VList.of(2), VList.of(1, 2, 3).filter { it % 2 == 0 })
+        assertEquals(VList.of(2, 4), VList.of(1, 2, 3, 4).filter { it % 2 == 0 })
+    }
+
+    @Test
+    fun filterNot() {
+        assertEquals(VList<Int>().javaClass, VList.of<Int>().filterNot { true }.javaClass)
+        assertEquals(VList.of(1).javaClass, VList.of<Int>(1).filter { false }.javaClass)
+        assertEquals(VList.of(1, 2), VList.of(1, 2).filterNot { false })
+        assertEquals(VList.of<Int>(), VList.of(1, 2).filterNot { true })
+        assertEquals(VList.of(2), VList.of(1, 2, 3).filterNot { it % 2 != 0 })
+        assertEquals(VList.of(2, 4), VList.of(1, 2, 3, 4).filterNot { it % 2 != 0 })
     }
 
     @Test

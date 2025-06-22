@@ -29,7 +29,6 @@ class EmptyList<T> : Cons<T> {
 
     override fun iterator(): Iterator<T> = ConsIterator(this)
 
-
     override fun equals(other: Any?): Boolean {
         if (other is EmptyList<*>) return true
         if (other !is List<Any?>) return false
