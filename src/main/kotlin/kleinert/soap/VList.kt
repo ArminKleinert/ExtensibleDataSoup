@@ -1,6 +1,6 @@
 package kleinert.soap
 
-class VList<T> : List<T> {
+class VList<T> : List<T>, Cons<T> {
     private class Segment(val next: Segment?, val elements: Array<Any?>) {
         override fun toString(): String {
             return "Segment(next=$next, elements=${elements.contentToString()})"
@@ -54,58 +54,42 @@ class VList<T> : List<T> {
     private val offset: Int
 
     override val size: Int
+        get() = if (base == null) 0 else base.elements.size * 2 - 1 - offset
 
     private constructor(segment: Segment?, offset: Int, size: Int = -1) {
         base = segment
         this.offset = offset
-        this.size = if (size >= 0) size else calcSize()
     }
 
     constructor() {
         this.base = null
         this.offset = 0
-        this.size = 0
     }
 
     constructor(coll: Iterable<T>) {
         val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.reversed())
         this.base = baseSegment
         this.offset = offset
-        this.size = calcSize()
     }
 
     constructor(coll: Array<T>) {
         val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.reversed())
         this.base = baseSegment
         this.offset = offset
-        this.size = calcSize()
     }
 
     constructor(vlist: VList<T>) {
         this.base = vlist.base
         this.offset = vlist.offset
-        this.size = vlist.size
     }
 
     constructor(coll: List<T>) {
         val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.asReversed())
         this.base = baseSegment
         this.offset = offset
-        this.size = calcSize()
     }
 
     fun split() = car to cdr
-
-    private fun calcSize(): Int {
-        if (base == null) return 0
-        var counter = -offset
-        var segment = base
-        while (segment != null) {
-            counter += segment.elements.size
-            segment = segment.next
-        }
-        return counter
-    }
 
     companion object {
         fun <T> of(vararg elements: T) = VList<T>(elements.toList())
@@ -137,7 +121,7 @@ class VList<T> : List<T> {
         }
     }
 
-    fun cons(elem: T): VList<T> {
+    override fun cons(element: T): VList<T> {
         require(offset >= 0)
 
         if (offset == 0 || base == null) {
@@ -145,20 +129,18 @@ class VList<T> : List<T> {
                 if (base == null) 1 else base.elements.size * 2
             val nextOffset = nextSegmentSize - 1
             val nextElements = arrayOfNulls<Any?>(nextSegmentSize)
-            nextElements[nextOffset] = elem //as T
+            nextElements[nextOffset] = element //as T
             val newSegment = Segment(base, nextElements)
             return VList(newSegment, nextOffset, size + 1)
         }
 
         val newElements = base.elements.copyOf()
-        newElements[offset - 1] = elem
+        newElements[offset - 1] = element
         val newSegment = Segment(base.next, newElements)
         return VList(newSegment, offset - 1, size + 1)
     }
 
-    fun first() = car
-
-    val car: T
+    override val car: T
         get() {
             if (base == null) throw NoSuchElementException("Empty list.")
 
@@ -166,7 +148,7 @@ class VList<T> : List<T> {
             return base.elements[offset] as T
         }
 
-    val cdr: VList<T>
+    override val cdr: VList<T>
         get() {
             if (base == null) return this
             if (offset == base.elements.size - 1) return VList(base.next, 0, size - 1)
@@ -247,26 +229,48 @@ class VList<T> : List<T> {
         return index
     }
 
-    fun drop(n: Int): VList<T> {
-        if (n > size) return of()
+    override fun drop(n: Int): VList<T> {
+        if (n <= 0 || isEmpty()) return this
+        if (n >= size) return of()
 
-        var rest = this
-        var restN = n
+        println("HERE")
 
-        while (rest.isNotEmpty()) {
-            if (restN <= 0)
-                return rest
-            if (rest.base == null)
-                return rest
-            if (restN < rest.base!!.elements.size - offset)
-                return VList(base, offset + restN, size - restN)
+        val baseElementNum = base!!.elements.size - offset
+        if (n < baseElementNum) return VList(base, offset + n)
+        if (n == baseElementNum) return VList(base.next, 0)
 
-            val segmentSizeDiff = rest.base!!.elements.size - offset
-            rest = VList(rest.base!!.next, 0, size - segmentSizeDiff)
-            restN -= segmentSizeDiff
+        var segment = base.next
+        var restN = n - baseElementNum
+
+        while (segment != null) {
+            val segmentSize = segment.elements.size
+            if (restN == segmentSize) {
+                return VList(segment.next, 0)
+            }
+
+            if (restN < segmentSize)
+                return VList(segment, segmentSize - restN)
+
+            segment = segment.next
+            restN -= segmentSize
         }
 
-        return rest
+        return VList()
+
+//        while (rest.isNotEmpty()) {
+//            if (restN <= 0)
+//                return rest
+//            if (rest.base == null)
+//                return rest
+//            if (restN < rest.base!!.elements.size - offset)
+//                return VList(base, offset + restN, size - restN)
+//
+//            val segmentSizeDiff = rest.base!!.elements.size - offset
+//            rest = VList(rest.base!!.next, 0, size - segmentSizeDiff)
+//            restN -= segmentSizeDiff
+//        }
+
+
     }
 
     fun toMutableList(): MutableList<T> {
@@ -305,7 +309,7 @@ class VList<T> : List<T> {
         return res
     }
 
-    inline fun <R> map(f: (T) -> R): VList<R> = VList(asIterable().map(f))
+    override inline fun <R> map(f: (T) -> R): VList<R> = VList(asIterable().map(f))
 
     fun <R> mapSegments(f: (T) -> R): List<List<R>> {
         val res = mutableListOf<List<R>>()

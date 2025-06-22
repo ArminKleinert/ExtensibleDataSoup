@@ -272,6 +272,14 @@ class VListTest {
         assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).drop(-10))
         assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).drop(0))
         assertEquals(VList.of<Int>(), VList.of(1, 2, 3).drop(10))
+
+        assertEquals(VList.of(1, 2, 3, 4, 5, 6), VList.of(1, 2, 3, 4, 5, 6).drop(0))
+        assertEquals(VList.of(2, 3, 4, 5, 6), VList.of(1, 2, 3, 4, 5, 6).drop(1))
+        assertEquals(VList.of(3, 4, 5, 6), VList.of(1, 2, 3, 4, 5, 6).drop(2))
+        assertEquals(VList.of(4, 5, 6), VList.of(1, 2, 3, 4, 5, 6).drop(3))
+        assertEquals(VList.of(5, 6), VList.of(1, 2, 3, 4, 5, 6).drop(4))
+        assertEquals(VList.of(6), VList.of(1, 2, 3, 4, 5, 6).drop(5))
+        assertEquals(VList.of<Int>(), VList.of(1, 2, 3, 4, 5, 6).drop(6))
     }
 
     @Test
@@ -295,4 +303,55 @@ class VListTest {
             VList.of(0, 1, 2, 3, 4, 5, 6, 7).mapSegments { it+1 }
         )
     }
+
+    @Test
+    fun split() {
+        assertThrows(NoSuchElementException::class.java) { VList.of<Int>().split() }
+        assertEquals(1 to VList.of<Int>(), VList.of(1).split())
+        assertEquals(1 to VList.of<Int>(2), VList.of(1, 2).split())
+    }
+
+    @Test
+    fun cadr() {
+        assertThrows(NoSuchElementException::class.java) { VList.of<Int>().cadr }
+        assertThrows(NoSuchElementException::class.java) { VList.of(1).cadr }
+        assertEquals(2, VList.of(1, 2, 3, 4, 5).cadr)
+        assertEquals(VList.of(1, 2, 3, 4, 5).cdr.car, VList.of(1, 2, 3, 4, 5).cadr)
+    }
+
+    @Test
+    fun caddr() {
+        assertThrows(NoSuchElementException::class.java) { VList.of<Int>().caddr }
+        assertThrows(NoSuchElementException::class.java) { VList.of(1).caddr }
+        assertEquals(3, VList.of(1, 2, 3, 4, 5).caddr)
+        assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.car, VList.of(1, 2, 3, 4, 5).caddr)}
+
+    @Test
+    fun cadddr() {
+        assertThrows(NoSuchElementException::class.java) { VList.of<Int>().cadddr }
+        assertThrows(NoSuchElementException::class.java) { VList.of(1).cadddr }
+        assertEquals(4, VList.of(1, 2, 3, 4, 5).cadddr)
+        assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.car, VList.of(1, 2, 3, 4, 5).cadddr)}
+
+    @Test
+    fun cddr() {
+        assertEquals(EmptyList<Int>(), VList.of<Int>().cddr)
+        assertEquals(EmptyList<Int>(), VList.of(1).cddr)
+        assertEquals(VList.of(3, 4, 5), VList.of(1, 2, 3, 4, 5).cddr)
+        assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr, VList.of(1, 2, 3, 4, 5).cddr)
+    }
+
+    @Test
+    fun cdddr() {
+        assertEquals(EmptyList<Int>(), VList.of<Int>().cdddr)
+        assertEquals(EmptyList<Int>(), VList.of(1).cdddr)
+        //assertEquals(VList.of(4, 5), VList.of(1, 2, 3, 4, 5).cdddr)
+        assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr, VList.of(1, 2, 3, 4, 5).cdddr)}
+
+    @Test
+    fun cddddr() {
+        assertEquals(EmptyList<Int>(), VList.of<Int>().cddddr)
+        assertEquals(EmptyList<Int>(), VList.of(1).cddddr)
+        //assertEquals(VList.of(5), VList.of(1, 2, 3, 4, 5).cddddr)
+        assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.cdr, VList.of(1, 2, 3, 4, 5).cddddr)}
 }

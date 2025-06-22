@@ -75,22 +75,28 @@ fun main(args: Array<String>) {
 //    println(EDNSoapReader.readString("#{#_\\a}"))
 //    println(EDNSoapReader.readString("{1 #_\\a}"))
 
-    run {
-        val vl = EDNSoapReader.readString("(1 2 3)")
-        println(vl is VList<*>)
-        println(vl)
-        println(EDNSoapWriter.encode(vl))
-    }
-    run {
-        val vl = EDNSoapReader.readString("(\"ab\" \"cd\")")
-        println(vl is VList<*>)
-        println(vl)
-        println(EDNSoapWriter.encode(vl))
-    }
-    val al = ArrayList(listOf(1, 2, 3))
-    al.component1()
+//    run {
+//        val vl = EDNSoapReader.readString("(1 2 3)")
+//        println(vl is VList<*>)
+//        println(vl)
+//        println(EDNSoapWriter.encode(vl))
+//    }
+//    run {
+//        val vl = EDNSoapReader.readString("(\"ab\" \"cd\")")
+//        println(vl is VList<*>)
+//        println(vl)
+//        println(EDNSoapWriter.encode(vl))
+//    }
+//    val al = ArrayList(listOf(1, 2, 3))
+//    al.component1()
+//
+//    run {
+//        println(BitSet.valueOf(longArrayOf(42, 12)))
+//    }
 
     run {
-        println(BitSet.valueOf(longArrayOf(42, 12)))
+        val vl = VList.of<Int>(1, 2, 3, 4, 5, 6)
+        val vld = vl.drop(2)
+        println("$vl $vld")
     }
 }
