@@ -155,10 +155,10 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         return res
     }
 
-    fun plus(element: T): Cons<T> = ConsSeq.concat(this, ConsHead(element, EmptyCons()))
-    fun plus(other: Iterable<T>): Cons<T> = ConsSeq.concat(this, Cons(other))
-    fun plus(other: List<T>): Cons<T> = ConsSeq.concat(this, CdrCodedList(other))
-    fun plus(other: Cons<T>): Cons<T> = ConsSeq.concat(this, other)
+    fun plus(element: T): Cons<T> = ConsPair.concat(this, ConsHead(element, EmptyCons()))
+    fun plus(other: Iterable<T>): Cons<T> = ConsPair.concat(this, Cons(other))
+    fun plus(other: List<T>): Cons<T> = ConsPair.concat(this, CdrCodedList(other))
+    fun plus(other: Cons<T>): Cons<T> = ConsPair.concat(this, other)
     fun plus(other: VList<T>): Cons<T> = other.prepend(this)
 
     fun reversed(): Cons<T> {

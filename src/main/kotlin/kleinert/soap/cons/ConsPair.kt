@@ -1,16 +1,14 @@
 package kleinert.soap.cons
 
-import kleinert.soap.cons.VList
-
-class ConsSeq<T> private constructor(val left: Cons<T>, val right: Cons<T>) : Cons<T> {
+class ConsPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : Cons<T> {
 
     companion object {
         fun <T> concat(left: Cons<T>, right: Cons<T>): Cons<T> =
             when {
                 left.isEmpty() -> right
                 right.isEmpty() -> left
-                left is ConsSeq<T> -> ConsSeq(left.left, ConsSeq(left.right, right))
-                else -> ConsSeq(left, right)
+                left is ConsPair<T> -> ConsPair(left.left, ConsPair(left.right, right))
+                else -> ConsPair(left, right)
             }
     }
 
@@ -40,4 +38,9 @@ class ConsSeq<T> private constructor(val left: Cons<T>, val right: Cons<T>) : Co
 
     override fun toString(): String = commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)
+    override fun hashCode(): Int {
+        var result = left.hashCode()
+        result = 31 * result + right.hashCode()
+        return result
+    }
 }

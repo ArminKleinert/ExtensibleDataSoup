@@ -1,17 +1,34 @@
 package kleinert.soap.cons
 
-class CdrCodedList<T> : Cons<T>, List<T>, Iterable<T>, RandomAccess {
-
+class CdrCodedList<T> : Cons<T>, RandomAccess {
     private val backingList: List<T>
+    private val offset: Int
 
     companion object {
         fun <T> of(vararg elements: T) = CdrCodedList(elements)
     }
 
-    constructor(lst: List<T>, isSafe: Boolean) {
-        backingList =
+    constructor(lst: List<T>, isSafe: Boolean, offset: Int = 0) {
+        val backing =
             if (isSafe) lst
             else lst.toList()
+
+        when {
+            offset >= backing.size -> {
+                this.backingList = listOf()
+                this.offset = 0
+            }
+
+            offset > backing.size / 2 -> {
+                this.backingList = backing.drop(offset)
+                this.offset = 0
+            }
+
+            else -> {
+                this.backingList = backing
+                this.offset = offset
+            }
+        }
     }
 
     constructor(lst: List<T>) : this(lst, false)
@@ -24,6 +41,7 @@ class CdrCodedList<T> : Cons<T>, List<T>, Iterable<T>, RandomAccess {
 
     constructor() : this(listOf(), true)
 
+    @get:Throws(NoSuchElementException::class)
     override val car: T
         get() = backingList[0]
 

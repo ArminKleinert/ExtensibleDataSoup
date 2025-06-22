@@ -1,8 +1,6 @@
 package kleinert.soap.cons
 
-import kleinert.soap.cons.Cons
-
-class VList<T> : List<T>, Cons<T> {
+class VList<T> : Cons<T> {
     private class Segment(val next: Segment?, val elements: Array<Any?>) {
         override fun toString(): String {
             return "Segment(next=$next, elements=${elements.contentToString()})"
@@ -57,6 +55,21 @@ class VList<T> : List<T>, Cons<T> {
 
     override val size: Int
         get() = if (base == null) 0 else base.elements.size * 2 - 1 - offset
+
+    override val car: T
+        get() {
+            if (base == null) throw NoSuchElementException("Empty list.")
+
+            @Suppress("UNCHECKED_CAST")
+            return base.elements[offset] as T
+        }
+
+    override val cdr: VList<T>
+        get() {
+            if (base == null) return this
+            if (offset == base.elements.size - 1) return VList(base.next, 0)
+            return VList(base, offset + 1)
+        }
 
     private constructor(segment: Segment?, offset: Int) {
         base = segment
@@ -126,22 +139,6 @@ class VList<T> : List<T>, Cons<T> {
     }
 
     override fun cons(element: T): VList<T> {
-//        require(offset >= 0)
-//
-//        if (offset == 0 || base == null) {
-//            val nextSegmentSize =
-//                if (base == null) 1 else base.elements.size * 2
-//            val nextOffset = nextSegmentSize - 1
-//            val nextElements = arrayOfNulls<Any?>(nextSegmentSize)
-//            nextElements[nextOffset] = element //as T
-//            val newSegment = Segment(base, nextElements)
-//            return VList(newSegment, nextOffset)
-//        }
-//
-//        val newElements = base.elements.copyOf()
-//        newElements[offset - 1] = element
-//        val newSegment = Segment(base.next, newElements)
-//        return VList(newSegment, offset - 1)
         return prepend(listOf(element))
     }
 
@@ -175,21 +172,6 @@ class VList<T> : List<T>, Cons<T> {
         }
         return VList(newBase, newOffset)
     }
-
-    override val car: T
-        get() {
-            if (base == null) throw NoSuchElementException("Empty list.")
-
-            @Suppress("UNCHECKED_CAST")
-            return base.elements[offset] as T
-        }
-
-    override val cdr: VList<T>
-        get() {
-            if (base == null) return this
-            if (offset == base.elements.size - 1) return VList(base.next, 0)
-            return VList(base, offset + 1)
-        }
 
     override fun cleared(): VList<T> = VList()
 

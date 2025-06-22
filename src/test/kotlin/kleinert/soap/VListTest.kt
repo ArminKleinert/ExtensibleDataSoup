@@ -226,12 +226,12 @@ class VListTest {
     @Test
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { VList.of<Int>().subList(3, 6).size }
+        assertEquals(listOf(4, 5, 6), VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(3, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
     }
 
     @Test
     fun toMutableList() {
-        assertTrue(VList<Int>().toMutableList() is MutableList<Int>)
         assertTrue(VList<Int>().toMutableList().isEmpty())
         assertEquals(5, VList.of(1, 2, 3, 4, 5).toMutableList().size)
     }

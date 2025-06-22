@@ -1,7 +1,8 @@
 package kleinert.soap.cons
 
 
-class EmptyCons<T> : Cons<T>, List<T>, Iterable<T> {
+class EmptyCons<T> : Cons<T> {
+    @get:Throws(NoSuchElementException::class)
     override val car: T
         get() = throw NoSuchElementException("")
 
@@ -38,7 +39,7 @@ class EmptyCons<T> : Cons<T>, List<T>, Iterable<T> {
     }
 }
 
-class ConsHead<T> : Cons<T>, List<T>, Iterable<T> {
+class ConsHead<T> : Cons<T> {
     override val car: T
 
     override val cdr: Cons<T>
@@ -51,12 +52,14 @@ class ConsHead<T> : Cons<T>, List<T>, Iterable<T> {
         this.size = cdr.size
     }
 
+    @Throws(NoSuchElementException::class)
     constructor(coll: Cons<T>) {
         this.car = coll.car
         this.cdr = coll.cdr
         this.size = coll.size
     }
 
+    @Throws(NoSuchElementException::class)
     constructor(iter: Iterable<T>) {
         val iterator = iter.iterator()
         this.car = iterator.next()
