@@ -1,6 +1,7 @@
 package kleinert.soap
 
 import kleinert.soap.cons.EmptyCons
+import kleinert.soap.cons.VList
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

@@ -1,5 +1,6 @@
 package kleinert.soap
 
+import kleinert.soap.cons.VList
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -150,7 +151,7 @@ data class EDNSoapOptions(
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
-    val useVListForSequences: Boolean = true,
+    val emptySequenceToUse: List<*> = VList<Any?>(),
     val useFasterSetConstruction: Boolean = false,
     val forceImmutableCollections: Boolean = true,
 ) {
@@ -166,7 +167,7 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = false,
                 allowMoreEncoderDecoderNames = false,
                 decodingSequenceSeparator = ", ",
-                useVListForSequences = true,
+                emptySequenceToUse = VList<Any?>(),
                 forceImmutableCollections = true,
                 useFasterSetConstruction = false,
                 ednClassDecoders = mapOf(),
@@ -181,7 +182,7 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
-                useVListForSequences = true,
+                emptySequenceToUse = VList<Any?>(),
                 forceImmutableCollections = true,
                 useFasterSetConstruction = true,
                 ednClassDecoders = ednClassDecoder,
@@ -196,7 +197,7 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
-                useVListForSequences = true,
+                emptySequenceToUse = VList<Any?>(),
                 forceImmutableCollections = true,
                 useFasterSetConstruction = false,
                 ednClassDecoders = mapOf(),
