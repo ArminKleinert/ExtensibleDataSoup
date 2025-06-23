@@ -7,7 +7,7 @@ import kotlin.random.Random
 class ConsEmptyTest {
 
     private val instance = EmptyCons<Boolean>()
-    
+
     @Test
     fun testConstructor() {
         assertEquals(instance, EmptyCons<Boolean>())
@@ -117,13 +117,13 @@ class ConsEmptyTest {
 
     @Test
     fun reversed() {
-        assertInstanceOf(EmptyCons::class.java,instance.reversed())
+        assertInstanceOf(EmptyCons::class.java, instance.reversed())
         assertEquals(instance, instance.reversed())
     }
 
     @Test
     fun map() {
-        assertInstanceOf(Cons::class.java,instance.map { it })
+        assertInstanceOf(Cons::class.java, instance.map { it })
 
         assertEquals(instance, instance.map { it })
         assertEquals(instance, instance.map { false })
@@ -266,8 +266,8 @@ class ConsEmptyTest {
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java,  EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
-        assertEquals( EmptyCons<Int>(),  EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(EmptyCons<Int>(), EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
     }
 
     @Test
@@ -290,7 +290,7 @@ class ConsEmptyTest {
     fun asSequence() {
         assertInstanceOf(Sequence::class.java, instance.asSequence())
         assertEquals(listOf<Boolean>(), instance.asSequence().toList())
-        assertEquals(listOf<Boolean>(), instance.asSequence().map{!it}.toList())
+        assertEquals(listOf<Boolean>(), instance.asSequence().map { !it }.toList())
     }
 
     @Test
@@ -306,7 +306,7 @@ class ConsEmptyTest {
         assertEquals(instance, instance + listOf())
 
         assertEquals(Cons.of(true), instance + listOf(true))
-        assertEquals(Cons.of(1,2,3,4,5), EmptyCons<Int>() + (1..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), EmptyCons<Int>() + (1..5))
 
         assertEquals(instance, instance + Cons.of())
         assertEquals(Cons.of(false, true, false, true), instance + Cons.of(false, true, false, true))
@@ -321,7 +321,7 @@ class ConsEmptyTest {
         assertInstanceOf(VList::class.java, instance + VList.of(true))
         assertEquals(VList.of(true), instance + VList.of(true))
 
-        assertInstanceOf(VList::class.java, instance+ VList.of(true, false, true, false))
+        assertInstanceOf(VList::class.java, instance + VList.of(true, false, true, false))
         assertEquals(VList.of(true, false, true, false), instance + VList.of(true, false, true, false))
     }
 

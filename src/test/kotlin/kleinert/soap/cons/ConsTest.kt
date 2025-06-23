@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class ConsTest {
-    @Test fun   of  () {
+    @Test
+    fun of() {
         assertInstanceOf(Cons::class.java, Cons.of<Boolean>())
         assertInstanceOf(Cons::class.java, Cons.of(true))
         assertInstanceOf(Cons::class.java, Cons.of(true, false))
@@ -28,7 +29,8 @@ class ConsTest {
         assertEquals(listOf(true, false), Cons.of(true, false))
     }
 
-    @Test fun   fromIterable  () {
+    @Test
+    fun fromIterable() {
         assertInstanceOf(Cons::class.java, Cons.fromIterable<Boolean>(arrayOf()))
         assertInstanceOf(Cons::class.java, Cons.fromIterable<Boolean>(listOf()))
         assertInstanceOf(Cons::class.java, Cons.fromIterable(sequenceOf<Boolean>().asIterable()))
@@ -53,7 +55,9 @@ class ConsTest {
         assertEquals(Cons.of(true, false), Cons.fromIterable(listOf(true, false)))
         assertEquals(Cons.of(true, false), Cons.fromIterable(sequenceOf(true, false).asIterable()))
     }
-    @Test fun   wrapList  () {
+
+    @Test
+    fun wrapList() {
         assertInstanceOf(CdrCodedList::class.java, Cons.wrapList<Boolean>(listOf()))
         assertEquals(CdrCodedList<Boolean>(), Cons.wrapList<Boolean>(listOf()))
 
@@ -63,7 +67,9 @@ class ConsTest {
         assertInstanceOf(CdrCodedList::class.java, Cons.wrapList(listOf(true, false)))
         assertEquals(CdrCodedList.of(true, false), Cons.wrapList(listOf(true, false)))
     }
-    @Test fun   randomAccess  () {
+
+    @Test
+    fun randomAccess() {
         assertInstanceOf(RandomAccess::class.java, Cons.randomAccess<Boolean>(listOf()))
         assertInstanceOf(Cons::class.java, Cons.randomAccess<Boolean>(listOf()))
         assertEquals(Cons.of<Boolean>(), Cons.randomAccess<Boolean>(listOf()))
@@ -74,8 +80,11 @@ class ConsTest {
 
         assertInstanceOf(RandomAccess::class.java, Cons.randomAccess(listOf(true, false)))
         assertInstanceOf(Cons::class.java, Cons.randomAccess<Boolean>(listOf()))
-        assertEquals(Cons.of(true, false), Cons.randomAccess(listOf(true, false)))}
-    @Test fun   log2Access  () {
+        assertEquals(Cons.of(true, false), Cons.randomAccess(listOf(true, false)))
+    }
+
+    @Test
+    fun log2Access() {
         assertInstanceOf(Cons::class.java, Cons.log2Access<Boolean>(listOf()))
         assertEquals(Cons.of<Boolean>(), Cons.log2Access<Boolean>(listOf()))
 
@@ -83,8 +92,11 @@ class ConsTest {
         assertEquals(Cons.of(true), Cons.log2Access(listOf(true)))
 
         assertInstanceOf(Cons::class.java, Cons.log2Access<Boolean>(listOf()))
-        assertEquals(Cons.of(true, false), Cons.log2Access(listOf(true, false)))}
-    @Test fun    singlyLinked () {
+        assertEquals(Cons.of(true, false), Cons.log2Access(listOf(true, false)))
+    }
+
+    @Test
+    fun singlyLinked() {
         assertInstanceOf(EmptyCons::class.java, Cons.singlyLinked<Boolean>(listOf()))
         assertEquals(EmptyCons<Boolean>(), Cons.singlyLinked<Boolean>(listOf()))
 
@@ -92,8 +104,11 @@ class ConsTest {
         assertEquals(EmptyCons<Boolean>().cons(true), Cons.singlyLinked(listOf(true)))
 
         assertInstanceOf(Cons::class.java, Cons.singlyLinked<Boolean>(listOf()))
-        assertEquals(EmptyCons<Boolean>().cons(true).cons(false), Cons.singlyLinked(listOf(true, false)))}
-    @Test fun    equalsConsOf () {
+        assertEquals(EmptyCons<Boolean>().cons(false).cons(true), Cons.singlyLinked(listOf(true, false)))
+    }
+
+    @Test
+    fun equalsConsOf() {
         assertEquals(Cons.of<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(Cons.of(true, false), CdrCodedList.of(true, false))
 
@@ -102,11 +117,16 @@ class ConsTest {
         assertEquals(Cons.of(true, false), EmptyCons<Boolean>().cons(false).cons(true))
 
         assertEquals(Cons.of<Boolean>(), VList.of<Boolean>())
-        assertEquals(Cons.of(true, false), VList.of(true,false))
+        assertEquals(Cons.of(true, false), VList.of(true, false))
 
-        assertEquals(Cons.of(1,2,3,4,5,6,7,8,9,10), ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10)))
+        assertEquals(
+            Cons.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+        )
     }
-    @Test fun    equalsCdrCodedListOf () {
+
+    @Test
+    fun equalsCdrCodedListOf() {
         assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false))
 
@@ -115,26 +135,47 @@ class ConsTest {
         assertEquals(CdrCodedList.of(true, false), EmptyCons<Boolean>().cons(false).cons(true))
 
         assertEquals(CdrCodedList.of<Boolean>(), VList.of<Boolean>())
-        assertEquals(CdrCodedList.of(true, false), VList.of(true,false))
+        assertEquals(CdrCodedList.of(true, false), VList.of(true, false))
 
-        assertEquals(CdrCodedList.of(1,2,3,4,5,6,7,8,9,10), ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10)))
+        assertEquals(
+            CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+        )
     }
-    @Test fun    equalsEmptyCons () {
+
+    @Test
+    fun equalsEmptyCons() {
         assertEquals(EmptyCons<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(EmptyCons<Boolean>(), EmptyCons<Boolean>())
         assertEquals(EmptyCons<Boolean>(), VList.of<Boolean>())
     }
-    @Test fun    equalsCell () {
+
+    @Test
+    fun equalsCell() {
         val trueFalse = ConsCell(true, ConsCell(false, EmptyCons()))
         assertEquals(trueFalse, CdrCodedList.of(true, false))
         assertEquals(trueFalse, Cons.singlyLinked(listOf(true, false)))
         assertEquals(trueFalse, EmptyCons<Boolean>().cons(false).cons(true))
-        assertEquals(trueFalse, VList.of(true,false))
+        assertEquals(trueFalse, VList.of(true, false))
 
-        val oneToTen = ConsCell(1, ConsCell(2,ConsCell( 3, ConsCell( 4, ConsCell( 5, ConsCell( 6, ConsCell(7 , ConsCell( 8, ConsCell( 9, ConsCell( 10, EmptyCons()))))))))))
+        val oneToTen = ConsCell(
+            1,
+            ConsCell(
+                2,
+                ConsCell(
+                    3,
+                    ConsCell(
+                        4,
+                        ConsCell(5, ConsCell(6, ConsCell(7, ConsCell(8, ConsCell(9, ConsCell(10, EmptyCons()))))))
+                    )
+                )
+            )
+        )
         assertEquals(oneToTen, ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10)))
     }
-    @Test fun    equalsVListOf () {
+
+    @Test
+    fun equalsVListOf() {
         assertEquals(VList.of<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(VList.of(true, false), CdrCodedList.of(true, false))
 
@@ -143,11 +184,16 @@ class ConsTest {
         assertEquals(VList.of(true, false), EmptyCons<Boolean>().cons(false).cons(true))
 
         assertEquals(VList.of<Boolean>(), VList.of<Boolean>())
-        assertEquals(VList.of(true, false), VList.of(true,false))
+        assertEquals(VList.of(true, false), VList.of(true, false))
 
-        assertEquals(VList.of(1,2,3,4,5,6,7,8,9,10), ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10)))
+        assertEquals(
+            VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+        )
     }
-    @Test fun    equalsListOf () {
+
+    @Test
+    fun equalsListOf() {
         assertEquals(listOf<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(listOf(true, false), CdrCodedList.of(true, false))
 
@@ -156,8 +202,11 @@ class ConsTest {
         assertEquals(listOf(true, false), EmptyCons<Boolean>().cons(false).cons(true))
 
         assertEquals(listOf<Boolean>(), VList.of<Boolean>())
-        assertEquals(listOf(true, false), VList.of(true,false))
+        assertEquals(listOf(true, false), VList.of(true, false))
 
-        assertEquals(listOf(1,2,3,4,5,6,7,8,9,10), ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10)))
+        assertEquals(
+            listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+        )
     }
 }

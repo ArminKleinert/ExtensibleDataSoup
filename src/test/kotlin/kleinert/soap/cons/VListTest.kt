@@ -573,7 +573,7 @@ class VListTest {
         assertInstanceOf(Cons::class.java, VList.of(1) + listOf(2, 3))
 
         assertEquals(Cons.of<Int>(), VList.of<Int>() + listOf())
-        assertEquals(Cons.of(1, 2, 3), VList.of(1,2,3) + listOf())
+        assertEquals(Cons.of(1, 2, 3), VList.of(1, 2, 3) + listOf())
 
         assertEquals(Cons.of(1), VList.of<Int>() + listOf(1))
         assertEquals(Cons.of(1, 2, 3), VList.of(1) + listOf(2, 3))
@@ -640,7 +640,7 @@ class VListTest {
     @Test
     fun isSingleton() {
         assertFalse(VList.of<Int>().isSingleton())
-        assertFalse(VList.of(1).isSingleton())
+        assertTrue(VList.of(1).isSingleton())
         assertFalse(VList.of(1, 2).isSingleton())
     }
 }

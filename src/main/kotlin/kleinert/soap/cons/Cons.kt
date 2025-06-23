@@ -25,7 +25,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
         fun <T> singlyLinked(list: Iterable<T>): Cons<T> {
             var head: Cons<T> = EmptyCons()
-            for (element in list) {
+            for (element in list.reversed()) {
                 head = ConsCell(element, head)
             }
             return head

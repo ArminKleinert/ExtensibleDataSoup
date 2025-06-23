@@ -565,7 +565,7 @@ class CdrCodedListTest {
         assertInstanceOf(Cons::class.java, CdrCodedList.of(1) + listOf(2, 3))
 
         assertEquals(Cons.of<Int>(), CdrCodedList.of<Int>() + listOf())
-        assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1,2,3) + listOf())
+        assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1, 2, 3) + listOf())
 
         assertEquals(Cons.of(1), CdrCodedList.of<Int>() + listOf(1))
         assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1) + listOf(2, 3))
@@ -598,7 +598,7 @@ class CdrCodedListTest {
     @Test
     fun isSingleton() {
         assertFalse(CdrCodedList.of<Int>().isSingleton())
-        assertFalse(CdrCodedList.of(1).isSingleton())
+        assertTrue(CdrCodedList.of(1).isSingleton())
         assertFalse(CdrCodedList.of(1, 2).isSingleton())
     }
 }
