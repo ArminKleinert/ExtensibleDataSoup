@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
 
-class ConsEmptyTest {
+class NullConsTest {
 
-    private val instance = EmptyCons<Boolean>()
+    private val instance = NullCons<Boolean>()
 
     @Test
     fun testConstructor() {
-        assertEquals(instance, EmptyCons<Boolean>())
+        assertEquals(instance, NullCons<Boolean>())
     }
 
     @Test
@@ -28,7 +28,7 @@ class ConsEmptyTest {
 
     @Test
     fun cdr() {
-        assertInstanceOf(EmptyCons::class.java, instance.cdr)
+        assertInstanceOf(NullCons::class.java, instance.cdr)
         assertTrue(instance.isEmpty())
         assertTrue(instance.cdr.isEmpty())
         assertSame(instance, instance.cdr)
@@ -42,13 +42,13 @@ class ConsEmptyTest {
     @Test
     fun contains() {
         assertFalse(instance.contains(true))
-        assertFalse(EmptyCons<String>().contains(""))
+        assertFalse(NullCons<String>().contains(""))
     }
 
     @Test
     fun containsAll() {
         assertFalse(instance.containsAll(listOf(true)))
-        assertFalse(EmptyCons<String>().containsAll(listOf("")))
+        assertFalse(NullCons<String>().containsAll(listOf("")))
     }
 
     @Test
@@ -61,7 +61,7 @@ class ConsEmptyTest {
     @Test
     fun isEmpty() {
         assertTrue(instance.isEmpty())
-        assertTrue(EmptyCons<String>().isEmpty())
+        assertTrue(NullCons<String>().isEmpty())
     }
 
     @Test
@@ -117,7 +117,7 @@ class ConsEmptyTest {
 
     @Test
     fun reversed() {
-        assertInstanceOf(EmptyCons::class.java, instance.reversed())
+        assertInstanceOf(NullCons::class.java, instance.reversed())
         assertEquals(instance, instance.reversed())
     }
 
@@ -135,13 +135,13 @@ class ConsEmptyTest {
         assertInstanceOf(Cons::class.java, CdrCodedList.of(true).mapIndexed { _, elem -> elem })
 
         assertEquals(instance, instance.mapIndexed { _, elem -> elem })
-        assertEquals(EmptyCons<Int>(), instance.mapIndexed { i, _ -> i })
+        assertEquals(NullCons<Int>(), instance.mapIndexed { i, _ -> i })
     }
 
     @Test
     fun filter() {
-        assertInstanceOf(EmptyCons::class.java, instance.filter { true })
-        assertInstanceOf(EmptyCons::class.java, instance.filter { false })
+        assertInstanceOf(NullCons::class.java, instance.filter { true })
+        assertInstanceOf(NullCons::class.java, instance.filter { false })
 
         assertEquals(instance, instance.filter { true })
         assertEquals(instance, instance.filter { it })
@@ -149,8 +149,8 @@ class ConsEmptyTest {
 
     @Test
     fun filterNot() {
-        assertInstanceOf(EmptyCons::class.java, instance.filterNot { true })
-        assertInstanceOf(EmptyCons::class.java, instance.filterNot { false })
+        assertInstanceOf(NullCons::class.java, instance.filterNot { true })
+        assertInstanceOf(NullCons::class.java, instance.filterNot { false })
 
         assertEquals(instance, instance.filterNot { true })
         assertEquals(instance, instance.filterNot { it })
@@ -254,20 +254,20 @@ class ConsEmptyTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, EmptyCons<Int>().sortedBy { it })
-        assertEquals(EmptyCons<Int>(), EmptyCons<Int>().sortedBy { it })
+        assertInstanceOf(Cons::class.java, NullCons<Int>().sortedBy { it })
+        assertEquals(NullCons<Int>(), NullCons<Int>().sortedBy { it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, EmptyCons<Int>().sortedByDescending { it })
-        assertEquals(EmptyCons<Int>(), EmptyCons<Int>().sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, NullCons<Int>().sortedByDescending { it })
+        assertEquals(NullCons<Int>(), NullCons<Int>().sortedByDescending { it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(EmptyCons<Int>(), EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, NullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(NullCons<Int>(), NullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
     }
 
     @Test
@@ -306,7 +306,7 @@ class ConsEmptyTest {
         assertEquals(instance, instance + listOf())
 
         assertEquals(Cons.of(true), instance + listOf(true))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), EmptyCons<Int>() + (1..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), NullCons<Int>() + (1..5))
 
         assertEquals(instance, instance + Cons.of())
         assertEquals(Cons.of(false, true, false, true), instance + Cons.of(false, true, false, true))

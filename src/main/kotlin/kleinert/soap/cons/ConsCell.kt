@@ -1,12 +1,12 @@
 package kleinert.soap.cons
 
 
-class EmptyCons<T> : Cons<T> {
+object NullCons : Cons<Any?> {
     @get:Throws(NoSuchElementException::class)
-    override val car: T
+    override val car: Any?
         get() = throw NoSuchElementException("")
 
-    override val cdr: EmptyCons<T>
+    override val cdr: NullCons
         get() = this
 
     override val size: Int
@@ -14,10 +14,10 @@ class EmptyCons<T> : Cons<T> {
 
     override fun isEmpty(): Boolean = true
 
-    override fun cleared(): Cons<T> = this
+    override fun cleared(): NullCons = this
 
     override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
-        if (list.isEmpty()) return EmptyCons()
+        if (list.isEmpty()) return NullCons()
         return CdrCodedList(list)
     }
 
@@ -28,7 +28,15 @@ class EmptyCons<T> : Cons<T> {
     }
 }
 
+fun <T> NullCons(): Cons<T> = NullCons as Cons<T>
+
 class ConsCell<T> : Cons<T> {
+    companion object {
+        fun <T> of(vararg elements: T) =
+            if (elements.isEmpty()) NullCons()
+            else ConsCell(elements.asIterable())
+    }
+
     override val car: T
 
     override val cdr: Cons<T>
@@ -38,14 +46,7 @@ class ConsCell<T> : Cons<T> {
     constructor(car: T, cdr: Cons<T>) {
         this.car = car
         this.cdr = cdr
-        this.size = cdr.size
-    }
-
-    @Throws(NoSuchElementException::class)
-    constructor(coll: Cons<T>) {
-        this.car = coll.car
-        this.cdr = coll.cdr
-        this.size = coll.size
+        this.size = cdr.size + 1
     }
 
     @Throws(NoSuchElementException::class)
@@ -61,6 +62,9 @@ class ConsCell<T> : Cons<T> {
         this.size = cdr.size + 1
     }
 
+    @Throws(NoSuchElementException::class)
+    constructor(arr: Array<T>) : this(arr.asIterable())
+
     override fun isEmpty(): Boolean = false
 
     override fun asSequence(): Sequence<T> = sequence {
@@ -72,7 +76,7 @@ class ConsCell<T> : Cons<T> {
         yieldAll(rest.asSequence())
     }
 
-    override fun cleared(): Cons<T> = EmptyCons()
+    override fun cleared(): Cons<T> = NullCons()
 
     override fun <R> sameTypeFromList(list: List<R>): Cons<R> = CdrCodedList(list)
 
