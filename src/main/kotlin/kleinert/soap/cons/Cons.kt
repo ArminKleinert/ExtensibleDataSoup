@@ -10,7 +10,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         fun <T> fromIterable(coll: List<T>): Cons<T> = if (coll is Cons<T>) coll else CdrCodedList(coll)
         fun <T> fromIterable(coll: Iterable<T>): Cons<T> = if (coll is Cons<T>) coll else VList(coll)
         fun <T> fromIterable(arr: Array<T>): Cons<T> = VList(arr)
-        //fun <T> fromIterable(seq: Sequence<T>): Cons<T> = LazyCons1(seq)
+        fun <T> fromIterable(seq: Sequence<T>): Cons<T> = LazyCons.of(seq)
 
         fun <T> wrapList(list: List<T>): CdrCodedList<T> {
             return CdrCodedList(list, true)
@@ -64,6 +64,8 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
     // Clojure style
     fun rest(): Cons<T> = cdr
+
+    fun count() = size
 
     fun cons(element: T): Cons<T> = ConsCell(element, this)
 
@@ -141,27 +143,6 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
     val cddddr: List<T>
         get() = drop(4)
 
-    fun <R> map(f: (T) -> R): Cons<R> =
-         sameTypeFromList(asIterable().map(f))
-
-    fun filter(pred: (T) -> Boolean): Cons<T> =
-         sameTypeFromList(asIterable().filter(pred))
-
-    fun filterNot(pred: (T) -> Boolean): Cons<T> =
-        sameTypeFromList(asIterable().filterNot(pred))
-
-    fun <R> mapIndexed(f: (Int, T) -> R): Cons<R> =
-        sameTypeFromList(asIterable().mapIndexed(f))
-
-    fun <R> flatMap(f: (T) -> Iterable<R>): Cons<R> =
-        sameTypeFromList(asIterable().flatMap(f))
-
-    fun take(n: Int): Cons<T> =
-        sameTypeFromList(asIterable().take(n))
-
-    fun takeWhile(predicate: (T) -> Boolean): Cons<T> =
-        sameTypeFromList(asIterable().takeWhile(predicate))
-
     fun drop(n: Int): Cons<T> {
         require(n >= 0) { "Requested element count $n is less than zero." }
         var countdown = n
@@ -172,21 +153,6 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         }
         return rest
     }
-
-    fun dropWhile(predicate: (T) -> Boolean): Cons<T> =
-        sameTypeFromList(asIterable().dropWhile(predicate))
-
-    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): Cons<T> =
-         sameTypeFromList(asIterable().sortedBy(selector))
-
-    fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): Cons<T> =
-         sameTypeFromList(asIterable().sortedByDescending(selector))
-
-    fun sortedWith(comparator: Comparator<in T>): Cons<T> =
-         sameTypeFromList(asIterable().sortedWith(comparator))
-
-    fun distinct(): Cons<T> =
-         sameTypeFromList(asIterable().distinct())
 
     fun shuffled(random: Random = Random.Default): Cons<T> =
         sameTypeFromList(toList().shuffled(random))
@@ -253,4 +219,118 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
     operator fun plus(other: VList<T>): Cons<T> =
         if (isLazyType()) ConsPair.concat(this, other)
         else other.prepend(this)
+
+    fun <A : Appendable> joinTo( buffer: A, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: ((T) -> CharSequence)? = null): A =
+        asSequence().joinTo(buffer, separator, prefix, postfix, limit, truncated, transform)
+
+    fun joinToString( separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: ((T) -> CharSequence)? = null): String =
+        asSequence().joinToString(separator, prefix, postfix, limit, truncated, transform)
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    fun chunked(size: Int): Cons<List<T>> = fromIterable(asIterable().chunked(size))
+    fun <R> chunked(size: Int, transform: (List<T>) -> R): Cons<R> = fromIterable(asIterable().chunked(size, transform))
+    fun distinct(): Cons<T> = fromIterable(asIterable().distinct())
+    fun <K> distinctBy(selector: (T) -> K): Cons<T> = fromIterable(asIterable().distinctBy(selector))
+    fun dropWhile(predicate: (T) -> Boolean): Cons<T> = fromIterable(asIterable().dropWhile(predicate))
+    fun filter(predicate: (T) -> Boolean): Cons<T> = fromIterable(asIterable().filter(predicate))
+    fun filterIndexed(predicate: (index: Int, T) -> Boolean): Cons<T> =
+        fromIterable(asIterable().filterIndexed(predicate))
+
+    fun filterNot(predicate: (T) -> Boolean): Cons<T> = fromIterable(asIterable().filterNot(predicate))
+    fun filterNotNull(): Cons<T> = fromIterable(asIterable().filterNotNull())
+    fun <R> flatMap(transform: (T) -> Iterable<R>): Cons<R> = fromIterable(asIterable().flatMap(transform))
+    fun <R> flatMap(transform: (T) -> Sequence<R>): Cons<R> = fromIterable(asIterable().flatMap(transform))
+    fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): Cons<R> =
+        fromIterable(asIterable().flatMapIndexed(transform))
+
+    fun <R> flatMapIndexed(transform: (index: Int, T) -> Sequence<R>): Cons<R> =
+        fromIterable(asIterable().flatMapIndexed(transform))
+
+    fun ifEmpty(defaultValue: () -> Cons<T>): Cons<T> =
+        fromIterable(asSequence().ifEmpty { defaultValue().asSequence() })
+
+    fun <R> map(transform: (T) -> R): Cons<R> = fromIterable(asIterable().map(transform))
+    fun <R> mapIndexed(transform: (index: Int, T) -> R): Cons<R> = fromIterable(asIterable().mapIndexed(transform))
+    fun <R : Any> mapIndexedNotNull(transform: (index: Int, T) -> R?): Cons<R> =
+        fromIterable(asIterable().mapIndexedNotNull(transform))
+
+    fun <R : Any> mapNotNull(transform: (T) -> R?): Cons<R> = fromIterable(asIterable().mapNotNull(transform))
+    fun minus(element: T): Cons<T> = fromIterable(asIterable().minus(element))
+    fun minus(elements: Set<T>): Cons<T> = fromIterable(asIterable().minus(elements.toSet()))
+    fun minus(elements: Iterable<T>): Cons<T> = minus(elements.toSet())
+    fun onEach(action: (T) -> Unit): Cons<T> = fromIterable(asIterable().onEach(action))
+    fun onEachIndexed(action: (index: Int, T) -> Unit): Cons<T> = fromIterable(asIterable().onEachIndexed(action))
+    fun requireNoNulls(): Cons<T> = fromIterable(asIterable().requireNoNulls())
+    fun <R> runningFold(initial: R, operation: (acc: R, T) -> R): Cons<R> =
+        fromIterable(asIterable().runningFold(initial, operation))
+
+    fun <R> runningFoldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): Cons<R> =
+        fromIterable(asIterable().runningFoldIndexed(initial, operation))
+
+    fun runningReduce(operation: (acc: T, T) -> T): Cons<T> = fromIterable(asIterable().runningReduce(operation))
+    fun runningReduceIndexed(operation: (index: Int, acc: T, T) -> T): Cons<T> =
+        fromIterable(asIterable().runningReduceIndexed(operation))
+
+    fun <R> scan(initial: R, operation: (acc: R, T) -> R): Cons<R> = fromIterable(asIterable().scan(initial, operation))
+    fun <R> scanIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): Cons<R> =
+        fromIterable(asIterable().scanIndexed(initial, operation))
+
+    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): Cons<T> = fromIterable(asIterable().sortedBy(selector))
+    fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): Cons<T> =
+        fromIterable(asIterable().sortedByDescending(selector))
+
+    fun sortedWith(comparator: Comparator<in T>): Cons<T> = fromIterable(asIterable().sortedWith(comparator))
+    fun take(n: Int): Cons<T> = fromIterable(asIterable().take(n))
+    fun takeWhile(predicate: (T) -> Boolean): Cons<T> = fromIterable(asIterable().takeWhile(predicate))
+    fun windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): Cons<List<T>> =
+        fromIterable(asIterable().windowed(size, step, partialWindows))
+
+    fun <R> windowed(size: Int, step: Int = 1, partialWindows: Boolean = false, transform: (List<T>) -> R): Cons<R> =
+        fromIterable(asIterable().windowed(size, step, partialWindows, transform))
+
+    fun withIndex(): Cons<IndexedValue<T>> = fromIterable(asIterable().withIndex())
+    fun <R> zip(other: Iterable<R>): Cons<Pair<T, R>> = fromIterable(asIterable().zip(other.asIterable()))
+    fun <R, V> zip(other: Iterable<R>, transform: (a: T, b: R) -> V): Cons<V> =
+        fromIterable(asIterable().zip(other.asIterable(), transform))
+
+    fun zipWithNext(): Cons<Pair<T, T>> = fromIterable(asIterable().zipWithNext())
+    fun <R> zipWithNext(transform: (a: T, b: T) -> R): Cons<R> = fromIterable(asIterable().zipWithNext(transform))
+
 }

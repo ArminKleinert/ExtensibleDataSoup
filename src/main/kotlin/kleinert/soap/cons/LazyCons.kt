@@ -19,7 +19,18 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
         }
 
     override val size: Int
-        get() = this.count()
+        get() {
+            if (lazySize < 0) {
+                var c = 0
+                var s1 = evaluateStep()
+                while (s1!!.isNotEmpty()) {
+                    s1 = s1.cdr
+                    c += 1
+                }
+                lazySize = c
+            }
+            return lazySize
+        }
 
     @Synchronized
     fun evaluateStep(): Cons<T>? {
@@ -32,18 +43,6 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
         return sv
     }
 
-    private fun count(): Int {
-        if (lazySize < 0) {
-            var c = 0
-            var s1 = evaluateStep()
-            while (s1!!.isNotEmpty()) {
-                s1 = s1.cdr
-                c += 1
-            }
-            lazySize = c
-        }
-        return lazySize
-    }
 
     override fun cons(element: T): Cons<T> {
         return ConsCell(element, this)
@@ -113,6 +112,9 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
                     else -> nullCons()
                 }
             }
+        }
+        fun <T> of(seq: Sequence<T>): Cons<T> {
+            return LazyCons.fromIterator(seq.iterator())
         }
 
         fun <T, R> fmap(f: (T) -> R, p: (T) -> Boolean, xs: Cons<T>): Cons<R> {
