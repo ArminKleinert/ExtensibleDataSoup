@@ -1,6 +1,7 @@
 package kleinert.soap.cons
 
 import java.util.*
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.random.Random
 
 sealed interface Cons<T> : List<T>, Iterable<T> {
@@ -10,6 +11,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         fun <T> fromIterable(coll: List<T>): Cons<T> = if (coll is Cons<T>) coll else CdrCodedList(coll)
         fun <T> fromIterable(coll: Iterable<T>): Cons<T> = if (coll is Cons<T>) coll else VList(coll)
         fun <T> fromIterable(arr: Array<T>): Cons<T> = VList(arr)
+        fun <T> fromIterable(seq: Sequence<T>): Cons<T> = PersistentLazy(seq)
 
         fun <T> wrapList(list: List<T>): CdrCodedList<T> {
             return CdrCodedList(list, true)
@@ -34,6 +36,14 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         fun <T> cons(element: T, seq: Cons<T>): Cons<T> {
             return seq.cons(element)
         }
+
+        fun <T> lazy(coll: Iterable<T>) = PersistentLazy(coll.asSequence())
+
+        fun <T> lazy(coll: Sequence<T>) = PersistentLazy(coll)
+
+        @OptIn(ExperimentalTypeInference::class)
+        fun <T> lazy(@BuilderInference block: suspend SequenceScope<T>.() -> Unit): PersistentLazy<T> =
+            PersistentLazy(Sequence { iterator(block) })
     }
 
     val car: T
