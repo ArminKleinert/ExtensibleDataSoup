@@ -41,12 +41,17 @@ class ConsCell<T> : Cons<T> {
 
     override val cdr: Cons<T>
 
+    private var lazySize: Int = -1
+
     override val size: Int
+        get() {
+            if (lazySize < 0) lazySize = cdr.size+1
+            return lazySize
+        }
 
     constructor(car: T, cdr: Cons<T>) {
         this.car = car
         this.cdr = cdr
-        this.size = cdr.size + 1
     }
 
     @Throws(NoSuchElementException::class)
@@ -59,7 +64,6 @@ class ConsCell<T> : Cons<T> {
             tail.add(it)
         }
         this.cdr = CdrCodedList(tail)
-        this.size = cdr.size + 1
     }
 
     @Throws(NoSuchElementException::class)

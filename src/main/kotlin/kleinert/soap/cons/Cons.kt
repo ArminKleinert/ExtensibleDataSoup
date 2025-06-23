@@ -1,7 +1,6 @@
 package kleinert.soap.cons
 
 import java.util.*
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.random.Random
 
 sealed interface Cons<T> : List<T>, Iterable<T> {
@@ -11,7 +10,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         fun <T> fromIterable(coll: List<T>): Cons<T> = if (coll is Cons<T>) coll else CdrCodedList(coll)
         fun <T> fromIterable(coll: Iterable<T>): Cons<T> = if (coll is Cons<T>) coll else VList(coll)
         fun <T> fromIterable(arr: Array<T>): Cons<T> = VList(arr)
-        fun <T> fromIterable(seq: Sequence<T>): Cons<T> = PersistentLazy(seq)
+        //fun <T> fromIterable(seq: Sequence<T>): Cons<T> = LazyCons1(seq)
 
         fun <T> wrapList(list: List<T>): CdrCodedList<T> {
             return CdrCodedList(list, true)
@@ -36,14 +35,6 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         fun <T> cons(element: T, seq: Cons<T>): Cons<T> {
             return seq.cons(element)
         }
-
-        fun <T> lazy(coll: Iterable<T>) = PersistentLazy(coll.asSequence())
-
-        fun <T> lazy(coll: Sequence<T>) = PersistentLazy(coll)
-
-        @OptIn(ExperimentalTypeInference::class)
-        fun <T> lazy(@BuilderInference block: suspend SequenceScope<T>.() -> Unit): PersistentLazy<T> =
-            PersistentLazy(Sequence { iterator(block) })
     }
 
     val car: T
@@ -150,14 +141,26 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
     val cddddr: List<T>
         get() = drop(4)
 
-    fun <R> map(f: (T) -> R): Cons<R> = sameTypeFromList(asIterable().map(f))
-    fun filter(pred: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().filter(pred))
-    fun filterNot(pred: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().filterNot(pred))
-    fun <R> mapIndexed(f: (Int, T) -> R): Cons<R> = sameTypeFromList(asIterable().mapIndexed(f))
-    fun <R> flatMap(f: (T) -> Iterable<R>): Cons<R> = sameTypeFromList(asIterable().flatMap(f))
+    fun <R> map(f: (T) -> R): Cons<R> =
+         sameTypeFromList(asIterable().map(f))
 
-    fun take(n: Int): Cons<T> = sameTypeFromList(asIterable().take(n))
-    fun takeWhile(predicate: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().takeWhile(predicate))
+    fun filter(pred: (T) -> Boolean): Cons<T> =
+         sameTypeFromList(asIterable().filter(pred))
+
+    fun filterNot(pred: (T) -> Boolean): Cons<T> =
+        sameTypeFromList(asIterable().filterNot(pred))
+
+    fun <R> mapIndexed(f: (Int, T) -> R): Cons<R> =
+        sameTypeFromList(asIterable().mapIndexed(f))
+
+    fun <R> flatMap(f: (T) -> Iterable<R>): Cons<R> =
+        sameTypeFromList(asIterable().flatMap(f))
+
+    fun take(n: Int): Cons<T> =
+        sameTypeFromList(asIterable().take(n))
+
+    fun takeWhile(predicate: (T) -> Boolean): Cons<T> =
+        sameTypeFromList(asIterable().takeWhile(predicate))
 
     fun drop(n: Int): Cons<T> {
         require(n >= 0) { "Requested element count $n is less than zero." }
@@ -170,18 +173,23 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         return rest
     }
 
-    fun dropWhile(predicate: (T) -> Boolean): Cons<T> = sameTypeFromList(asIterable().dropWhile(predicate))
+    fun dropWhile(predicate: (T) -> Boolean): Cons<T> =
+        sameTypeFromList(asIterable().dropWhile(predicate))
 
-    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): Cons<T> = sameTypeFromList(asIterable().sortedBy(selector))
+    fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): Cons<T> =
+         sameTypeFromList(asIterable().sortedBy(selector))
 
     fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): Cons<T> =
-        sameTypeFromList(asIterable().sortedByDescending(selector))
+         sameTypeFromList(asIterable().sortedByDescending(selector))
 
-    fun sortedWith(comparator: Comparator<in T>): Cons<T> = sameTypeFromList(asIterable().sortedWith(comparator))
+    fun sortedWith(comparator: Comparator<in T>): Cons<T> =
+         sameTypeFromList(asIterable().sortedWith(comparator))
 
-    fun distinct(): Cons<T> = sameTypeFromList(asIterable().distinct())
+    fun distinct(): Cons<T> =
+         sameTypeFromList(asIterable().distinct())
 
-    fun shuffled(random: Random = Random.Default): Cons<T> = sameTypeFromList(toList().shuffled(random))
+    fun shuffled(random: Random = Random.Default): Cons<T> =
+        sameTypeFromList(toList().shuffled(random))
 
     fun asSequence(): Sequence<T> = sequence {
         var cell = this@Cons
@@ -232,6 +240,8 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
     fun isSingleton(): Boolean = isNotEmpty() && cdr.isEmpty()
 
+    fun isLazyType(): Boolean = false
+
     operator fun plus(element: T): Cons<T> = ConsPair.concat(this, ConsCell(element, nullCons()))
 
     operator fun plus(other: Iterable<T>): Cons<T> = ConsPair.concat(this, fromIterable(other))
@@ -240,5 +250,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
     operator fun plus(other: Cons<T>): Cons<T> = ConsPair.concat(this, other)
 
-    operator fun plus(other: VList<T>): VList<T> = other.prepend(this)
+    operator fun plus(other: VList<T>): Cons<T> =
+        if (isLazyType()) ConsPair.concat(this, other)
+        else other.prepend(this)
 }

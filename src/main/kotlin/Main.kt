@@ -1,8 +1,6 @@
 import kleinert.soap.*
 import kleinert.soap.cons.Cons
 import kleinert.soap.cons.LazyCons
-import kleinert.soap.cons.PersistentLazy
-import kleinert.soap.cons.VList
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -125,23 +123,19 @@ fun main(args: Array<String>) {
 //    }
 
 //    run {
-//        val l = LazyCons.map({it+1}, Cons.of(1, 2, 3, 4, 5))
+//        val bigList = Cons.wrapList((1..100000).toList())
+//        val biggerList = bigList + bigList + bigList
+//        //val l = LazyCons.take(1, LazyCons.map({it+1}, Cons.fromIterable(1..10000000000)))
+//        val l = LazyCons.take(4, LazyCons.filter({it > 100 && it % 2 == 0}, LazyCons.drop(4, LazyCons.map({ it + 1 }, biggerList))))
 //        println(l)
-//        println("Result: "+l.toList())
-//    }
-//
-//    run {
-//        val l = LazyCons.fmap( {it+1}, {it % 2 == 1},Cons.of(1, 2, 3, 4, 5))
-//        println(l)
-//        println("Result: "+l.toList())
+//        println("Result: " + l.toList())
 //    }
 
     run {
-        val l = PersistentLazy(sequenceOf(1,2,3,4))
+        val biggerList = LazyCons.fromIterator((1..500).iterator())
+        val l = LazyCons.take(4, LazyCons.filter({it > 100 && it % 2 == 0}, LazyCons.drop(4, LazyCons.map({ it + 1 }, biggerList))))
         println(l)
-    }
-    run {
-        val l = PersistentLazy.of { yieldAll(1..1003) }
-        println(l)
+        println("Result: " + l.toList())
+        println(biggerList.toList())
     }
 }

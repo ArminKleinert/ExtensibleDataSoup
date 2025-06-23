@@ -2,21 +2,21 @@ package kleinert.soap.cons
 
 import kotlin.experimental.ExperimentalTypeInference
 
-class PersistentLazy<T> : Cons<T>, Sequence<T> {
+class LazyCons1<T> : Cons<T>, Sequence<T> {
     companion object {
         fun <T> from(coll: Iterable<T>) = when (coll) {
-            is PersistentLazy<T> -> coll
-            is Cons<T> -> PersistentLazy(coll)
-            is Sequence<*> -> PersistentLazy(coll)
-            else -> PersistentLazy(coll.asSequence())
+            is LazyCons1<T> -> coll
+            is Cons<T> -> LazyCons1(coll)
+            is Sequence<*> -> LazyCons1(coll)
+            else -> LazyCons1(coll.asSequence())
         }
 
         @OptIn(ExperimentalTypeInference::class)
-        fun <T> of(@BuilderInference block: suspend SequenceScope<T>.() -> Unit): PersistentLazy<T> =
-            PersistentLazy(Sequence { iterator(block) })
+        fun <T> of(@BuilderInference block: suspend SequenceScope<T>.() -> Unit): LazyCons1<T> =
+            LazyCons1(Sequence { iterator(block) })
 
-        fun <T> of(vararg elements: T): PersistentLazy<T> =
-            PersistentLazy(elements.asSequence())
+        fun <T> of(vararg elements: T): LazyCons1<T> =
+            LazyCons1(elements.asSequence())
     }
 
     private var memoized: Boolean = false
@@ -24,6 +24,7 @@ class PersistentLazy<T> : Cons<T>, Sequence<T> {
     private var memoCar: T? = null
     private var memoCdr: Cons<T>? = null
     private var memoSize: Int = -1
+    private var clearlyEmpty: Boolean = false
 
     private var seq: Sequence<T>
 
@@ -31,7 +32,7 @@ class PersistentLazy<T> : Cons<T>, Sequence<T> {
         get() {
             if (!memoized) evalFirstAndRest()
             if (isEmpty()) throw NoSuchElementException()
-            return memoCar!! as T
+            return memoCar!!
         }
 
     override val cdr: Cons<T>
@@ -51,7 +52,7 @@ class PersistentLazy<T> : Cons<T>, Sequence<T> {
     }
 
     constructor(cons: Cons<T>) {
-        if (cons is PersistentLazy<T>) {
+        if (cons is LazyCons1<T>) {
             this.seq = cons.seq
         } else {
             this.seq = cons.asSequence()
@@ -64,22 +65,43 @@ class PersistentLazy<T> : Cons<T>, Sequence<T> {
 
         memoized = true
 
-        memoCar = try {
-            seq.first()
-        } catch (nsee: NoSuchElementException) {
+        val iter = seq.iterator()
+
+        if (iter.hasNext()) {
+            memoCar = seq.first() // May throw "NoSuchElementException", in which case the sequence must be empty.
+            memoCdr = LazyCons1(seq.drop(1))
+        } else {
+            memoCar = null
+            clearlyEmpty = true
+            memoCdr = nullCons()
             memoSize = 0
-            null
+            seq = sequenceOf()
         }
-        memoCdr = PersistentLazy(seq.drop(1))
+
+//        try {
+//            memoCar = seq.first() // May throw "NoSuchElementException", in which case the sequence must be empty.
+//            clearlyEmpty = false
+//            memoCdr = PersistentLazy(seq.drop(1))
+//        } catch (nsee: NoSuchElementException) {
+//            memoCar = null
+//            clearlyEmpty = true
+//            memoCdr = nullCons()
+//            memoSize = 0
+//        }
     }
 
-    override fun isEmpty(): Boolean = size == 0
+    override fun isEmpty(): Boolean {
+        evalFirstAndRest()
+        return clearlyEmpty
+    }
 
     override fun cleared(): Cons<T> = Cons.of()
 
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> = PersistentLazy(list.asSequence())
+    override fun <R> sameTypeFromList(list: List<R>): Cons<R> = LazyCons1(list.asSequence())
 
     override fun iterator(): Iterator<T> = seq.iterator()
+
+    override fun isLazyType(): Boolean = true
 
     override fun toString(): String = super.commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)
