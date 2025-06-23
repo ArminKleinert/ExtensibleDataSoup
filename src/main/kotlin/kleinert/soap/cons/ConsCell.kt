@@ -28,7 +28,7 @@ class EmptyCons<T> : Cons<T> {
     }
 }
 
-class ConsHead<T> : Cons<T> {
+class ConsCell<T> : Cons<T> {
     override val car: T
 
     override val cdr: Cons<T>
@@ -64,8 +64,8 @@ class ConsHead<T> : Cons<T> {
     override fun isEmpty(): Boolean = false
 
     override fun asSequence(): Sequence<T> = sequence {
-        var rest: Cons<T> = this@ConsHead
-        while (rest is ConsHead<T>) {
+        var rest: Cons<T> = this@ConsCell
+        while (rest is ConsCell<T>) {
             yield(rest.car)
             rest = rest.cdr
         }

@@ -5,7 +5,7 @@ import kotlin.random.Random
 
 sealed interface Cons<T> : List<T>, Iterable<T> {
     companion object {
-        fun <T> of(vararg elements: T) = VList(elements.toList())
+        fun <T> of(vararg elements: T) = if (elements.isEmpty()) EmptyCons() else VList(elements.toList())
 
         fun <T> fromIterable(coll: List<T>) = if (coll is Cons<T>) coll else CdrCodedList(coll)
         fun <T> fromIterable(coll: Iterable<T>) = if (coll is Cons<T>) coll else VList(coll)
@@ -26,7 +26,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
         fun <T> singlyLinked(list: Iterable<T>): Cons<T> {
             var head: Cons<T> = EmptyCons()
             for (element in list) {
-                head = ConsHead(element, head)
+                head = ConsCell(element, head)
             }
             return head
         }
@@ -60,7 +60,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
     // Clojure style
     fun rest(): Cons<T> = cdr
 
-    fun cons(element: T): Cons<T> = ConsHead(element, this)
+    fun cons(element: T): Cons<T> = ConsCell(element, this)
 
     override fun isEmpty(): Boolean
 
@@ -218,7 +218,7 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
     fun isSingleton(): Boolean = isNotEmpty() && cdr.isEmpty()
 
-    operator fun plus(element: T): Cons<T> = ConsPair.concat(this, ConsHead(element, EmptyCons()))
+    operator fun plus(element: T): Cons<T> = ConsPair.concat(this, ConsCell(element, EmptyCons()))
 
     operator fun plus(other: Iterable<T>): Cons<T> = ConsPair.concat(this, fromIterable(other))
 

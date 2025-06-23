@@ -1,14 +1,13 @@
-package kleinert.soap
+package kleinert.soap.cons
 
-import kleinert.soap.cons.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
 
-class ConsSinglyLinkedTest {
+class CdrCodedListTest {
     @Test
     fun testConstructor() {
-        assertThrows(NoSuchElementException::class.java) { ConsHead(listOf<Int>()) }
+        assertTrue(CdrCodedList<Int>() == CdrCodedList(listOf<Int>()))
         assertTrue(CdrCodedList<Int>(arrayOf()) == CdrCodedList(listOf<Int>()))
         assertTrue(CdrCodedList(listOf<Int>().asIterable()) == CdrCodedList(listOf<Int>()))
         assertTrue(CdrCodedList(CdrCodedList<Int>()) == CdrCodedList(listOf<Int>()))
@@ -229,6 +228,7 @@ class ConsSinglyLinkedTest {
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of<Int>().subList(3, 6).size }
         assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
+        assertEquals(listOf<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(0, 0))
         assertEquals(listOf(4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(3, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
     }
@@ -593,5 +593,12 @@ class ConsSinglyLinkedTest {
 
         assertInstanceOf(VList::class.java, CdrCodedList.of(1, 2) + VList.of(3, 4))
         assertEquals(VList.of(1, 2, 3, 4), CdrCodedList.of(1, 2) + VList.of(3, 4))
+    }
+
+    @Test
+    fun isSingleton() {
+        assertFalse(CdrCodedList.of<Int>().isSingleton())
+        assertFalse(CdrCodedList.of(1).isSingleton())
+        assertFalse(CdrCodedList.of(1, 2).isSingleton())
     }
 }

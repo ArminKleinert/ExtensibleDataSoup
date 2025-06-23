@@ -1,6 +1,5 @@
-package kleinert.soap
+package kleinert.soap.cons
 
-import kleinert.soap.cons.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
@@ -324,5 +323,10 @@ class ConsEmptyTest {
 
         assertInstanceOf(VList::class.java, instance+ VList.of(true, false, true, false))
         assertEquals(VList.of(true, false, true, false), instance + VList.of(true, false, true, false))
+    }
+
+    @Test
+    fun isSingleton() {
+        assertFalse(instance.isSingleton())
     }
 }

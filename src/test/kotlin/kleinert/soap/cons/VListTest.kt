@@ -1,9 +1,5 @@
-package kleinert.soap
+package kleinert.soap.cons
 
-import kleinert.soap.cons.CdrCodedList
-import kleinert.soap.cons.Cons
-import kleinert.soap.cons.EmptyCons
-import kleinert.soap.cons.VList
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
@@ -639,5 +635,12 @@ class VListTest {
             listOf(listOf(1), listOf(2, 3, 4, 5), listOf(6, 7), listOf(8)),
             VList.of(0, 1, 2, 3, 4, 5, 6, 7).mapSegments { it + 1 }
         )
+    }
+
+    @Test
+    fun isSingleton() {
+        assertFalse(VList.of<Int>().isSingleton())
+        assertFalse(VList.of(1).isSingleton())
+        assertFalse(VList.of(1, 2).isSingleton())
     }
 }
