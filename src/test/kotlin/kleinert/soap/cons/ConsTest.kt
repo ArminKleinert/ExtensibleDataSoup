@@ -13,19 +13,19 @@ class ConsTest {
         assertEquals(Cons.of<Boolean>(), Cons.of<Boolean>())
         assertEquals(VList.of<Boolean>(), Cons.of<Boolean>())
         assertEquals(CdrCodedList.of<Boolean>(), Cons.of<Boolean>())
-        assertEquals(NullCons<Boolean>(), Cons.of<Boolean>())
+        assertEquals(nullCons<Boolean>(), Cons.of<Boolean>())
         assertEquals(listOf<Boolean>(), Cons.of<Boolean>())
 
         assertEquals(Cons.of(true), Cons.of(true))
         assertEquals(VList.of(true), Cons.of(true))
         assertEquals(CdrCodedList.of(true), Cons.of(true))
-        assertEquals(ConsCell(true, NullCons()), Cons.of(true))
+        assertEquals(ConsCell(true, nullCons()), Cons.of(true))
         assertEquals(listOf(true), Cons.of(true))
 
         assertEquals(Cons.of(true, false), Cons.of(true, false))
         assertEquals(VList.of(true, false), Cons.of(true, false))
         assertEquals(CdrCodedList.of(true, false), Cons.of(true, false))
-        assertEquals(ConsCell(true, ConsCell(false, NullCons())), Cons.of(true, false))
+        assertEquals(ConsCell(true, ConsCell(false, nullCons())), Cons.of(true, false))
         assertEquals(listOf(true, false), Cons.of(true, false))
     }
 
@@ -35,9 +35,9 @@ class ConsTest {
         assertInstanceOf(Cons::class.java, Cons.fromIterable<Boolean>(listOf()))
         assertInstanceOf(Cons::class.java, Cons.fromIterable(sequenceOf<Boolean>().asIterable()))
 
-        assertEquals(NullCons<Boolean>(), Cons.fromIterable<Boolean>(arrayOf()))
-        assertEquals(NullCons<Boolean>(), Cons.fromIterable<Boolean>(listOf()))
-        assertEquals(NullCons<Boolean>(), Cons.fromIterable(sequenceOf<Boolean>().asIterable()))
+        assertEquals(nullCons<Boolean>(), Cons.fromIterable<Boolean>(arrayOf()))
+        assertEquals(nullCons<Boolean>(), Cons.fromIterable<Boolean>(listOf()))
+        assertEquals(nullCons<Boolean>(), Cons.fromIterable(sequenceOf<Boolean>().asIterable()))
 
         assertInstanceOf(Cons::class.java, Cons.fromIterable(arrayOf(true)))
         assertInstanceOf(Cons::class.java, Cons.fromIterable(listOf(true)))
@@ -98,13 +98,13 @@ class ConsTest {
     @Test
     fun singlyLinked() {
         assertInstanceOf(NullCons::class.java, Cons.singlyLinked<Boolean>(listOf()))
-        assertEquals(NullCons<Boolean>(), Cons.singlyLinked<Boolean>(listOf()))
+        assertEquals(nullCons<Boolean>(), Cons.singlyLinked<Boolean>(listOf()))
 
         assertInstanceOf(Cons::class.java, Cons.singlyLinked<Boolean>(listOf()))
-        assertEquals(NullCons<Boolean>().cons(true), Cons.singlyLinked(listOf(true)))
+        assertEquals(nullCons<Boolean>().cons(true), Cons.singlyLinked(listOf(true)))
 
         assertInstanceOf(Cons::class.java, Cons.singlyLinked<Boolean>(listOf()))
-        assertEquals(NullCons<Boolean>().cons(false).cons(true), Cons.singlyLinked(listOf(true, false)))
+        assertEquals(nullCons<Boolean>().cons(false).cons(true), Cons.singlyLinked(listOf(true, false)))
     }
 
     @Test
@@ -112,9 +112,9 @@ class ConsTest {
         assertEquals(Cons.of<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(Cons.of(true, false), CdrCodedList.of(true, false))
 
-        assertEquals(Cons.of<Boolean>(), NullCons<Boolean>())
+        assertEquals(Cons.of<Boolean>(), nullCons<Boolean>())
         assertEquals(Cons.of(true, false), Cons.singlyLinked(listOf(true, false)))
-        assertEquals(Cons.of(true, false), NullCons<Boolean>().cons(false).cons(true))
+        assertEquals(Cons.of(true, false), nullCons<Boolean>().cons(false).cons(true))
 
         assertEquals(Cons.of<Boolean>(), VList.of<Boolean>())
         assertEquals(Cons.of(true, false), VList.of(true, false))
@@ -130,9 +130,9 @@ class ConsTest {
         assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false))
 
-        assertEquals(CdrCodedList.of<Boolean>(), NullCons<Boolean>())
+        assertEquals(CdrCodedList.of<Boolean>(), nullCons<Boolean>())
         assertEquals(CdrCodedList.of(true, false), Cons.singlyLinked(listOf(true, false)))
-        assertEquals(CdrCodedList.of(true, false), NullCons<Boolean>().cons(false).cons(true))
+        assertEquals(CdrCodedList.of(true, false), nullCons<Boolean>().cons(false).cons(true))
 
         assertEquals(CdrCodedList.of<Boolean>(), VList.of<Boolean>())
         assertEquals(CdrCodedList.of(true, false), VList.of(true, false))
@@ -145,17 +145,17 @@ class ConsTest {
 
     @Test
     fun equalsEmptyCons() {
-        assertEquals(NullCons<Boolean>(), CdrCodedList.of<Boolean>())
-        assertEquals(NullCons<Boolean>(), NullCons<Boolean>())
-        assertEquals(NullCons<Boolean>(), VList.of<Boolean>())
+        assertEquals(nullCons<Boolean>(), CdrCodedList.of<Boolean>())
+        assertEquals(nullCons<Boolean>(), nullCons<Boolean>())
+        assertEquals(nullCons<Boolean>(), VList.of<Boolean>())
     }
 
     @Test
     fun equalsCell() {
-        val trueFalse = ConsCell(true, ConsCell(false, NullCons()))
+        val trueFalse = ConsCell(true, ConsCell(false, nullCons()))
         assertEquals(trueFalse, CdrCodedList.of(true, false))
         assertEquals(trueFalse, Cons.singlyLinked(listOf(true, false)))
-        assertEquals(trueFalse, NullCons<Boolean>().cons(false).cons(true))
+        assertEquals(trueFalse, nullCons<Boolean>().cons(false).cons(true))
         assertEquals(trueFalse, VList.of(true, false))
 
         val oneToTen = ConsCell(
@@ -166,7 +166,7 @@ class ConsTest {
                     3,
                     ConsCell(
                         4,
-                        ConsCell(5, ConsCell(6, ConsCell(7, ConsCell(8, ConsCell(9, ConsCell(10, NullCons()))))))
+                        ConsCell(5, ConsCell(6, ConsCell(7, ConsCell(8, ConsCell(9, ConsCell(10, nullCons()))))))
                     )
                 )
             )
@@ -179,9 +179,9 @@ class ConsTest {
         assertEquals(VList.of<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(VList.of(true, false), CdrCodedList.of(true, false))
 
-        assertEquals(VList.of<Boolean>(), NullCons<Boolean>())
+        assertEquals(VList.of<Boolean>(), nullCons<Boolean>())
         assertEquals(VList.of(true, false), Cons.singlyLinked(listOf(true, false)))
-        assertEquals(VList.of(true, false), NullCons<Boolean>().cons(false).cons(true))
+        assertEquals(VList.of(true, false), nullCons<Boolean>().cons(false).cons(true))
 
         assertEquals(VList.of<Boolean>(), VList.of<Boolean>())
         assertEquals(VList.of(true, false), VList.of(true, false))
@@ -197,9 +197,9 @@ class ConsTest {
         assertEquals(listOf<Boolean>(), CdrCodedList.of<Boolean>())
         assertEquals(listOf(true, false), CdrCodedList.of(true, false))
 
-        assertEquals(listOf<Boolean>(), NullCons<Boolean>())
+        assertEquals(listOf<Boolean>(), nullCons<Boolean>())
         assertEquals(listOf(true, false), Cons.singlyLinked(listOf(true, false)))
-        assertEquals(listOf(true, false), NullCons<Boolean>().cons(false).cons(true))
+        assertEquals(listOf(true, false), nullCons<Boolean>().cons(false).cons(true))
 
         assertEquals(listOf<Boolean>(), VList.of<Boolean>())
         assertEquals(listOf(true, false), VList.of(true, false))

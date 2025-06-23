@@ -3,7 +3,7 @@ package kleinert.soap.cons
 
 object NullCons : Cons<Any?> {
     @get:Throws(NoSuchElementException::class)
-    override val car: Any?
+    override val car: Any
         get() = throw NoSuchElementException("")
 
     override val cdr: NullCons
@@ -17,7 +17,7 @@ object NullCons : Cons<Any?> {
     override fun cleared(): NullCons = this
 
     override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
-        if (list.isEmpty()) return NullCons()
+        if (list.isEmpty()) return nullCons()
         return CdrCodedList(list)
     }
 
@@ -28,12 +28,12 @@ object NullCons : Cons<Any?> {
     }
 }
 
-fun <T> NullCons(): Cons<T> = NullCons as Cons<T>
+fun <T> nullCons(): Cons<T> = NullCons as Cons<T>
 
 class ConsCell<T> : Cons<T> {
     companion object {
         fun <T> of(vararg elements: T) =
-            if (elements.isEmpty()) NullCons()
+            if (elements.isEmpty()) nullCons()
             else ConsCell(elements.asIterable())
     }
 
@@ -76,7 +76,7 @@ class ConsCell<T> : Cons<T> {
         yieldAll(rest.asSequence())
     }
 
-    override fun cleared(): Cons<T> = NullCons()
+    override fun cleared(): Cons<T> = nullCons()
 
     override fun <R> sameTypeFromList(list: List<R>): Cons<R> = CdrCodedList(list)
 

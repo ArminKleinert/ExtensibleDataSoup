@@ -325,24 +325,24 @@ class CdrCodedListTest {
 
     @Test
     fun cddr() {
-        assertEquals(NullCons<Int>(), CdrCodedList.of<Int>().cddr)
-        assertEquals(NullCons<Int>(), CdrCodedList.of(1).cddr)
+        assertEquals(nullCons<Int>(), CdrCodedList.of<Int>().cddr)
+        assertEquals(nullCons<Int>(), CdrCodedList.of(1).cddr)
         assertEquals(CdrCodedList.of(3, 4, 5), CdrCodedList.of(1, 2, 3, 4, 5).cddr)
         assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr, CdrCodedList.of(1, 2, 3, 4, 5).cddr)
     }
 
     @Test
     fun cdddr() {
-        assertEquals(NullCons<Int>(), CdrCodedList.of<Int>().cdddr)
-        assertEquals(NullCons<Int>(), CdrCodedList.of(1).cdddr)
+        assertEquals(nullCons<Int>(), CdrCodedList.of<Int>().cdddr)
+        assertEquals(nullCons<Int>(), CdrCodedList.of(1).cdddr)
         assertEquals(CdrCodedList.of(4, 5), CdrCodedList.of(1, 2, 3, 4, 5).cdddr)
         assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr.cdr, CdrCodedList.of(1, 2, 3, 4, 5).cdddr)
     }
 
     @Test
     fun cddddr() {
-        assertEquals(NullCons<Int>(), CdrCodedList.of<Int>().cddddr)
-        assertEquals(NullCons<Int>(), CdrCodedList.of(1).cddddr)
+        assertEquals(nullCons<Int>(), CdrCodedList.of<Int>().cddddr)
+        assertEquals(nullCons<Int>(), CdrCodedList.of(1).cddddr)
         assertEquals(CdrCodedList.of(5), CdrCodedList.of(1, 2, 3, 4, 5).cddddr)
         assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.cdr, CdrCodedList.of(1, 2, 3, 4, 5).cddddr)
     }

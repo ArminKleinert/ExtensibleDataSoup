@@ -333,24 +333,24 @@ class VListTest {
 
     @Test
     fun cddr() {
-        assertEquals(NullCons<Int>(), VList.of<Int>().cddr)
-        assertEquals(NullCons<Int>(), VList.of(1).cddr)
+        assertEquals(nullCons<Int>(), VList.of<Int>().cddr)
+        assertEquals(nullCons<Int>(), VList.of(1).cddr)
         assertEquals(VList.of(3, 4, 5), VList.of(1, 2, 3, 4, 5).cddr)
         assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr, VList.of(1, 2, 3, 4, 5).cddr)
     }
 
     @Test
     fun cdddr() {
-        assertEquals(NullCons<Int>(), VList.of<Int>().cdddr)
-        assertEquals(NullCons<Int>(), VList.of(1).cdddr)
+        assertEquals(nullCons<Int>(), VList.of<Int>().cdddr)
+        assertEquals(nullCons<Int>(), VList.of(1).cdddr)
         assertEquals(VList.of(4, 5), VList.of(1, 2, 3, 4, 5).cdddr)
         assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr, VList.of(1, 2, 3, 4, 5).cdddr)
     }
 
     @Test
     fun cddddr() {
-        assertEquals(NullCons<Int>(), VList.of<Int>().cddddr)
-        assertEquals(NullCons<Int>(), VList.of(1).cddddr)
+        assertEquals(nullCons<Int>(), VList.of<Int>().cddddr)
+        assertEquals(nullCons<Int>(), VList.of(1).cddddr)
         assertEquals(VList.of(5), VList.of(1, 2, 3, 4, 5).cddddr)
         assertEquals(VList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.cdr, VList.of(1, 2, 3, 4, 5).cddddr)
     }

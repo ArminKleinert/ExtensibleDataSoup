@@ -6,423 +6,456 @@ import org.junit.jupiter.api.Assertions.*
 import kotlin.random.Random
 
 class ConsCellTest {
+
+    val one = nullCons<Int>().cons(1)
+    val two = one.cons(2)
+    val three = two.cons(3)
+
     @Test
     fun testConstructor() {
         assertEquals(listOf(1), ConsCell(listOf(1)))
         assertEquals(listOf(1, 2), ConsCell(listOf(1, 2)))
         assertEquals(listOf(1, 2, 3, 4), ConsCell(listOf(1, 2, 3, 4)))
-        assertEquals(ConsCell(1, NullCons()), ConsCell(1, NullCons()))
-        assertEquals(ConsCell(1, ConsCell(2, NullCons())), ConsCell(1, ConsCell(2, NullCons())))
+        assertEquals(ConsCell(1, nullCons()), ConsCell(1, nullCons()))
+        assertEquals(ConsCell(1, ConsCell(2, nullCons())), ConsCell(1, ConsCell(2, nullCons())))
     }
     @Test
     fun getSize() {
-        assertEquals(1, ConsCell(1, NullCons()).size)
-        assertEquals(2, ConsCell(1, ConsCell(2, NullCons())).size)
-        assertEquals(3, ConsCell(1, ConsCell(2, ConsCell(3, VList.of()))).size)
+        assertEquals(1, one.size)
+        assertEquals(2, two.size)
+        assertEquals(3, three.size)
     }
 
     @Test
     fun cons() {
-        val list = CdrCodedList<Int>()
+        val list = nullCons<Int>()
         assertEquals(0, list.size)
 
-        assertInstanceOf(Cons::class.java, list.cons(1))
-        assertEquals(CdrCodedList(arrayOf(1)), list.cons(1))
-        assertEquals(CdrCodedList(arrayOf(2, 1)), list.cons(1).cons(2))
-        assertEquals(CdrCodedList(arrayOf(3, 2, 1)), list.cons(1).cons(2).cons(3))
+        assertInstanceOf(Cons::class.java, one)
+        assertEquals(CdrCodedList(arrayOf(1)), one)
+        assertEquals(CdrCodedList(arrayOf(2, 1)), two)
+        assertEquals(CdrCodedList(arrayOf(3, 2, 1)), three)
     }
 
     @Test
     fun cdr() {
-        assertInstanceOf(CdrCodedList::class.java, CdrCodedList<Int>().cdr)
-        assertInstanceOf(CdrCodedList::class.java, CdrCodedList.of(2, 1).cdr)
-        assertEquals(CdrCodedList<Int>(), CdrCodedList<Int>().cdr)
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(2, 1).cdr)
-        assertEquals(CdrCodedList(2..5), CdrCodedList(1..5).cdr)
+        val one = nullCons<Int>().cons(1)
+        val two = one.cons(2)
+        val three = two.cons(3)
+        assertInstanceOf(Cons::class.java, one.cdr)
+        assertInstanceOf(Cons::class.java, two.cdr)
+        assertInstanceOf(Cons::class.java, three.cdr)
+
+        assertSame(one.cdr, two.cdr.cdr)
+        assertSame(one.cdr, three.cdr.cdr.cdr)
+        assertSame(one, two.cdr)
+        assertSame(two, three.cdr)
     }
 
     @Test
     fun car() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Int>().car }
-        assertEquals(1, CdrCodedList.of(1).car)
-        assertEquals(2, CdrCodedList.of(2, 1).car)
-        assertEquals((0..99).first(), CdrCodedList(0..99).car)
-        assertEquals(5, CdrCodedList.of(1, 2, 3, 4).cons(5).car)
+        val one = nullCons<Int>().cons(1)
+        val two = one.cons(2)
+        val three = two.cons(3)
 
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Int>().first() }
-        assertEquals(1, CdrCodedList.of(1).first())
-        assertEquals(2, CdrCodedList.of(2, 1).first())
-        assertEquals((0..99).first(), CdrCodedList(0..99).first())
-        assertEquals(5, CdrCodedList.of(1, 2, 3, 4).cons(5).first())
+        assertThrows(NoSuchElementException::class.java) { one.cdr.car }
+        assertThrows(NoSuchElementException::class.java) { two.cdr.cdr.car }
+        assertThrows(NoSuchElementException::class.java) { three.cdr.cdr.cdr.car }
+
+        assertEquals(1, one.car)
+        assertEquals(2, two.car)
+        assertEquals(3, three.car)
+        assertEquals(1, two.cdr.car)
+        assertEquals(2, three.cdr.car)
+        assertEquals(1, three.cdr.cdr.car)
+
+        assertSame(one.cdr, three.cdr.cdr.cdr)
+        assertSame(one, two.cdr)
+        assertSame(two, three.cdr)
     }
 
     @Test
     fun contains() {
-        assertFalse(CdrCodedList<Int>().contains(1))
-        assertFalse(CdrCodedList<String>().contains(""))
-        assertFalse(CdrCodedList<Int>(listOf()).contains(1))
-        assertFalse(CdrCodedList(listOf(2, 1, 3)).contains(5))
+        assertFalse(one.contains(0))
+        assertTrue(one.contains(1))
+        assertFalse(one.contains(2))
+        assertFalse(one.contains(3))
+        assertFalse(one.contains(4))
 
-        assertTrue(CdrCodedList(listOf(1)).contains(1))
-        assertTrue(CdrCodedList(listOf(2, 1, 3)).contains(1))
+        assertFalse(two.contains(0))
+        assertTrue(two.contains(1))
+        assertTrue(two.contains(2))
+        assertFalse(two.contains(3))
+        assertFalse(two.contains(4))
+
+        assertFalse(three.contains(0))
+        assertTrue(three.contains(1))
+        assertTrue(three.contains(2))
+        assertTrue(three.contains(3))
+        assertFalse(three.contains(4))
     }
 
     @Test
     fun containsAll() {
-        assertTrue(CdrCodedList<Int>().containsAll(listOf()))
+        assertTrue(one.containsAll(listOf(1)))
+        assertFalse(one.containsAll(listOf(2)))
+        assertFalse(one.containsAll(listOf(3)))
+        assertFalse(one.containsAll(listOf(1, 2)))
+        assertFalse(one.containsAll(listOf(2, 3)))
+        assertFalse(one.containsAll(listOf(1, 2, 3)))
 
-        assertFalse(CdrCodedList<Int>().containsAll(listOf(1)))
-        assertFalse(CdrCodedList<String>().containsAll(listOf("")))
-        assertFalse(CdrCodedList<Int>(listOf()).containsAll(listOf(1)))
-        assertFalse(CdrCodedList(listOf(2, 1, 3)).containsAll(listOf(5)))
+        assertTrue(two.containsAll(listOf(1)))
+        assertTrue(two.containsAll(listOf(2)))
+        assertFalse(two.containsAll(listOf(3)))
+        assertTrue(two.containsAll(listOf(1, 2)))
+        assertFalse(two.containsAll(listOf(2, 3)))
+        assertFalse(two.containsAll(listOf(1, 2, 3)))
 
-        assertTrue(CdrCodedList(listOf(1)).containsAll(listOf(1)))
-        assertTrue(CdrCodedList(listOf(2, 1, 3)).containsAll(listOf(1)))
-
-        assertTrue(CdrCodedList(0..99).containsAll(listOf(10, 20, 30, 50, 60, 70, 80, 90)))
-        assertTrue(CdrCodedList(0..99).containsAll(setOf(10, 20, 30, 50, 60, 70, 80, 90)))
-        assertTrue(CdrCodedList(0..99).containsAll(CdrCodedList.of(10, 20, 30, 50, 60, 70, 80, 90)))
+        assertTrue(three.containsAll(listOf(1)))
+        assertTrue(three.containsAll(listOf(2)))
+        assertTrue(three.containsAll(listOf(3)))
+        assertTrue(three.containsAll(listOf(1, 2)))
+        assertTrue(three.containsAll(listOf(2, 3)))
+        assertTrue(three.containsAll(listOf(1, 2, 3)))
     }
 
     @Test
     fun get() {
-        assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of<Int>()[0] }
-        assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of(1)[1] }
-        assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of(1, 2, 3, 4, 5)[10] }
+        assertEquals(1, one[0])
+        assertThrows(IndexOutOfBoundsException::class.java) { one[1] }
+        assertThrows(IndexOutOfBoundsException::class.java) { one[2] }
+        assertThrows(IndexOutOfBoundsException::class.java) { one[3] }
 
-        assertEquals(1, CdrCodedList.of(1)[0])
-        assertEquals(2, CdrCodedList.of(2, 1)[0])
-        assertEquals((0..99).first(), CdrCodedList(0..99)[0])
-        assertEquals(5, CdrCodedList.of(1, 2, 3, 4).cons(5)[0])
+        assertEquals(2, two[0])
+        assertEquals(1, two[1])
+        assertThrows(IndexOutOfBoundsException::class.java) { two[2] }
+        assertThrows(IndexOutOfBoundsException::class.java) { two[3] }
 
-        assertEquals(2, CdrCodedList.of(3, 2, 1)[1])
-        assertEquals(1, CdrCodedList.of(3, 2, 1)[2])
-        assertEquals(5, CdrCodedList.of(1, 2, 3, 4).cons(5)[0])
-        assertEquals(50, CdrCodedList(0..99)[50])
+        assertEquals(3, three[0])
+        assertEquals(2, three[1])
+        assertEquals(1, three[2])
+        assertThrows(IndexOutOfBoundsException::class.java) { three[3] }
     }
 
     @Test
     fun isEmpty() {
-        assertTrue(CdrCodedList<Int>().isEmpty())
-        assertTrue(CdrCodedList<String>().isEmpty())
-        assertTrue(CdrCodedList<Int>(listOf()).isEmpty())
-        assertTrue(CdrCodedList(listOf(1)).cdr.isEmpty())
+        assertFalse(one.isEmpty())
+        assertTrue(one.cdr.isEmpty())
 
-        assertFalse(CdrCodedList<Int>().cons(1).isEmpty())
-        assertFalse(CdrCodedList<Int>().cons(1).cons(2).isEmpty())
-        assertFalse(CdrCodedList<Int>().cons(1).cons(2).cons(3).isEmpty())
-        assertFalse(CdrCodedList(listOf(2, 1, 3)).isEmpty())
+        assertFalse(two.isEmpty())
+        assertFalse(two.cdr.isEmpty())
+        assertTrue(two.cdr.cdr.isEmpty())
 
-        assertFalse(CdrCodedList<Int>().isNotEmpty())
-        assertFalse(CdrCodedList<String>().isNotEmpty())
-        assertFalse(CdrCodedList<Int>(listOf()).isNotEmpty())
-        assertFalse(CdrCodedList(listOf(1)).cdr.isNotEmpty())
-
-        assertTrue(CdrCodedList<Int>().cons(1).isNotEmpty())
-        assertTrue(CdrCodedList<Int>().cons(1).cons(2).isNotEmpty())
-        assertTrue(CdrCodedList<Int>().cons(1).cons(2).cons(3).isNotEmpty())
-        assertTrue(CdrCodedList(listOf(2, 1, 3)).isNotEmpty())
+        assertFalse(three.isEmpty())
+        assertFalse(three.cdr.isEmpty())
+        assertFalse(three.cdr.cdr.isEmpty())
+        assertTrue(three.cdr.cdr.cdr.isEmpty())
     }
 
     @Test
     fun indexOf() {
-        assertEquals(-1, CdrCodedList.of(1).indexOf(0))
-        assertEquals(-1, CdrCodedList(listOf(2, 1, 3, 2, 1, 3)).indexOf(4))
-        assertEquals(0, CdrCodedList.of(1).indexOf(1))
-        assertEquals(0, CdrCodedList.of<Int>().cons(1).indexOf(1))
-        assertEquals(2, CdrCodedList(listOf(2, 1, 3)).indexOf(3))
-        assertEquals(2, CdrCodedList(listOf(2, 1, 3, 2, 1, 3)).indexOf(3))
-        assertEquals(2, CdrCodedList(listOf(2, 1, 3, 2, 1, 3, 15)).indexOf(3))
-        assertEquals(0, CdrCodedList(listOf(1, 1, 1, 1, 1, 1)).indexOf(1))
+        assertEquals(-1, one.indexOf(0))
+        assertEquals(0, one.indexOf(1))
+        assertEquals(-1, one.indexOf(2))
+        assertEquals(-1, one.indexOf(3))
+        assertEquals(-1, one.indexOf(4))
+
+        assertEquals(-1, two.indexOf(0))
+        assertEquals(1, two.indexOf(1))
+        assertEquals(0, two.indexOf(2))
+        assertEquals(-1, two.indexOf(3))
+        assertEquals(-1, two.indexOf(4))
+
+        assertEquals(-1, three.indexOf(0))
+        assertEquals(2, three.indexOf(1))
+        assertEquals(1, three.indexOf(2))
+        assertEquals(0, three.indexOf(3))
+        assertEquals(-1, three.indexOf(4))
+
+        val threeConsOne = three.cons(1)
+        assertEquals(-1, threeConsOne.indexOf(0))
+        assertEquals(0, threeConsOne.indexOf(1))
+        assertEquals(2, threeConsOne.indexOf(2))
+        assertEquals(1, threeConsOne.indexOf(3))
+        assertEquals(-1, threeConsOne.indexOf(4))
     }
 
     @Test
     fun lastIndexOf() {
-        assertEquals(-1, CdrCodedList.of(1).lastIndexOf(0))
-        assertEquals(-1, CdrCodedList(listOf(2, 1, 3, 2, 1, 3)).lastIndexOf(4))
-        assertEquals(0, CdrCodedList.of(1).lastIndexOf(1))
-        assertEquals(0, CdrCodedList.of<Int>().cons(1).lastIndexOf(1))
-        assertEquals(2, CdrCodedList(listOf(2, 1, 3)).lastIndexOf(3))
-        assertEquals(5, CdrCodedList(listOf(2, 1, 3, 2, 1, 3)).lastIndexOf(3))
-        assertEquals(5, CdrCodedList(listOf(2, 1, 3, 2, 1, 3, 15)).lastIndexOf(3))
-        assertEquals(5, CdrCodedList(listOf(1, 1, 1, 1, 1, 1)).lastIndexOf(1))
+        assertEquals(-1, one.lastIndexOf(0))
+        assertEquals(0, one.lastIndexOf(1))
+        assertEquals(-1, one.lastIndexOf(2))
+        assertEquals(-1, one.lastIndexOf(3))
+        assertEquals(-1, one.lastIndexOf(4))
+
+        assertEquals(-1, two.lastIndexOf(0))
+        assertEquals(1, two.lastIndexOf(1))
+        assertEquals(0, two.lastIndexOf(2))
+        assertEquals(-1, two.lastIndexOf(3))
+        assertEquals(-1, two.lastIndexOf(4))
+
+        assertEquals(-1, three.lastIndexOf(0))
+        assertEquals(2, three.lastIndexOf(1))
+        assertEquals(1, three.lastIndexOf(2))
+        assertEquals(0, three.lastIndexOf(3))
+        assertEquals(-1, three.lastIndexOf(4))
+
+        val threeConsOne = three.cons(1)
+        assertEquals(-1, threeConsOne.lastIndexOf(0))
+        assertEquals(3, threeConsOne.lastIndexOf(1))
+        assertEquals(2, threeConsOne.lastIndexOf(2))
+        assertEquals(1, threeConsOne.lastIndexOf(3))
+        assertEquals(-1, threeConsOne.lastIndexOf(4))
     }
 
     @Test
     fun iterator() {
         run {
             var counter = 0
-            for (e in CdrCodedList<Int>()) {
+            for (e in one.cdr) {
                 counter++
             }
             assertEquals(0, counter)
         }
         run {
             var counter = 0
-            for (e in CdrCodedList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))) {
+            for (e in three) {
                 counter++
             }
-            assertEquals(10, counter)
+            assertEquals(3, counter)
         }
         run {
             var counter = 0
-            CdrCodedList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).forEach { _ -> counter++ }
-            assertEquals(10, counter)
+            CdrCodedList(three).forEach { _ -> counter++ }
+            assertEquals(3, counter)
         }
 
         run {
-            val iterator = CdrCodedList.of(1, 2, 3, 4, 5).iterator()
+            val iterator = three.iterator()
             var sum = 0
             while (iterator.hasNext()) {
                 sum += iterator.next()
             }
-            assertEquals(15, sum)
+            assertEquals(6, sum)
         }
 
-        assertEquals(15, CdrCodedList.of(1, 2, 3, 4, 5).sum())
-        assertEquals(15, CdrCodedList.of(1, 2, 3, 4, 5).fold(0, Int::plus))
-        assertEquals(15, CdrCodedList.of(1, 2, 3, 4, 5).foldRight(0, Int::plus))
-        assertEquals(15, CdrCodedList.of(1, 2, 3, 4, 5).reduce(Int::plus))
+        assertEquals(6, three.sum())
+        assertEquals(6, three.fold(0, Int::plus))
+        assertEquals(6, three.foldRight(0, Int::plus))
+        assertEquals(6, three.reduce(Int::plus))
     }
 
     @Test
     fun listIterator() {
         run {
             var counter = 0
-            for (e in CdrCodedList<Int>().listIterator()) {
+            for (e in one.cdr.listIterator()) {
                 counter++
             }
             assertEquals(0, counter)
         }
         run {
             var counter = 0
-            for (e in CdrCodedList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).listIterator()) {
+            for (e in three.listIterator()) {
                 counter++
             }
-            assertEquals(10, counter)
+            assertEquals(3, counter)
         }
         run {
             var counter = 0
-            CdrCodedList(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).listIterator().forEach { _ -> counter++ }
-            assertEquals(10, counter)
+            three.listIterator().forEach { _ -> counter++ }
+            assertEquals(3, counter)
         }
 
         run {
-            val iterator = CdrCodedList.of(1, 2, 3, 4, 5).listIterator()
+            val iterator = three.listIterator()
             var sum = 0
             while (iterator.hasNext()) {
                 sum += iterator.next()
             }
-            assertEquals(15, sum)
+            assertEquals(6, sum)
         }
     }
 
     @Test
     fun subList() {
-        assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of<Int>().subList(3, 6).size }
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
-        assertEquals(listOf<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(0, 0))
-        assertEquals(listOf(4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
-        assertEquals(3, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
+        assertThrows(IndexOutOfBoundsException::class.java) { three.subList(0, 5) }
+        assertInstanceOf(Cons::class.java,three.subList(0, 2))
+        assertEquals(three, three.subList(0, 3))
+        assertEquals(two, three.subList(1, 3))
+        assertEquals(one, three.subList(2, 3))
     }
 
     @Test
     fun toMutableList() {
-        assertTrue(CdrCodedList<Int>().toMutableList().isEmpty())
-        assertEquals(5, CdrCodedList.of(1, 2, 3, 4, 5).toMutableList().size)
+        assertEquals(mutableListOf(1), one.toMutableList())
+        assertEquals(mutableListOf(2, 1), two.toMutableList())
+        assertEquals(mutableListOf(3, 2, 1), three.toMutableList())
     }
 
     @Test
     fun reversed() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().reversed())
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(3, 2, 1).reversed())
+        assertInstanceOf(Cons::class.java, one.reversed())
+        assertInstanceOf(Cons::class.java, two.reversed())
+        assertInstanceOf(Cons::class.java, three.reversed())
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().reversed())
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(3, 2, 1).reversed())
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of<Int>().cons(1).cons(2).cons(3).reversed())
+        assertEquals(three, three.reversed().reversed())
+
+        assertEquals(Cons.of(1), one.reversed())
+        assertEquals(Cons.of(1, 2), two.reversed())
+        assertEquals(Cons.of(1, 2, 3), three.reversed())
     }
 
     @Test
     fun map() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().map { it })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).map { it })
+        assertInstanceOf(Cons::class.java, one.map { it })
+        assertInstanceOf(Cons::class.java, two.map { it })
+        assertInstanceOf(Cons::class.java, three.map { it })
 
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).map { it })
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).map { it })
-        assertEquals(CdrCodedList.of(2, 3), CdrCodedList.of(1, 2).map { it + 1 })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3).map { it })
-        assertEquals(CdrCodedList.of(2, 3, 4), CdrCodedList.of(1, 2, 3).map { it + 1 })
+        assertEquals(Cons.of(1), one.map { it })
+        assertEquals(Cons.of(3, 2), two.map { it + 1 })
     }
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().mapIndexed { _, elem -> elem })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).mapIndexed { _, elem -> elem })
+        assertInstanceOf(Cons::class.java, one.mapIndexed { i, e -> e+i })
+        assertInstanceOf(Cons::class.java, two.mapIndexed { i, e -> e+i })
+        assertInstanceOf(Cons::class.java, three.mapIndexed { i, e -> e+i })
 
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(0, 1), CdrCodedList.of(1, 2).mapIndexed { i, _ -> i })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(2, 3, 4), CdrCodedList.of(1, 2, 3).mapIndexed { _, elem -> elem + 1 })
-        assertEquals(CdrCodedList.of(1, 3, 5), CdrCodedList.of(1, 2, 3).mapIndexed { i, elem -> elem + i })
-        assertEquals(CdrCodedList.of(1, 2, 3, 4), CdrCodedList.of(1, 2, 3, 4).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(2, 3, 4, 5), CdrCodedList.of(1, 2, 3, 4).mapIndexed { _, elem -> elem + 1 })
-        assertEquals(CdrCodedList.of(1, 3, 5, 7), CdrCodedList.of(1, 2, 3, 4).mapIndexed { i, elem -> elem + i })
+        assertEquals(Cons.of(1), one.mapIndexed { i, e -> e+i })
+        assertEquals(Cons.of(2, 2), two.mapIndexed { i, e -> e+i })
+        assertEquals(Cons.of(3, 3, 3), three.mapIndexed { i, e -> e+i })
+        assertEquals(Cons.of(4, 3, 2), three.mapIndexed { _, e -> e+1 })
     }
 
     @Test
     fun filter() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().filter { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).filter { true })
+        assertInstanceOf(Cons::class.java, one.filter { true })
+        assertInstanceOf(Cons::class.java, three.filter { it % 2 != 0 })
 
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).filter { true })
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2).filter { false })
-        assertEquals(CdrCodedList.of(2), CdrCodedList.of(1, 2, 3).filter { it % 2 == 0 })
-        assertEquals(CdrCodedList.of(2, 4), CdrCodedList.of(1, 2, 3, 4).filter { it % 2 == 0 })
+        assertEquals(Cons.of<Int>(), one.filter { it % 2 == 0 })
+        assertEquals(Cons.of(1), one.filter { it % 2 != 0 })
+        assertEquals(Cons.of(1), two.filter { it % 2 != 0 })
+        assertEquals(Cons.of(3, 1), three.filter { it % 2 != 0 })
     }
 
     @Test
     fun filterNot() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().filterNot { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).filterNot { true })
+        assertInstanceOf(Cons::class.java, one.filterNot { true })
+        assertInstanceOf(Cons::class.java, three.filterNot { it % 2 != 0 })
 
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).filterNot { false })
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2).filterNot { true })
-        assertEquals(CdrCodedList.of(2), CdrCodedList.of(1, 2, 3).filterNot { it % 2 != 0 })
-        assertEquals(CdrCodedList.of(2, 4), CdrCodedList.of(1, 2, 3, 4).filterNot { it % 2 != 0 })
+        assertEquals(Cons.of<Int>(), one.filterNot { it % 2 != 0 })
+        assertEquals(Cons.of(1), one.filterNot { it % 2 == 0 })
+        assertEquals(Cons.of(1), two.filterNot { it % 2 == 0 })
+        assertEquals(Cons.of(3, 1), three.filterNot { it % 2 == 0 })
     }
 
     @Test
     fun cadr() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Int>().cadr }
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of(1).cadr }
-        assertEquals(2, CdrCodedList.of(1, 2, 3, 4, 5).cadr)
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.car, CdrCodedList.of(1, 2, 3, 4, 5).cadr)
+        assertThrows(NoSuchElementException::class.java) { one.cadr }
+        assertEquals(1, two.cadr)
+        assertEquals(2, three.cadr)
+        assertEquals(3, three.cons(4).cadr)
     }
 
     @Test
     fun caddr() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Int>().caddr }
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of(1).caddr }
-        assertEquals(3, CdrCodedList.of(1, 2, 3, 4, 5).caddr)
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr.car, CdrCodedList.of(1, 2, 3, 4, 5).caddr)
+        assertThrows(NoSuchElementException::class.java) { one.caddr }
+        assertThrows(NoSuchElementException::class.java) { two.caddr }
+        assertEquals(1, three.caddr)
+        assertEquals(2, three.cons(4).caddr)
     }
 
     @Test
     fun cadddr() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Int>().cadddr }
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of(1).cadddr }
-        assertEquals(4, CdrCodedList.of(1, 2, 3, 4, 5).cadddr)
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.car, CdrCodedList.of(1, 2, 3, 4, 5).cadddr)
+        assertThrows(NoSuchElementException::class.java) { one.cadddr }
+        assertThrows(NoSuchElementException::class.java) { two.cadddr }
+        assertThrows(NoSuchElementException::class.java) { three.cadddr }
+        assertEquals(1, three.cons(4).cadddr)
     }
 
     @Test
     fun cddr() {
-        assertEquals(NullCons<Int>(), CdrCodedList.of<Int>().cddr)
-        assertEquals(NullCons<Int>(), CdrCodedList.of(1).cddr)
-        assertEquals(CdrCodedList.of(3, 4, 5), CdrCodedList.of(1, 2, 3, 4, 5).cddr)
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr, CdrCodedList.of(1, 2, 3, 4, 5).cddr)
+        assertEquals(nullCons<Int>(), one.cddr)
+        assertEquals(nullCons<Int>(), two.cddr)
+        assertEquals(Cons.of(1), three.cddr)
+        assertEquals(Cons.of(2, 1), three.cons(4).cddr)
+        assertEquals(Cons.of(3, 2, 1), three.cons(4).cons(5).cddr)
     }
 
     @Test
     fun cdddr() {
-        assertEquals(NullCons<Int>(), CdrCodedList.of<Int>().cdddr)
-        assertEquals(NullCons<Int>(), CdrCodedList.of(1).cdddr)
-        assertEquals(CdrCodedList.of(4, 5), CdrCodedList.of(1, 2, 3, 4, 5).cdddr)
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr.cdr, CdrCodedList.of(1, 2, 3, 4, 5).cdddr)
+        assertEquals(nullCons<Int>(), one.cdddr)
+        assertEquals(nullCons<Int>(), two.cdddr)
+        assertEquals(nullCons<Int>(), three.cdddr)
+        assertEquals(Cons.of(1), three.cons(4).cdddr)
+        assertEquals(Cons.of(2, 1), three.cons(4).cons(5).cdddr)
     }
 
     @Test
     fun cddddr() {
-        assertEquals(NullCons<Int>(), CdrCodedList.of<Int>().cddddr)
-        assertEquals(NullCons<Int>(), CdrCodedList.of(1).cddddr)
-        assertEquals(CdrCodedList.of(5), CdrCodedList.of(1, 2, 3, 4, 5).cddddr)
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5).cdr.cdr.cdr.cdr, CdrCodedList.of(1, 2, 3, 4, 5).cddddr)
+        assertEquals(nullCons<Int>(), one.cddddr)
+        assertEquals(nullCons<Int>(), two.cddddr)
+        assertEquals(nullCons<Int>(), three.cddddr)
+        assertEquals(nullCons<Int>(), three.cons(4).cddddr)
+        assertEquals(Cons.of(1), three.cons(4).cons(5).cddddr)
     }
 
     @Test
     fun flatMap() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().flatMap { listOf(it) })
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().flatMap { listOf(it) })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).flatMap { listOf(it) })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3).flatMap { listOf(it) })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(listOf(1, 2), listOf(3)).flatMap { it })
+        assertInstanceOf(Cons::class.java, three.flatMap { listOf(it) })
+        assertEquals(three, three.flatMap { listOf(it) })
+        assertEquals(Cons.of(3, 3, 2, 2, 1, 1), three.flatMap { listOf(it, it) })
     }
 
     @Test
     fun take() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().take(10))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).take(10))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).take(2))
+        assertInstanceOf(Cons::class.java, three.take(0))
+        assertInstanceOf(Cons::class.java, three.take(1))
+        assertInstanceOf(Cons::class.java, three.take(2))
+        assertInstanceOf(Cons::class.java, three.take(22))
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(0))
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(10))
-
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(0))
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(1))
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(2))
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(3))
-        assertEquals(CdrCodedList.of(1, 2, 3, 4), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(4))
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(5))
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).take(6))
+        assertEquals(Cons.of<Int>(), three.take(0))
+        assertEquals(Cons.of(3), three.take(1))
+        assertEquals(Cons.of(3, 2), three.take(2))
+        assertEquals(Cons.of(3, 2, 1), three.take(3))
+        assertEquals(Cons.of(3, 2, 1), three.take(4))
     }
 
     @Test
     fun drop() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().drop(10))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).drop(10))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).drop(2))
+        assertInstanceOf(Cons::class.java, three.drop(0))
+        assertInstanceOf(Cons::class.java, three.drop(1))
+        assertInstanceOf(Cons::class.java, three.drop(2))
+        assertInstanceOf(Cons::class.java, three.drop(22))
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(0))
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(10))
-
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(0))
-        assertEquals(CdrCodedList.of(2, 3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(1))
-        assertEquals(CdrCodedList.of(3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(2))
-        assertEquals(CdrCodedList.of(4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(3))
-        assertEquals(CdrCodedList.of(5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(4))
-        assertEquals(CdrCodedList.of(6), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(5))
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6).drop(6))
+        assertEquals(three, three.drop(0))
+        assertEquals(two, three.drop(1))
+        assertEquals(one, three.drop(2))
+        assertEquals(Cons.of<Int>(), three.drop(3))
+        assertEquals(Cons.of<Int>(), three.drop(4))
     }
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().takeWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).takeWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).takeWhile { false })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).takeWhile { it < 3 })
+        assertInstanceOf(Cons::class.java, three.takeWhile {true})
+        assertInstanceOf(Cons::class.java, three.takeWhile {false})
+        assertInstanceOf(Cons::class.java, three.takeWhile {it % 2 == 1})
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().takeWhile { it < 3 })
-
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2, 3, 2, 1).takeWhile { it < 3 })
-
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 1 })
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 2 })
-        assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 3 })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 4 })
-        assertEquals(CdrCodedList.of(1, 2, 3, 4), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 5 })
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 6 })
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).takeWhile { it < 7 })
+        assertEquals(three, three.takeWhile {true})
+        assertEquals(Cons.of(3), three.takeWhile {it % 2 == 1})
+        assertEquals(Cons.of<Int>(), three.takeWhile {false})
     }
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().dropWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).dropWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).dropWhile { false })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).dropWhile { it < 3 })
+        assertInstanceOf(Cons::class.java, three.dropWhile {true})
+        assertInstanceOf(Cons::class.java, three.dropWhile {false})
+        assertInstanceOf(Cons::class.java, three.dropWhile {it % 2 == 1})
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().dropWhile { it < 3 })
-
-        assertEquals(CdrCodedList.of(3, 2, 1), CdrCodedList.of(1, 2, 3, 2, 1).dropWhile { it < 3 })
-
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 1 })
-        assertEquals(CdrCodedList.of(2, 3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 2 })
-        assertEquals(CdrCodedList.of(3, 4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 3 })
-        assertEquals(CdrCodedList.of(4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 4 })
-        assertEquals(CdrCodedList.of(5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 5 })
-        assertEquals(CdrCodedList.of(6), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 6 })
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6).dropWhile { it < 8 })
+        assertEquals(three, three.dropWhile {false})
+        assertEquals(two, three.dropWhile {it % 2 == 1})
+        assertEquals(Cons.of<Int>(), three.dropWhile {true})
     }
 
 //    @Test
@@ -448,150 +481,119 @@ class ConsCellTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().sortedBy { it })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedBy { it })
+        assertInstanceOf(Cons::class.java, one.sortedBy { it })
+        assertInstanceOf(Cons::class.java, three.sortedBy { it })
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().sortedBy { it })
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedBy { it })
-
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3).sortedBy { it })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(3, 1, 2).sortedBy { it })
-
-        assertEquals(CdrCodedList.of(1, 2, 2, 3), CdrCodedList.of(1, 2, 2, 3).sortedBy { it })
-        assertEquals(CdrCodedList.of(1, 2, 2, 3), CdrCodedList.of(3, 1, 2, 2).sortedBy { it })
+        assertEquals(Cons.of(1), one.sortedBy { it })
+        assertEquals(Cons.of(1, 2, 3), three.sortedBy { it })
+        assertEquals(Cons.of(1, 2, 3), three.reversed().sortedBy { it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().sortedByDescending { it })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, one.sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, three.sortedByDescending { it })
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().sortedByDescending { it })
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedByDescending { it })
-
-        assertEquals(CdrCodedList.of(3, 2, 1), CdrCodedList.of(1, 2, 3).sortedByDescending { it })
-        assertEquals(CdrCodedList.of(3, 2, 1), CdrCodedList.of(3, 1, 2).sortedByDescending { it })
-
-        assertEquals(CdrCodedList.of(3, 2, 2, 1), CdrCodedList.of(1, 2, 2, 3).sortedByDescending { it })
-        assertEquals(CdrCodedList.of(3, 2, 2, 1), CdrCodedList.of(3, 1, 2, 2).sortedByDescending { it })
+        assertEquals(Cons.of(1), one.sortedByDescending { it })
+        assertEquals(Cons.of(3, 2, 1), three.sortedByDescending { it })
+        assertEquals(Cons.of(3, 2, 1), three.reversed().sortedByDescending { it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedWith { n, m -> -n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, one.sortedWith { n,m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, three.sortedWith {n,m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, one.sortedWith { n,m -> -n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, three.sortedWith { n,m -> -n.compareTo(m) })
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedWith { n, m -> -n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(3, 1, 2), CdrCodedList.of(3, 1, 2).sortedWith { _, _ -> 0 })
-
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3).sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(3, 1, 2).sortedWith { n, m -> n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(1, 2, 2, 3), CdrCodedList.of(1, 2, 2, 3).sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(1, 2, 2, 3), CdrCodedList.of(3, 1, 2, 2).sortedWith { n, m -> n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(3, 2, 1), CdrCodedList.of(1, 2, 3).sortedWith { n, m -> -n.compareTo(m) })
-        assertEquals(CdrCodedList.of(3, 2, 1), CdrCodedList.of(3, 1, 2).sortedWith { n, m -> -n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(3, 2, 2, 1), CdrCodedList.of(1, 2, 2, 3).sortedWith { n, m -> -n.compareTo(m) })
-        assertEquals(CdrCodedList.of(3, 2, 2, 1), CdrCodedList.of(3, 1, 2, 2).sortedWith { n, m -> -n.compareTo(m) })
+        assertEquals(Cons.of(1), one.sortedWith { n,m -> n.compareTo(m) })
+        assertEquals(Cons.of(1, 2, 3), three.sortedWith { n,m -> n.compareTo(m) })
+        assertEquals(Cons.of(1, 2, 3), three.reversed().sortedWith { n,m -> n.compareTo(m) })
+        assertEquals(Cons.of(1), one.sortedWith { n,m -> -n.compareTo(m) })
+        assertEquals(Cons.of(3, 2, 1), three.sortedWith { n,m -> -n.compareTo(m) })
+        assertEquals(Cons.of(3, 2, 1), three.reversed().sortedWith { n,m -> -n.compareTo(m) })
     }
 
     @Test
     fun distinct() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().distinct())
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).distinct())
+        assertInstanceOf(Cons::class.java, three.distinct())
+        assertInstanceOf(Cons::class.java, two.cons(1).distinct())
 
-        assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().distinct())
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).distinct())
-        assertEquals(CdrCodedList.of(1, 2, 3, 4, 5), CdrCodedList.of(1, 2, 3, 4, 5).distinct())
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1, 1, 1, 1, 1, 1).distinct())
-
-        assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 1, 2, 2, 3, 3).distinct())
-        assertEquals(CdrCodedList.of(2, 1, 3), CdrCodedList.of(2, 1, 1, 2, 3, 3).distinct())
+        assertEquals(three, three.distinct())
+        assertEquals(nullCons<Int>().cons(2).cons(1), two.cons(1).distinct())
     }
 
     @Test
     fun shuffled() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().shuffled())
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).shuffled())
+        assertInstanceOf(Cons::class.java, three.shuffled())
 
         val seed = 0xDEADBEEF
         val rand = Random(seed)
-        val temp = CdrCodedList(1..50)
-        val tempShuffled = temp.shuffled(rand)
-        assertNotSame(temp, tempShuffled)
 
-        assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).shuffled(rand))
-        assertEquals(CdrCodedList.of(1, 1, 1), CdrCodedList.of(1, 1, 1).shuffled(rand))
-        assertEquals(CdrCodedList(1..55).shuffled(Random(seed)), CdrCodedList(1..55).shuffled(Random(seed)))
+        assertEquals(one,one.shuffled(rand))
+
+        val oneOneOne = nullCons<Int>().cons(1).cons(1).cons(1)
+        assertEquals(oneOneOne, oneOneOne.shuffled(rand))
     }
 
     @Test
     fun asSequence() {
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of<Int>().asSequence())
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of(1, 2).asSequence())
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of(1, 2, 3).asSequence())
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of(1, 2, 3).asSequence().map { it + 1 })
+        assertInstanceOf(Sequence::class.java, one.asSequence())
+        assertInstanceOf(Sequence::class.java, two.asSequence())
+        assertInstanceOf(Sequence::class.java, three.asSequence())
+        assertInstanceOf(Sequence::class.java, three.asSequence().map { it + 1 })
 
-        assertEquals(listOf(1), CdrCodedList.of(1).asSequence().toList())
-        assertEquals(listOf(1, 2), CdrCodedList.of(1, 2).asSequence().toList())
-        assertEquals(listOf(2, 3, 4), CdrCodedList.of(1, 2, 3).asSequence().map { it + 1 }.toList())
+        assertEquals(listOf(1), one.asSequence().toList())
+        assertEquals(listOf(2, 1), two.asSequence().toList())
+        assertEquals(listOf(4, 3, 2), three.asSequence().map { it + 1 }.toList())
     }
 
     @Test
     fun plusElement() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>() + 1)
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1) + 2)
+        assertInstanceOf(Cons::class.java, one + 1)
+        assertInstanceOf(Cons::class.java, two + 2)
 
-        assertEquals(Cons.of(1), CdrCodedList.of<Int>() + 1)
-        assertEquals(Cons.of(1, 2), CdrCodedList.of(1) + 2)
+        assertEquals(Cons.of(1, 1), one + 1)
+        assertEquals(Cons.of(3, 2, 1, 2), three + 2)
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>() + listOf(1))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(1) + listOf(2, 3))
+        assertInstanceOf(Cons::class.java, one + listOf(2, 3))
 
-        assertEquals(Cons.of<Int>(), CdrCodedList.of<Int>() + listOf())
-        assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1, 2, 3) + listOf())
+        assertEquals(three, three + listOf())
 
-        assertEquals(Cons.of(1), CdrCodedList.of<Int>() + listOf(1))
-        assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1) + listOf(2, 3))
+        assertEquals(Cons.of(2, 1), nullCons<Int>().cons(2) + listOf(1))
+        assertEquals(Cons.of(1, 2, 3), nullCons<Int>().cons(1) + listOf(2, 3))
 
-        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of<Int>() + (1..5))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of<Int>() + (1..<6))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + (2..5))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + sequenceOf(2, 3, 4, 5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), one + (2..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), one + (2..<6))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), one + sequenceOf(2, 3, 4, 5))
 
-        assertEquals(Cons.of<Int>(), CdrCodedList.of<Int>() + Cons.of())
-        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + Cons.of(2, 3, 4, 5))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + CdrCodedList(listOf(2, 3, 4, 5)))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), one + Cons.of(2, 3, 4, 5))
+        assertEquals(Cons.of(3, 2, 1, 3, 4), three + CdrCodedList(listOf(3, 4)))
     }
 
     @Test
     fun plusVList() {
-        assertInstanceOf(VList::class.java, CdrCodedList.of<Int>() + VList.of())
-        assertEquals(VList.of<Int>(), CdrCodedList.of<Int>() + VList.of())
+        assertInstanceOf(VList::class.java, three + VList.of())
+        assertEquals(VList.of(3, 2, 1), three + VList.of())
 
-        assertInstanceOf(VList::class.java, CdrCodedList.of<Int>() + VList.of(1))
-        assertEquals(VList.of(1), CdrCodedList.of<Int>() + VList.of(1))
+        assertInstanceOf(VList::class.java, three + VList.of(1))
+        assertEquals(VList.of(3, 2, 1, 1), three + VList.of(1))
 
-        assertInstanceOf(VList::class.java, CdrCodedList.of(1, 2) + VList.of(3))
-        assertEquals(VList.of(1, 2, 3), CdrCodedList.of(1, 2) + VList.of(3))
+        assertInstanceOf(VList::class.java, three + VList.of(1, 2))
+        assertEquals(VList.of(3, 2, 1, 1, 2), three + VList.of(1, 2))
 
-        assertInstanceOf(VList::class.java, CdrCodedList.of(1, 2) + VList.of(3, 4))
-        assertEquals(VList.of(1, 2, 3, 4), CdrCodedList.of(1, 2) + VList.of(3, 4))
+        assertInstanceOf(VList::class.java, three + VList(0..5))
+        assertEquals(VList.of(3, 2, 1, 0, 1, 2, 3, 4, 5), three + VList(0..5))
     }
 
     @Test
     fun isSingleton() {
-        assertFalse(CdrCodedList.of<Int>().isSingleton())
-        assertTrue(CdrCodedList.of(1).isSingleton())
-        assertFalse(CdrCodedList.of(1, 2).isSingleton())
+        assertFalse(one.cdr.isSingleton())
+        assertTrue(one.isSingleton())
+        assertFalse(two.isSingleton())
+        assertFalse(three.isSingleton())
     }
 }

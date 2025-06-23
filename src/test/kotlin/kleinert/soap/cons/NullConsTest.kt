@@ -6,11 +6,11 @@ import kotlin.random.Random
 
 class NullConsTest {
 
-    private val instance = NullCons<Boolean>()
+    private val instance = nullCons<Boolean>()
 
     @Test
     fun testConstructor() {
-        assertEquals(instance, NullCons<Boolean>())
+        assertEquals(instance, nullCons<Boolean>())
     }
 
     @Test
@@ -42,13 +42,13 @@ class NullConsTest {
     @Test
     fun contains() {
         assertFalse(instance.contains(true))
-        assertFalse(NullCons<String>().contains(""))
+        assertFalse(nullCons<String>().contains(""))
     }
 
     @Test
     fun containsAll() {
         assertFalse(instance.containsAll(listOf(true)))
-        assertFalse(NullCons<String>().containsAll(listOf("")))
+        assertFalse(nullCons<String>().containsAll(listOf("")))
     }
 
     @Test
@@ -61,7 +61,7 @@ class NullConsTest {
     @Test
     fun isEmpty() {
         assertTrue(instance.isEmpty())
-        assertTrue(NullCons<String>().isEmpty())
+        assertTrue(nullCons<String>().isEmpty())
     }
 
     @Test
@@ -135,7 +135,7 @@ class NullConsTest {
         assertInstanceOf(Cons::class.java, CdrCodedList.of(true).mapIndexed { _, elem -> elem })
 
         assertEquals(instance, instance.mapIndexed { _, elem -> elem })
-        assertEquals(NullCons<Int>(), instance.mapIndexed { i, _ -> i })
+        assertEquals(nullCons<Int>(), instance.mapIndexed { i, _ -> i })
     }
 
     @Test
@@ -254,20 +254,20 @@ class NullConsTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, NullCons<Int>().sortedBy { it })
-        assertEquals(NullCons<Int>(), NullCons<Int>().sortedBy { it })
+        assertInstanceOf(Cons::class.java, nullCons<Int>().sortedBy { it })
+        assertEquals(nullCons<Int>(), nullCons<Int>().sortedBy { it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, NullCons<Int>().sortedByDescending { it })
-        assertEquals(NullCons<Int>(), NullCons<Int>().sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, nullCons<Int>().sortedByDescending { it })
+        assertEquals(nullCons<Int>(), nullCons<Int>().sortedByDescending { it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, NullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(NullCons<Int>(), NullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, nullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(nullCons<Int>(), nullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
     }
 
     @Test
@@ -306,7 +306,7 @@ class NullConsTest {
         assertEquals(instance, instance + listOf())
 
         assertEquals(Cons.of(true), instance + listOf(true))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), NullCons<Int>() + (1..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), nullCons<Int>() + (1..5))
 
         assertEquals(instance, instance + Cons.of())
         assertEquals(Cons.of(false, true, false, true), instance + Cons.of(false, true, false, true))
