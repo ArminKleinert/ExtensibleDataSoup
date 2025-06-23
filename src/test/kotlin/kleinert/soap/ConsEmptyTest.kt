@@ -96,239 +96,140 @@ class ConsEmptyTest {
     fun listIterator() {
         run {
             var counter = 0
-            for (e in CdrCodedList<Boolean>().listIterator()) {
+            for (e in instance.listIterator()) {
                 counter++
             }
             assertEquals(0, counter)
-        }
-        run {
-            var counter = 0
-            for (e in CdrCodedList(listOf(true, false, true, false, true, true, 7, 8, 9, true0)).listIterator()) {
-                counter++
-            }
-            assertEquals(true0, counter)
-        }
-        run {
-            var counter = 0
-            CdrCodedList(listOf(true, false, true, false, true, true, 7, 8, 9, true0)).listIterator().forEach { _ -> counter++ }
-            assertEquals(true0, counter)
-        }
-
-        run {
-            val iterator = CdrCodedList.of(true, false, true, false, true).listIterator()
-            var sum = 0
-            while (iterator.hasNext()) {
-                sum += iterator.next()
-            }
-            assertEquals(truetrue, sum)
         }
     }
 
     @Test
     fun subList() {
-        assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of<Boolean>().subList(true, true).size }
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true, false, true, true, 7, 8, 9, true0).subList(true, true))
-        assertEquals(listOf(false, true, true), CdrCodedList.of(true, false, true, false, true, true, 7, 8, 9, true0).subList(true, true))
-        assertEquals(true, CdrCodedList.of(true, false, true, false, true, true, 7, 8, 9, true0).subList(true, true).size)
+        assertThrows(IndexOutOfBoundsException::class.java) { instance.subList(0, 1).size }
+        assertThrows(IndexOutOfBoundsException::class.java) { instance.subList(1, 2).size }
+        assertEquals(instance, instance.subList(0, 0))
     }
 
     @Test
     fun toMutableList() {
-        assertTrue(CdrCodedList<Boolean>().toMutableList().isEmpty())
-        assertEquals(true, CdrCodedList.of(true, false, true, false, true).toMutableList().size)
+        assertTrue(instance.toMutableList().isEmpty())
+        assertEquals(0, instance.toMutableList().size)
     }
 
     @Test
     fun reversed() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().reversed())
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).reversed())
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().reversed())
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).reversed())
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of<Boolean>().cons(true).cons(false).cons(true).reversed())
+        assertInstanceOf(EmptyCons::class.java,instance.reversed())
+        assertEquals(instance, instance.reversed())
     }
 
     @Test
     fun map() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().map { it })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true).map { it })
+        assertInstanceOf(Cons::class.java,instance.map { it })
 
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).map { it })
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false).map { it })
-        assertEquals(CdrCodedList.of(false, true), CdrCodedList.of(true, false).map { it + true })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).map { it })
-        assertEquals(CdrCodedList.of(false, true, false), CdrCodedList.of(true, false, true).map { it + true })
+        assertEquals(instance, instance.map { it })
+        assertEquals(instance, instance.map { false })
     }
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().mapIndexed { _, elem -> elem })
+        assertInstanceOf(Cons::class.java, instance.mapIndexed { _, elem -> elem })
         assertInstanceOf(Cons::class.java, CdrCodedList.of(true).mapIndexed { _, elem -> elem })
 
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(0, true), CdrCodedList.of(true, false).mapIndexed { i, _ -> i })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(false, true, false), CdrCodedList.of(true, false, true).mapIndexed { _, elem -> elem + true })
-        assertEquals(CdrCodedList.of(true, true, true), CdrCodedList.of(true, false, true).mapIndexed { i, elem -> elem + i })
-        assertEquals(CdrCodedList.of(true, false, true, false), CdrCodedList.of(true, false, true, false).mapIndexed { _, elem -> elem })
-        assertEquals(CdrCodedList.of(false, true, false, true), CdrCodedList.of(true, false, true, false).mapIndexed { _, elem -> elem + true })
-        assertEquals(CdrCodedList.of(true, true, true, 7), CdrCodedList.of(true, false, true, false).mapIndexed { i, elem -> elem + i })
+        assertEquals(instance, instance.mapIndexed { _, elem -> elem })
+        assertEquals(EmptyCons<Int>(), instance.mapIndexed { i, _ -> i })
     }
 
     @Test
     fun filter() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().filter { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true).filter { true })
+        assertInstanceOf(EmptyCons::class.java, instance.filter { true })
+        assertInstanceOf(EmptyCons::class.java, instance.filter { false })
 
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false).filter { true })
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of(true, false).filter { false })
-        assertEquals(CdrCodedList.of(false), CdrCodedList.of(true, false, true).filter { it % false == 0 })
-        assertEquals(CdrCodedList.of(false, false), CdrCodedList.of(true, false, true, false).filter { it % false == 0 })
+        assertEquals(instance, instance.filter { true })
+        assertEquals(instance, instance.filter { it })
     }
 
     @Test
     fun filterNot() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().filterNot { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true).filterNot { true })
+        assertInstanceOf(EmptyCons::class.java, instance.filterNot { true })
+        assertInstanceOf(EmptyCons::class.java, instance.filterNot { false })
 
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false).filterNot { false })
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of(true, false).filterNot { true })
-        assertEquals(CdrCodedList.of(false), CdrCodedList.of(true, false, true).filterNot { it % false != 0 })
-        assertEquals(CdrCodedList.of(false, false), CdrCodedList.of(true, false, true, false).filterNot { it % false != 0 })
+        assertEquals(instance, instance.filterNot { true })
+        assertEquals(instance, instance.filterNot { it })
     }
 
     @Test
     fun cadr() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Boolean>().cadr }
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of(true).cadr }
-        assertEquals(false, CdrCodedList.of(true, false, true, false, true).cadr)
-        assertEquals(CdrCodedList.of(true, false, true, false, true).cdr.car, CdrCodedList.of(true, false, true, false, true).cadr)
+        assertThrows(NoSuchElementException::class.java) { instance.cadr }
     }
 
     @Test
     fun caddr() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Boolean>().caddr }
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of(true).caddr }
-        assertEquals(true, CdrCodedList.of(true, false, true, false, true).caddr)
-        assertEquals(CdrCodedList.of(true, false, true, false, true).cdr.cdr.car, CdrCodedList.of(true, false, true, false, true).caddr)
+        assertThrows(NoSuchElementException::class.java) { instance.caddr }
     }
 
     @Test
     fun cadddr() {
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of<Boolean>().cadddr }
-        assertThrows(NoSuchElementException::class.java) { CdrCodedList.of(true).cadddr }
-        assertEquals(false, CdrCodedList.of(true, false, true, false, true).cadddr)
-        assertEquals(CdrCodedList.of(true, false, true, false, true).cdr.cdr.cdr.car, CdrCodedList.of(true, false, true, false, true).cadddr)
+        assertThrows(NoSuchElementException::class.java) { instance.cadddr }
     }
 
     @Test
     fun cddr() {
-        assertEquals(EmptyCons<Boolean>(), CdrCodedList.of<Boolean>().cddr)
-        assertEquals(EmptyCons<Boolean>(), CdrCodedList.of(true).cddr)
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true, false, true).cddr)
-        assertEquals(CdrCodedList.of(true, false, true, false, true).cdr.cdr, CdrCodedList.of(true, false, true, false, true).cddr)
+        assertSame(instance, instance.cddr)
     }
 
     @Test
     fun cdddr() {
-        assertEquals(EmptyCons<Boolean>(), CdrCodedList.of<Boolean>().cdddr)
-        assertEquals(EmptyCons<Boolean>(), CdrCodedList.of(true).cdddr)
-        assertEquals(CdrCodedList.of(false, true), CdrCodedList.of(true, false, true, false, true).cdddr)
-        assertEquals(CdrCodedList.of(true, false, true, false, true).cdr.cdr.cdr, CdrCodedList.of(true, false, true, false, true).cdddr)
+        assertSame(instance, instance.cdddr)
     }
 
     @Test
     fun cddddr() {
-        assertEquals(EmptyCons<Boolean>(), CdrCodedList.of<Boolean>().cddddr)
-        assertEquals(EmptyCons<Boolean>(), CdrCodedList.of(true).cddddr)
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true, false, true, false, true).cddddr)
-        assertEquals(CdrCodedList.of(true, false, true, false, true).cdr.cdr.cdr.cdr, CdrCodedList.of(true, false, true, false, true).cddddr)
+        assertSame(instance, instance.cddddr)
     }
 
     @Test
     fun flatMap() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().flatMap { listOf(it) })
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().flatMap { listOf(it) })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).flatMap { listOf(it) })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).flatMap { listOf(it) })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(listOf(true, false), listOf(true)).flatMap { it })
+        assertInstanceOf(Cons::class.java, instance.flatMap { listOf(it) })
+        assertEquals(instance, instance.flatMap { listOf(it) })
+        assertEquals(instance, instance.flatMap { listOf(false, true) })
     }
 
     @Test
     fun take() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().take(true0))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).take(true0))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).take(false))
+        assertInstanceOf(Cons::class.java, instance.take(0))
+        assertInstanceOf(Cons::class.java, instance.take(10))
 
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().drop(0))
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().drop(true0))
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of(true, false, true, false, true, true).take(0))
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true, false, true, false, true, true).take(true))
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false, true, false, true, true).take(false))
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true, false, true, true).take(true))
-        assertEquals(CdrCodedList.of(true, false, true, false), CdrCodedList.of(true, false, true, false, true, true).take(false))
-        assertEquals(CdrCodedList.of(true, false, true, false, true), CdrCodedList.of(true, false, true, false, true, true).take(true))
-        assertEquals(CdrCodedList.of(true, false, true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).take(true))
+        assertEquals(instance, instance.take(0))
+        assertEquals(instance, instance.take(10))
     }
 
     @Test
     fun drop() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().drop(true0))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).drop(true0))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).drop(false))
+        assertInstanceOf(Cons::class.java, instance.drop(0))
+        assertInstanceOf(Cons::class.java, instance.drop(10))
 
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().drop(0))
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().drop(true0))
-
-        assertEquals(CdrCodedList.of(true, false, true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).drop(0))
-        assertEquals(CdrCodedList.of(false, true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).drop(true))
-        assertEquals(CdrCodedList.of(true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).drop(false))
-        assertEquals(CdrCodedList.of(false, true, true), CdrCodedList.of(true, false, true, false, true, true).drop(true))
-        assertEquals(CdrCodedList.of(true, true), CdrCodedList.of(true, false, true, false, true, true).drop(false))
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true, false, true, false, true, true).drop(true))
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of(true, false, true, false, true, true).drop(true))
+        assertEquals(instance, instance.drop(0))
+        assertEquals(instance, instance.drop(10))
     }
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().takeWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).takeWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).takeWhile { false })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).takeWhile { it < true })
+        assertInstanceOf(Cons::class.java, instance.takeWhile { true })
+        assertInstanceOf(Cons::class.java, instance.takeWhile { false })
+        assertInstanceOf(Cons::class.java, instance.takeWhile { it })
 
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().takeWhile { it < true })
-
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false, true, false, true).takeWhile { it < true })
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < true })
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < false })
-        assertEquals(CdrCodedList.of(true, false), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < true })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < false })
-        assertEquals(CdrCodedList.of(true, false, true, false), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < true })
-        assertEquals(CdrCodedList.of(true, false, true, false, true), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < true })
-        assertEquals(CdrCodedList.of(true, false, true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).takeWhile { it < 7 })
+        assertEquals(instance, instance.takeWhile { true })
+        assertEquals(instance, instance.takeWhile { false })
     }
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().dropWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).dropWhile { true })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).dropWhile { false })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).dropWhile { it < true })
+        assertInstanceOf(Cons::class.java, instance.dropWhile { true })
+        assertInstanceOf(Cons::class.java, instance.dropWhile { false })
+        assertInstanceOf(Cons::class.java, instance.dropWhile { it })
 
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().dropWhile { it < true })
-
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true, false, true).dropWhile { it < true })
-
-        assertEquals(CdrCodedList.of(true, false, true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < true })
-        assertEquals(CdrCodedList.of(false, true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < false })
-        assertEquals(CdrCodedList.of(true, false, true, true), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < true })
-        assertEquals(CdrCodedList.of(false, true, true), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < false })
-        assertEquals(CdrCodedList.of(true, true), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < true })
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < true })
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of(true, false, true, false, true, true).dropWhile { it < 8 })
+        assertEquals(instance, instance.dropWhile { true })
+        assertEquals(instance, instance.dropWhile { false })
     }
 
 //    @Test
@@ -354,143 +255,74 @@ class ConsEmptyTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().sortedBy { it })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).sortedBy { it })
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().sortedBy { it })
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).sortedBy { it })
-
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).sortedBy { it })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, true, false).sortedBy { it })
-
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, false, false, true).sortedBy { it })
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, true, false, false).sortedBy { it })
+        assertInstanceOf(Cons::class.java, EmptyCons<Int>().sortedBy { it })
+        assertEquals(EmptyCons<Int>(), EmptyCons<Int>().sortedBy { it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().sortedByDescending { it })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).sortedByDescending { it })
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().sortedByDescending { it })
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).sortedByDescending { it })
-
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).sortedByDescending { it })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, true, false).sortedByDescending { it })
-
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, false, false, true).sortedByDescending { it })
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, true, false, false).sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, EmptyCons<Int>().sortedByDescending { it })
+        assertEquals(EmptyCons<Int>(), EmptyCons<Int>().sortedByDescending { it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).sortedWith { n, m -> -n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).sortedWith { n, m -> -n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(true, true, false), CdrCodedList.of(true, true, false).sortedWith { _, _ -> 0 })
-
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, true, false).sortedWith { n, m -> n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, false, false, true).sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, true, false, false).sortedWith { n, m -> n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, false, true).sortedWith { n, m -> -n.compareTo(m) })
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, true, false).sortedWith { n, m -> -n.compareTo(m) })
-
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, false, false, true).sortedWith { n, m -> -n.compareTo(m) })
-        assertEquals(CdrCodedList.of(true, false, false, true), CdrCodedList.of(true, true, false, false).sortedWith { n, m -> -n.compareTo(m) })
+        assertInstanceOf(Cons::class.java,  EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertEquals( EmptyCons<Int>(),  EmptyCons<Int>().sortedWith { n, m -> n.compareTo(m) })
     }
 
     @Test
     fun distinct() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().distinct())
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).distinct())
-
-        assertEquals(CdrCodedList.of<Boolean>(), CdrCodedList.of<Boolean>().distinct())
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).distinct())
-        assertEquals(CdrCodedList.of(true, false, true, false, true), CdrCodedList.of(true, false, true, false, true).distinct())
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true, true, true, true, true, true).distinct())
-
-        assertEquals(CdrCodedList.of(true, false, true), CdrCodedList.of(true, true, false, false, true, true).distinct())
-        assertEquals(CdrCodedList.of(false, true, true), CdrCodedList.of(false, true, true, false, true, true).distinct())
+        assertInstanceOf(Cons::class.java, instance.distinct())
+        assertEquals(instance, instance.distinct())
     }
 
     @Test
     fun shuffled() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>().shuffled())
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true, false, true).shuffled())
+        assertInstanceOf(Cons::class.java, instance.shuffled())
 
         val seed = 0xDEADBEEF
         val rand = Random(seed)
-        val temp = CdrCodedList(true..true0)
-        val tempShuffled = temp.shuffled(rand)
-        assertNotSame(temp, tempShuffled)
-
-        assertEquals(CdrCodedList.of(true), CdrCodedList.of(true).shuffled(rand))
-        assertEquals(CdrCodedList.of(true, true, true), CdrCodedList.of(true, true, true).shuffled(rand))
-        assertEquals(CdrCodedList(true..truetrue).shuffled(Random(seed)), CdrCodedList(true..truetrue).shuffled(Random(seed)))
+        assertEquals(instance, instance.shuffled(rand))
+        assertEquals(instance.shuffled(rand), instance.shuffled(rand))
     }
 
     @Test
     fun asSequence() {
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of<Boolean>().asSequence())
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of(true, false).asSequence())
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of(true, false, true).asSequence())
-        assertInstanceOf(Sequence::class.java, CdrCodedList.of(true, false, true).asSequence().map { it + true })
-
-        assertEquals(listOf(true), CdrCodedList.of(true).asSequence().toList())
-        assertEquals(listOf(true, false), CdrCodedList.of(true, false).asSequence().toList())
-        assertEquals(listOf(false, true, false), CdrCodedList.of(true, false, true).asSequence().map { it + true }.toList())
+        assertInstanceOf(Sequence::class.java, instance.asSequence())
+        assertEquals(listOf<Boolean>(), instance.asSequence().toList())
+        assertEquals(listOf<Boolean>(), instance.asSequence().map{!it}.toList())
     }
 
     @Test
     fun plusElement() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>() + true)
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true) + false)
-
-        assertEquals(Cons.of(true), CdrCodedList.of<Boolean>() + true)
-        assertEquals(Cons.of(true, false), CdrCodedList.of(true) + false)
+        assertInstanceOf(Cons::class.java, instance + true)
+        assertEquals(Cons.of(true), instance + true)
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(Cons::class.java, CdrCodedList.of<Boolean>() + listOf(true))
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true) + listOf(false, true))
+        assertInstanceOf(Cons::class.java, instance + listOf(true))
 
-        assertEquals(Cons.of<Boolean>(), CdrCodedList.of<Boolean>() + listOf())
-        assertEquals(Cons.of(true, false, true), CdrCodedList.of(true,false,true) + listOf())
+        assertEquals(instance, instance + listOf())
 
-        assertEquals(Cons.of(true), CdrCodedList.of<Boolean>() + listOf(true))
-        assertEquals(Cons.of(true, false, true), CdrCodedList.of(true) + listOf(false, true))
+        assertEquals(Cons.of(true), instance + listOf(true))
+        assertEquals(Cons.of(1,2,3,4,5), EmptyCons<Int>() + (1..5))
 
-        assertEquals(Cons.of(true, false, true, false, true), CdrCodedList.of<Boolean>() + (true..true))
-        assertEquals(Cons.of(true, false, true, false, true), CdrCodedList.of<Boolean>() + (true..<true))
-        assertEquals(Cons.of(true, false, true, false, true), CdrCodedList.of(true) + (false..true))
-        assertEquals(Cons.of(true, false, true, false, true), CdrCodedList.of(true) + sequenceOf(false, true, false, true))
-
-        assertEquals(Cons.of<Boolean>(), CdrCodedList.of<Boolean>() + Cons.of())
-        assertEquals(Cons.of(true, false, true, false, true), CdrCodedList.of(true) + Cons.of(false, true, false, true))
-        assertEquals(Cons.of(true, false, true, false, true), CdrCodedList.of(true) + CdrCodedList(listOf(false, true, false, true)))
+        assertEquals(instance, instance + Cons.of())
+        assertEquals(Cons.of(false, true, false, true), instance + Cons.of(false, true, false, true))
+        assertEquals(Cons.of(false, true, false, true), instance + CdrCodedList(listOf(false, true, false, true)))
     }
 
     @Test
     fun plusVList() {
-        assertInstanceOf(VList::class.java, CdrCodedList.of<Boolean>() + VList.of())
-        assertEquals(VList.of<Boolean>(), CdrCodedList.of<Boolean>() + VList.of())
+        assertInstanceOf(VList::class.java, instance + VList.of())
+        assertEquals(VList.of<Boolean>(), instance + VList.of())
 
-        assertInstanceOf(VList::class.java, CdrCodedList.of<Boolean>() + VList.of(true))
-        assertEquals(VList.of(true), CdrCodedList.of<Boolean>() + VList.of(true))
+        assertInstanceOf(VList::class.java, instance + VList.of(true))
+        assertEquals(VList.of(true), instance + VList.of(true))
 
-        assertInstanceOf(VList::class.java, CdrCodedList.of(true, false) + VList.of(true))
-        assertEquals(VList.of(true, false, true), CdrCodedList.of(true, false) + VList.of(true))
-
-        assertInstanceOf(VList::class.java, CdrCodedList.of(true, false) + VList.of(true, false))
-        assertEquals(VList.of(true, false, true, false), CdrCodedList.of(true, false) + VList.of(true, false))
+        assertInstanceOf(VList::class.java, instance+ VList.of(true, false, true, false))
+        assertEquals(VList.of(true, false, true, false), instance + VList.of(true, false, true, false))
     }
 }

@@ -232,6 +232,7 @@ class CdrCodedListTest {
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of<Int>().subList(3, 6).size }
         assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
+        assertEquals(listOf<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(0, 0))
         assertEquals(listOf(4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(3, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
     }

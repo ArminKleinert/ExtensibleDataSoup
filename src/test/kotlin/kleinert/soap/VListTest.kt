@@ -233,6 +233,7 @@ class VListTest {
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { VList.of<Int>().subList(3, 6).size }
         assertInstanceOf(Cons::class.java, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
+        assertEquals(listOf<Int>(), VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(0, 0))
         assertEquals(listOf(4, 5, 6), VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(3, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
     }
