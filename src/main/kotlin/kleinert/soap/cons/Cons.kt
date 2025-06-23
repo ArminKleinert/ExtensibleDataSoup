@@ -30,6 +30,10 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
             }
             return head
         }
+
+        fun <T> cons(element: T, seq: Cons<T>): Cons<T> {
+            return seq.cons(element)
+        }
     }
 
     val car: T

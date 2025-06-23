@@ -124,7 +124,19 @@ fun main(args: Array<String>) {
 //    }
 
     run {
-        val l = LazyCons.map({it+1}, Cons.of<Int>(1))
+        val l = LazyCons.map({it+1}, Cons.of(1, 2, 3, 4, 5))
+        println(l)
+        println("Result: "+l.toList())
+    }
+
+    run {
+        val l = LazyCons.filter({it % 2 == 1}, Cons.of(1, 2, 3, 4, 5))
+        println(l)
+        println("Result: "+l.toList())
+    }
+
+    run {
+        val l = LazyCons.fmap( {it+1}, {it % 2 == 1},Cons.of(1, 2, 3, 4, 5))
         println(l)
         println("Result: "+l.toList())
     }
