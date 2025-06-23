@@ -1,4 +1,6 @@
 import kleinert.soap.*
+import kleinert.soap.cons.Cons
+import kleinert.soap.cons.LazyCons
 import kleinert.soap.cons.VList
 
 fun examples1() {
@@ -115,9 +117,15 @@ fun main(args: Array<String>) {
 //        println("$vl $vld ${vld.javaClass}")
 //    }
 
+//    run {
+//        val vl = VList.of(1, 2, 3)
+//        val vln = vl.prepend(listOf(6, 7))
+//        println("$vl $vln ${vln.javaClass}")
+//    }
+
     run {
-        val vl = VList.of(1, 2, 3)
-        val vln = vl.prepend(listOf(6, 7))
-        println("$vl $vln ${vln.javaClass}")
+        val l = LazyCons.map({it+1}, Cons.of<Int>(1))
+        println(l)
+        println("Result: "+l.toList())
     }
 }
