@@ -19,6 +19,7 @@ class ConsCellTest {
         assertEquals(ConsCell(1, nullCons()), ConsCell(1, nullCons()))
         assertEquals(ConsCell(1, ConsCell(2, nullCons())), ConsCell(1, ConsCell(2, nullCons())))
     }
+
     @Test
     fun getSize() {
         assertEquals(1, one.size)
@@ -280,7 +281,7 @@ class ConsCellTest {
     @Test
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { three.subList(0, 5) }
-        assertInstanceOf(Cons::class.java,three.subList(0, 2))
+        assertInstanceOf(Cons::class.java, three.subList(0, 2))
         assertEquals(three, three.subList(0, 3))
         assertEquals(two, three.subList(1, 3))
         assertEquals(one, three.subList(2, 3))
@@ -318,14 +319,14 @@ class ConsCellTest {
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(Cons::class.java, one.mapIndexed { i, e -> e+i })
-        assertInstanceOf(Cons::class.java, two.mapIndexed { i, e -> e+i })
-        assertInstanceOf(Cons::class.java, three.mapIndexed { i, e -> e+i })
+        assertInstanceOf(Cons::class.java, one.mapIndexed { i, e -> e + i })
+        assertInstanceOf(Cons::class.java, two.mapIndexed { i, e -> e + i })
+        assertInstanceOf(Cons::class.java, three.mapIndexed { i, e -> e + i })
 
-        assertEquals(Cons.of(1), one.mapIndexed { i, e -> e+i })
-        assertEquals(Cons.of(2, 2), two.mapIndexed { i, e -> e+i })
-        assertEquals(Cons.of(3, 3, 3), three.mapIndexed { i, e -> e+i })
-        assertEquals(Cons.of(4, 3, 2), three.mapIndexed { _, e -> e+1 })
+        assertEquals(Cons.of(1), one.mapIndexed { i, e -> e + i })
+        assertEquals(Cons.of(2, 2), two.mapIndexed { i, e -> e + i })
+        assertEquals(Cons.of(3, 3, 3), three.mapIndexed { i, e -> e + i })
+        assertEquals(Cons.of(4, 3, 2), three.mapIndexed { _, e -> e + 1 })
     }
 
     @Test
@@ -438,24 +439,24 @@ class ConsCellTest {
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(Cons::class.java, three.takeWhile {true})
-        assertInstanceOf(Cons::class.java, three.takeWhile {false})
-        assertInstanceOf(Cons::class.java, three.takeWhile {it % 2 == 1})
+        assertInstanceOf(Cons::class.java, three.takeWhile { true })
+        assertInstanceOf(Cons::class.java, three.takeWhile { false })
+        assertInstanceOf(Cons::class.java, three.takeWhile { it % 2 == 1 })
 
-        assertEquals(three, three.takeWhile {true})
-        assertEquals(Cons.of(3), three.takeWhile {it % 2 == 1})
-        assertEquals(Cons.of<Int>(), three.takeWhile {false})
+        assertEquals(three, three.takeWhile { true })
+        assertEquals(Cons.of(3), three.takeWhile { it % 2 == 1 })
+        assertEquals(Cons.of<Int>(), three.takeWhile { false })
     }
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(Cons::class.java, three.dropWhile {true})
-        assertInstanceOf(Cons::class.java, three.dropWhile {false})
-        assertInstanceOf(Cons::class.java, three.dropWhile {it % 2 == 1})
+        assertInstanceOf(Cons::class.java, three.dropWhile { true })
+        assertInstanceOf(Cons::class.java, three.dropWhile { false })
+        assertInstanceOf(Cons::class.java, three.dropWhile { it % 2 == 1 })
 
-        assertEquals(three, three.dropWhile {false})
-        assertEquals(two, three.dropWhile {it % 2 == 1})
-        assertEquals(Cons.of<Int>(), three.dropWhile {true})
+        assertEquals(three, three.dropWhile { false })
+        assertEquals(two, three.dropWhile { it % 2 == 1 })
+        assertEquals(Cons.of<Int>(), three.dropWhile { true })
     }
 
 //    @Test
@@ -501,17 +502,17 @@ class ConsCellTest {
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, one.sortedWith { n,m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, three.sortedWith {n,m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, one.sortedWith { n,m -> -n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, three.sortedWith { n,m -> -n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, one.sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, three.sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, one.sortedWith { n, m -> -n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, three.sortedWith { n, m -> -n.compareTo(m) })
 
-        assertEquals(Cons.of(1), one.sortedWith { n,m -> n.compareTo(m) })
-        assertEquals(Cons.of(1, 2, 3), three.sortedWith { n,m -> n.compareTo(m) })
-        assertEquals(Cons.of(1, 2, 3), three.reversed().sortedWith { n,m -> n.compareTo(m) })
-        assertEquals(Cons.of(1), one.sortedWith { n,m -> -n.compareTo(m) })
-        assertEquals(Cons.of(3, 2, 1), three.sortedWith { n,m -> -n.compareTo(m) })
-        assertEquals(Cons.of(3, 2, 1), three.reversed().sortedWith { n,m -> -n.compareTo(m) })
+        assertEquals(Cons.of(1), one.sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(Cons.of(1, 2, 3), three.sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(Cons.of(1, 2, 3), three.reversed().sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(Cons.of(1), one.sortedWith { n, m -> -n.compareTo(m) })
+        assertEquals(Cons.of(3, 2, 1), three.sortedWith { n, m -> -n.compareTo(m) })
+        assertEquals(Cons.of(3, 2, 1), three.reversed().sortedWith { n, m -> -n.compareTo(m) })
     }
 
     @Test
@@ -530,7 +531,7 @@ class ConsCellTest {
         val seed = 0xDEADBEEF
         val rand = Random(seed)
 
-        assertEquals(one,one.shuffled(rand))
+        assertEquals(one, one.shuffled(rand))
 
         val oneOneOne = nullCons<Int>().cons(1).cons(1).cons(1)
         assertEquals(oneOneOne, oneOneOne.shuffled(rand))
