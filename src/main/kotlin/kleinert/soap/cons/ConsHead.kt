@@ -14,17 +14,6 @@ class EmptyCons<T> : Cons<T> {
 
     override fun isEmpty(): Boolean = true
 
-    override fun iterator(): Iterator<T> = listIterator()
-
-    override fun listIterator(): ListIterator<T> = object : ListIterator<T> {
-        override fun hasNext(): Boolean = false
-        override fun hasPrevious(): Boolean = false
-        override fun nextIndex(): Int = 0
-        override fun previousIndex(): Int = -1
-        override fun next(): Nothing = throw NoSuchElementException()
-        override fun previous(): Nothing = throw NoSuchElementException()
-    }
-
     override fun cleared(): Cons<T> = this
 
     override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
@@ -74,34 +63,13 @@ class ConsHead<T> : Cons<T> {
 
     override fun isEmpty(): Boolean = false
 
-    override fun iterator(): Iterator<T> {
-        val result = mutableListOf<T>()
-        result.add(car)
-
-        var rest = cdr
+    override fun asSequence(): Sequence<T> = sequence {
+        var rest: Cons<T> = this@ConsHead
         while (rest is ConsHead<T>) {
-            result.add(rest.car)
+            yield(rest.car)
             rest = rest.cdr
         }
-
-        result.addAll(rest.toList())
-
-        return result.iterator()
-    }
-
-    override fun toList(): List<T> {
-        val result = mutableListOf<T>()
-        result.add(car)
-
-        var rest = cdr
-        while (rest is ConsHead<T>) {
-            result.add(rest.car)
-            rest = rest.cdr
-        }
-
-        result.addAll(rest.toList())
-
-        return result
+        yieldAll(rest.asSequence())
     }
 
     override fun cleared(): Cons<T> = EmptyCons()

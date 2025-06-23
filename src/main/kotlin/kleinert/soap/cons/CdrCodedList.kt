@@ -62,8 +62,6 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
 
     override fun <R> sameTypeFromList(list: List<R>): CdrCodedList<R> = CdrCodedList(list)
 
-    override fun cons(element: T): Cons<T> = CdrCodedList(listOf(element) + actualList, true)
-
     override fun asIterable() = actualList
 
     override fun toList(): List<T> = actualList
@@ -71,6 +69,13 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
     override fun asSequence() = actualList.asSequence()
 
     override fun reversed(): CdrCodedList<T> = CdrCodedList(actualList.asReversed())
+
+    override fun drop(n: Int): Cons<T>  {
+        require(n >= 0) { "Requested element count $n is less than zero." }
+        if (n == 0) return this
+        if (offset + n >= backingList.size) return CdrCodedList()
+        return CdrCodedList(backingList, true, offset + n)
+    }
 
     override fun toString(): String = commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)

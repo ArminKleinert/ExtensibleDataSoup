@@ -34,13 +34,13 @@ class CdrCodedListTest {
 
     @Test
     fun cons() {
-        val vlist = CdrCodedList<Int>()
-        assertEquals(0, vlist.size)
+        val list = CdrCodedList<Int>()
+        assertEquals(0, list.size)
 
-        assertInstanceOf(Cons::class.java, vlist.cons(1))
-        assertEquals(CdrCodedList(arrayOf(1)), vlist.cons(1))
-        assertEquals(CdrCodedList(arrayOf(2, 1)), vlist.cons(1).cons(2))
-        assertEquals(CdrCodedList(arrayOf(3, 2, 1)), vlist.cons(1).cons(2).cons(3))
+        assertInstanceOf(Cons::class.java, list.cons(1))
+        assertEquals(CdrCodedList(arrayOf(1)), list.cons(1))
+        assertEquals(CdrCodedList(arrayOf(2, 1)), list.cons(1).cons(2))
+        assertEquals(CdrCodedList(arrayOf(3, 2, 1)), list.cons(1).cons(2).cons(3))
     }
 
     @Test
