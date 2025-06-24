@@ -1,6 +1,6 @@
 package kleinert.soap.cons
 
-class VList<T> : Cons<T> {
+class VList<T> : ImmutableLazyList<T> {
     private class Segment(val next: Segment?, val elements: Array<Any?>) {
         override fun toString(): String {
             return "Segment(next=$next, elements=${elements.contentToString()})"
@@ -149,7 +149,7 @@ class VList<T> : Cons<T> {
 
         val reversedElementsIterator =
             when (elements) {
-                is Cons<T> -> elements.toList()
+                is ImmutableLazyList<T> -> elements.toList()
                 is List<T> -> elements
                 else -> elements.toList()
             }.asReversed().iterator()

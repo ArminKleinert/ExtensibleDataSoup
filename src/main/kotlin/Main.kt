@@ -1,7 +1,6 @@
 import kleinert.soap.*
-import kleinert.soap.cons.Cons
-import kleinert.soap.cons.LazyCons
-import kotlin.math.pow
+import kleinert.soap.cons.ImmutableLazyList
+import kleinert.soap.cons.LazyList
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -147,41 +146,41 @@ fun main(args: Array<String>) {
 //    }
 
     run {
-        val lst = Cons.concat(
-            Cons.of(1, 2, 3, 4, 5), Cons.of(6, 7, 8, 9, 10),
-            Cons.of(11, 12, 13, 14, 15), Cons.of(16, 17, 18, 19, 20)
+        val lst = ImmutableLazyList.concat(
+            ImmutableLazyList.of(1, 2, 3, 4, 5), ImmutableLazyList.of(6, 7, 8, 9, 10),
+            ImmutableLazyList.of(11, 12, 13, 14, 15), ImmutableLazyList.of(16, 17, 18, 19, 20)
         )
         println(lst)
     }
 
     run {
-        val lst = Cons.of(1, 2, 3, 4, 5)
-        val seq = LazyCons.cycle(lst)
+        val lst = ImmutableLazyList.of(1, 2, 3, 4, 5)
+        val seq = LazyList.cycle(lst)
         println(seq.take(22))
     }
 
     run {
-        val seq = LazyCons.repeat(1)
+        val seq = LazyList.repeat(1)
         println(seq.take(22))
     }
 
     run {
-        val seq = LazyCons.repeatedly { Random.nextInt(0..9) }
+        val seq = LazyList.repeatedly { Random.nextInt(0..9) }
         println(seq.take(22))
     }
 
     run {
-        val seq = Cons.from(sequenceOf(1, 2, 3, 4, 5))
+        val seq = ImmutableLazyList.from(sequenceOf(1, 2, 3, 4, 5))
         println(seq)
     }
 
     run {
-        val seq = LazyCons.iterate({ it * 2 }, 1L)
+        val seq = LazyList.iterate({ it * 2 }, 1L)
         println(seq.take(33))
     }
 
     run {
-        val seq = LazyCons.iterate({ it + 1 }, 1)
+        val seq = LazyList.iterate({ it + 1 }, 1)
         println(seq.take(10))
         // println(seq.filter{it < 5}.take(5)) // This operation will always hang, which is the intended behaviour. :)
     }

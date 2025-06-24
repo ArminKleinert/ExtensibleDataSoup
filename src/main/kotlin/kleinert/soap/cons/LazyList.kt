@@ -1,9 +1,9 @@
 package kleinert.soap.cons
 
 
-class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
-    private var fn: (() -> Cons<T>?)? = fn
-    private var sv: Cons<T>? = null
+class LazyList<T>(fn: () -> ImmutableLazyList<T>?) : ImmutableLazyList<T> {
+    private var fn: (() -> ImmutableLazyList<T>?)? = fn
+    private var sv: ImmutableLazyList<T>? = null
     private var lazySize: Int = -1
 
     override val car: T
@@ -12,7 +12,7 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
             return sv!!.car
         }
 
-    override val cdr: Cons<T>
+    override val cdr: ImmutableLazyList<T>
         get() {
             evaluateStep()
             return sv!!.cdr
@@ -33,7 +33,7 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
         }
 
     @Synchronized
-    fun evaluateStep(): Cons<T>? {
+    fun evaluateStep(): ImmutableLazyList<T>? {
         if (fn != null) {
             val tfn = fn!!
             fn = null
@@ -51,8 +51,8 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
         return asSequence().iterator()
     }
 
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
-        return Cons.from(list)
+    override fun <R> sameTypeFromList(list: List<R>): ImmutableLazyList<R> {
+        return ImmutableLazyList.from(list)
     }
 
     override fun isLazyType(): Boolean = true
@@ -104,39 +104,39 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
 //            }
 //        }
 
-        fun <T> of(vararg xs: T): Cons<T> = lazySeq(xs.asSequence())
+        fun <T> of(vararg xs: T): ImmutableLazyList<T> = lazySeq(xs.asSequence())
 
-        fun <T> fromIterator(iterator: Iterator<T>): Cons<T> = lazySeq {
+        fun <T> fromIterator(iterator: Iterator<T>): ImmutableLazyList<T> = lazySeq {
             when {
-                iterator.hasNext() -> Cons.cons(iterator.next(), fromIterator(iterator))
+                iterator.hasNext() -> ImmutableLazyList.cons(iterator.next(), fromIterator(iterator))
                 else -> nullCons()
             }
         }
 
-        fun <T> lazySeq(seq: Sequence<T>): Cons<T> = fromIterator(seq.iterator())
+        fun <T> lazySeq(seq: Sequence<T>): ImmutableLazyList<T> = fromIterator(seq.iterator())
 
-        fun <T> lazySeq(fn: () -> Cons<T>?): Cons<T> = LazyCons(fn)
+        fun <T> lazySeq(fn: () -> ImmutableLazyList<T>?): ImmutableLazyList<T> = LazyList(fn)
 
-        fun <T> repeatedly(n: Int = -1, fn: () -> T): Cons<T> = lazySeq {
+        fun <T> repeatedly(n: Int = -1, fn: () -> T): ImmutableLazyList<T> = lazySeq {
             when (n) {
-                -1 -> Cons.cons(fn(), repeatedly(n, fn))
+                -1 -> ImmutableLazyList.cons(fn(), repeatedly(n, fn))
                 0 -> nullCons()
-                else -> Cons.cons(fn(), repeatedly(n - 1, fn))
+                else -> ImmutableLazyList.cons(fn(), repeatedly(n - 1, fn))
             }
         }
 
-        fun <T> lazySeq(x: T, fn: () -> Cons<T>) = Cons.cons(x, fn)
+        fun <T> lazySeq(x: T, fn: () -> ImmutableLazyList<T>) = ImmutableLazyList.cons(x, fn)
 
-        fun <T> cycle(xs: Cons<T>): Cons<T> = lazySeq {
+        fun <T> cycle(xs: ImmutableLazyList<T>): ImmutableLazyList<T> = lazySeq {
             if (xs.isEmpty()) nullCons()
-            else lazySeq(xs.car) { Cons.concat(xs.cdr, cycle(xs)) }
+            else lazySeq(xs.car) { ImmutableLazyList.concat(xs.cdr, cycle(xs)) }
         }
 
-        fun <T> repeat(x: T): Cons<T> = lazySeq {
+        fun <T> repeat(x: T): ImmutableLazyList<T> = lazySeq {
             lazySeq(x) { repeat(x) }
         }
 
-        fun <T> iterate(f: (T) -> T, x: T): Cons<T> = lazySeq {
+        fun <T> iterate(f: (T) -> T, x: T): ImmutableLazyList<T> = lazySeq {
             lazySeq(x) { iterate(f, f(x)) }
         }
     }

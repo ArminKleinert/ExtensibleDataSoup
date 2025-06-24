@@ -1,7 +1,6 @@
 package kleinert.soap
 
-import kleinert.soap.cons.Cons
-import kleinert.soap.cons.VList
+import kleinert.soap.cons.ImmutableLazyList
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -37,7 +36,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
             is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> encodePredefinedNumberType(obj as Number)
             is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
             is Map.Entry<*, *> -> "${encode(obj.key)} ${encode(obj.value)}"
-            is Cons<*> -> tryEncoder(obj) ?: encodeOtherIterable(obj)
+            is ImmutableLazyList<*> -> tryEncoder(obj) ?: encodeOtherIterable(obj)
             is ByteArray -> tryEncoder(obj) ?: encode(obj.toList())
             is ShortArray -> tryEncoder(obj) ?: encode(obj.toList())
             is IntArray -> tryEncoder(obj) ?: encode(obj.toList())

@@ -32,7 +32,7 @@ class ConsCellTest {
         val list = nullCons<Int>()
         assertEquals(0, list.size)
 
-        assertInstanceOf(Cons::class.java, one)
+        assertInstanceOf(ImmutableLazyList::class.java, one)
         assertEquals(CdrCodedList(arrayOf(1)), one)
         assertEquals(CdrCodedList(arrayOf(2, 1)), two)
         assertEquals(CdrCodedList(arrayOf(3, 2, 1)), three)
@@ -43,9 +43,9 @@ class ConsCellTest {
         val one = nullCons<Int>().cons(1)
         val two = one.cons(2)
         val three = two.cons(3)
-        assertInstanceOf(Cons::class.java, one.cdr)
-        assertInstanceOf(Cons::class.java, two.cdr)
-        assertInstanceOf(Cons::class.java, three.cdr)
+        assertInstanceOf(ImmutableLazyList::class.java, one.cdr)
+        assertInstanceOf(ImmutableLazyList::class.java, two.cdr)
+        assertInstanceOf(ImmutableLazyList::class.java, three.cdr)
 
         assertSame(one.cdr, two.cdr.cdr)
         assertSame(one.cdr, three.cdr.cdr.cdr)
@@ -281,7 +281,7 @@ class ConsCellTest {
     @Test
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { three.subList(0, 5) }
-        assertInstanceOf(Cons::class.java, three.subList(0, 2))
+        assertInstanceOf(ImmutableLazyList::class.java, three.subList(0, 2))
         assertEquals(three, three.subList(0, 3))
         assertEquals(two, three.subList(1, 3))
         assertEquals(one, three.subList(2, 3))
@@ -296,59 +296,59 @@ class ConsCellTest {
 
     @Test
     fun reversed() {
-        assertInstanceOf(Cons::class.java, one.reversed())
-        assertInstanceOf(Cons::class.java, two.reversed())
-        assertInstanceOf(Cons::class.java, three.reversed())
+        assertInstanceOf(ImmutableLazyList::class.java, one.reversed())
+        assertInstanceOf(ImmutableLazyList::class.java, two.reversed())
+        assertInstanceOf(ImmutableLazyList::class.java, three.reversed())
 
         assertEquals(three, three.reversed().reversed())
 
-        assertEquals(Cons.of(1), one.reversed())
-        assertEquals(Cons.of(1, 2), two.reversed())
-        assertEquals(Cons.of(1, 2, 3), three.reversed())
+        assertEquals(ImmutableLazyList.of(1), one.reversed())
+        assertEquals(ImmutableLazyList.of(1, 2), two.reversed())
+        assertEquals(ImmutableLazyList.of(1, 2, 3), three.reversed())
     }
 
     @Test
     fun map() {
-        assertInstanceOf(Cons::class.java, one.map { it })
-        assertInstanceOf(Cons::class.java, two.map { it })
-        assertInstanceOf(Cons::class.java, three.map { it })
+        assertInstanceOf(ImmutableLazyList::class.java, one.map { it })
+        assertInstanceOf(ImmutableLazyList::class.java, two.map { it })
+        assertInstanceOf(ImmutableLazyList::class.java, three.map { it })
 
-        assertEquals(Cons.of(1), one.map { it })
-        assertEquals(Cons.of(3, 2), two.map { it + 1 })
+        assertEquals(ImmutableLazyList.of(1), one.map { it })
+        assertEquals(ImmutableLazyList.of(3, 2), two.map { it + 1 })
     }
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(Cons::class.java, one.mapIndexed { i, e -> e + i })
-        assertInstanceOf(Cons::class.java, two.mapIndexed { i, e -> e + i })
-        assertInstanceOf(Cons::class.java, three.mapIndexed { i, e -> e + i })
+        assertInstanceOf(ImmutableLazyList::class.java, one.mapIndexed { i, e -> e + i })
+        assertInstanceOf(ImmutableLazyList::class.java, two.mapIndexed { i, e -> e + i })
+        assertInstanceOf(ImmutableLazyList::class.java, three.mapIndexed { i, e -> e + i })
 
-        assertEquals(Cons.of(1), one.mapIndexed { i, e -> e + i })
-        assertEquals(Cons.of(2, 2), two.mapIndexed { i, e -> e + i })
-        assertEquals(Cons.of(3, 3, 3), three.mapIndexed { i, e -> e + i })
-        assertEquals(Cons.of(4, 3, 2), three.mapIndexed { _, e -> e + 1 })
+        assertEquals(ImmutableLazyList.of(1), one.mapIndexed { i, e -> e + i })
+        assertEquals(ImmutableLazyList.of(2, 2), two.mapIndexed { i, e -> e + i })
+        assertEquals(ImmutableLazyList.of(3, 3, 3), three.mapIndexed { i, e -> e + i })
+        assertEquals(ImmutableLazyList.of(4, 3, 2), three.mapIndexed { _, e -> e + 1 })
     }
 
     @Test
     fun filter() {
-        assertInstanceOf(Cons::class.java, one.filter { true })
-        assertInstanceOf(Cons::class.java, three.filter { it % 2 != 0 })
+        assertInstanceOf(ImmutableLazyList::class.java, one.filter { true })
+        assertInstanceOf(ImmutableLazyList::class.java, three.filter { it % 2 != 0 })
 
-        assertEquals(Cons.of<Int>(), one.filter { it % 2 == 0 })
-        assertEquals(Cons.of(1), one.filter { it % 2 != 0 })
-        assertEquals(Cons.of(1), two.filter { it % 2 != 0 })
-        assertEquals(Cons.of(3, 1), three.filter { it % 2 != 0 })
+        assertEquals(ImmutableLazyList.of<Int>(), one.filter { it % 2 == 0 })
+        assertEquals(ImmutableLazyList.of(1), one.filter { it % 2 != 0 })
+        assertEquals(ImmutableLazyList.of(1), two.filter { it % 2 != 0 })
+        assertEquals(ImmutableLazyList.of(3, 1), three.filter { it % 2 != 0 })
     }
 
     @Test
     fun filterNot() {
-        assertInstanceOf(Cons::class.java, one.filterNot { true })
-        assertInstanceOf(Cons::class.java, three.filterNot { it % 2 != 0 })
+        assertInstanceOf(ImmutableLazyList::class.java, one.filterNot { true })
+        assertInstanceOf(ImmutableLazyList::class.java, three.filterNot { it % 2 != 0 })
 
-        assertEquals(Cons.of<Int>(), one.filterNot { it % 2 != 0 })
-        assertEquals(Cons.of(1), one.filterNot { it % 2 == 0 })
-        assertEquals(Cons.of(1), two.filterNot { it % 2 == 0 })
-        assertEquals(Cons.of(3, 1), three.filterNot { it % 2 == 0 })
+        assertEquals(ImmutableLazyList.of<Int>(), one.filterNot { it % 2 != 0 })
+        assertEquals(ImmutableLazyList.of(1), one.filterNot { it % 2 == 0 })
+        assertEquals(ImmutableLazyList.of(1), two.filterNot { it % 2 == 0 })
+        assertEquals(ImmutableLazyList.of(3, 1), three.filterNot { it % 2 == 0 })
     }
 
     @Test
@@ -379,9 +379,9 @@ class ConsCellTest {
     fun cddr() {
         assertEquals(nullCons<Int>(), one.cddr)
         assertEquals(nullCons<Int>(), two.cddr)
-        assertEquals(Cons.of(1), three.cddr)
-        assertEquals(Cons.of(2, 1), three.cons(4).cddr)
-        assertEquals(Cons.of(3, 2, 1), three.cons(4).cons(5).cddr)
+        assertEquals(ImmutableLazyList.of(1), three.cddr)
+        assertEquals(ImmutableLazyList.of(2, 1), three.cons(4).cddr)
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.cons(4).cons(5).cddr)
     }
 
     @Test
@@ -389,8 +389,8 @@ class ConsCellTest {
         assertEquals(nullCons<Int>(), one.cdddr)
         assertEquals(nullCons<Int>(), two.cdddr)
         assertEquals(nullCons<Int>(), three.cdddr)
-        assertEquals(Cons.of(1), three.cons(4).cdddr)
-        assertEquals(Cons.of(2, 1), three.cons(4).cons(5).cdddr)
+        assertEquals(ImmutableLazyList.of(1), three.cons(4).cdddr)
+        assertEquals(ImmutableLazyList.of(2, 1), three.cons(4).cons(5).cdddr)
     }
 
     @Test
@@ -399,64 +399,64 @@ class ConsCellTest {
         assertEquals(nullCons<Int>(), two.cddddr)
         assertEquals(nullCons<Int>(), three.cddddr)
         assertEquals(nullCons<Int>(), three.cons(4).cddddr)
-        assertEquals(Cons.of(1), three.cons(4).cons(5).cddddr)
+        assertEquals(ImmutableLazyList.of(1), three.cons(4).cons(5).cddddr)
     }
 
     @Test
     fun flatMap() {
-        assertInstanceOf(Cons::class.java, three.flatMap { listOf(it) })
+        assertInstanceOf(ImmutableLazyList::class.java, three.flatMap { listOf(it) })
         assertEquals(three, three.flatMap { listOf(it) })
-        assertEquals(Cons.of(3, 3, 2, 2, 1, 1), three.flatMap { listOf(it, it) })
+        assertEquals(ImmutableLazyList.of(3, 3, 2, 2, 1, 1), three.flatMap { listOf(it, it) })
     }
 
     @Test
     fun take() {
-        assertInstanceOf(Cons::class.java, three.take(0))
-        assertInstanceOf(Cons::class.java, three.take(1))
-        assertInstanceOf(Cons::class.java, three.take(2))
-        assertInstanceOf(Cons::class.java, three.take(22))
+        assertInstanceOf(ImmutableLazyList::class.java, three.take(0))
+        assertInstanceOf(ImmutableLazyList::class.java, three.take(1))
+        assertInstanceOf(ImmutableLazyList::class.java, three.take(2))
+        assertInstanceOf(ImmutableLazyList::class.java, three.take(22))
 
-        assertEquals(Cons.of<Int>(), three.take(0))
-        assertEquals(Cons.of(3), three.take(1))
-        assertEquals(Cons.of(3, 2), three.take(2))
-        assertEquals(Cons.of(3, 2, 1), three.take(3))
-        assertEquals(Cons.of(3, 2, 1), three.take(4))
+        assertEquals(ImmutableLazyList.of<Int>(), three.take(0))
+        assertEquals(ImmutableLazyList.of(3), three.take(1))
+        assertEquals(ImmutableLazyList.of(3, 2), three.take(2))
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.take(3))
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.take(4))
     }
 
     @Test
     fun drop() {
-        assertInstanceOf(Cons::class.java, three.drop(0))
-        assertInstanceOf(Cons::class.java, three.drop(1))
-        assertInstanceOf(Cons::class.java, three.drop(2))
-        assertInstanceOf(Cons::class.java, three.drop(22))
+        assertInstanceOf(ImmutableLazyList::class.java, three.drop(0))
+        assertInstanceOf(ImmutableLazyList::class.java, three.drop(1))
+        assertInstanceOf(ImmutableLazyList::class.java, three.drop(2))
+        assertInstanceOf(ImmutableLazyList::class.java, three.drop(22))
 
         assertEquals(three, three.drop(0))
         assertEquals(two, three.drop(1))
         assertEquals(one, three.drop(2))
-        assertEquals(Cons.of<Int>(), three.drop(3))
-        assertEquals(Cons.of<Int>(), three.drop(4))
+        assertEquals(ImmutableLazyList.of<Int>(), three.drop(3))
+        assertEquals(ImmutableLazyList.of<Int>(), three.drop(4))
     }
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(Cons::class.java, three.takeWhile { true })
-        assertInstanceOf(Cons::class.java, three.takeWhile { false })
-        assertInstanceOf(Cons::class.java, three.takeWhile { it % 2 == 1 })
+        assertInstanceOf(ImmutableLazyList::class.java, three.takeWhile { true })
+        assertInstanceOf(ImmutableLazyList::class.java, three.takeWhile { false })
+        assertInstanceOf(ImmutableLazyList::class.java, three.takeWhile { it % 2 == 1 })
 
         assertEquals(three, three.takeWhile { true })
-        assertEquals(Cons.of(3), three.takeWhile { it % 2 == 1 })
-        assertEquals(Cons.of<Int>(), three.takeWhile { false })
+        assertEquals(ImmutableLazyList.of(3), three.takeWhile { it % 2 == 1 })
+        assertEquals(ImmutableLazyList.of<Int>(), three.takeWhile { false })
     }
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(Cons::class.java, three.dropWhile { true })
-        assertInstanceOf(Cons::class.java, three.dropWhile { false })
-        assertInstanceOf(Cons::class.java, three.dropWhile { it % 2 == 1 })
+        assertInstanceOf(ImmutableLazyList::class.java, three.dropWhile { true })
+        assertInstanceOf(ImmutableLazyList::class.java, three.dropWhile { false })
+        assertInstanceOf(ImmutableLazyList::class.java, three.dropWhile { it % 2 == 1 })
 
         assertEquals(three, three.dropWhile { false })
         assertEquals(two, three.dropWhile { it % 2 == 1 })
-        assertEquals(Cons.of<Int>(), three.dropWhile { true })
+        assertEquals(ImmutableLazyList.of<Int>(), three.dropWhile { true })
     }
 
 //    @Test
@@ -482,43 +482,43 @@ class ConsCellTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, one.sortedBy { it })
-        assertInstanceOf(Cons::class.java, three.sortedBy { it })
+        assertInstanceOf(ImmutableLazyList::class.java, one.sortedBy { it })
+        assertInstanceOf(ImmutableLazyList::class.java, three.sortedBy { it })
 
-        assertEquals(Cons.of(1), one.sortedBy { it })
-        assertEquals(Cons.of(1, 2, 3), three.sortedBy { it })
-        assertEquals(Cons.of(1, 2, 3), three.reversed().sortedBy { it })
+        assertEquals(ImmutableLazyList.of(1), one.sortedBy { it })
+        assertEquals(ImmutableLazyList.of(1, 2, 3), three.sortedBy { it })
+        assertEquals(ImmutableLazyList.of(1, 2, 3), three.reversed().sortedBy { it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, one.sortedByDescending { it })
-        assertInstanceOf(Cons::class.java, three.sortedByDescending { it })
+        assertInstanceOf(ImmutableLazyList::class.java, one.sortedByDescending { it })
+        assertInstanceOf(ImmutableLazyList::class.java, three.sortedByDescending { it })
 
-        assertEquals(Cons.of(1), one.sortedByDescending { it })
-        assertEquals(Cons.of(3, 2, 1), three.sortedByDescending { it })
-        assertEquals(Cons.of(3, 2, 1), three.reversed().sortedByDescending { it })
+        assertEquals(ImmutableLazyList.of(1), one.sortedByDescending { it })
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.sortedByDescending { it })
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.reversed().sortedByDescending { it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, one.sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, three.sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, one.sortedWith { n, m -> -n.compareTo(m) })
-        assertInstanceOf(Cons::class.java, three.sortedWith { n, m -> -n.compareTo(m) })
+        assertInstanceOf(ImmutableLazyList::class.java, one.sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(ImmutableLazyList::class.java, three.sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(ImmutableLazyList::class.java, one.sortedWith { n, m -> -n.compareTo(m) })
+        assertInstanceOf(ImmutableLazyList::class.java, three.sortedWith { n, m -> -n.compareTo(m) })
 
-        assertEquals(Cons.of(1), one.sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(Cons.of(1, 2, 3), three.sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(Cons.of(1, 2, 3), three.reversed().sortedWith { n, m -> n.compareTo(m) })
-        assertEquals(Cons.of(1), one.sortedWith { n, m -> -n.compareTo(m) })
-        assertEquals(Cons.of(3, 2, 1), three.sortedWith { n, m -> -n.compareTo(m) })
-        assertEquals(Cons.of(3, 2, 1), three.reversed().sortedWith { n, m -> -n.compareTo(m) })
+        assertEquals(ImmutableLazyList.of(1), one.sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(ImmutableLazyList.of(1, 2, 3), three.sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(ImmutableLazyList.of(1, 2, 3), three.reversed().sortedWith { n, m -> n.compareTo(m) })
+        assertEquals(ImmutableLazyList.of(1), one.sortedWith { n, m -> -n.compareTo(m) })
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.sortedWith { n, m -> -n.compareTo(m) })
+        assertEquals(ImmutableLazyList.of(3, 2, 1), three.reversed().sortedWith { n, m -> -n.compareTo(m) })
     }
 
     @Test
     fun distinct() {
-        assertInstanceOf(Cons::class.java, three.distinct())
-        assertInstanceOf(Cons::class.java, two.cons(1).distinct())
+        assertInstanceOf(ImmutableLazyList::class.java, three.distinct())
+        assertInstanceOf(ImmutableLazyList::class.java, two.cons(1).distinct())
 
         assertEquals(three, three.distinct())
         assertEquals(nullCons<Int>().cons(2).cons(1), two.cons(1).distinct())
@@ -526,7 +526,7 @@ class ConsCellTest {
 
     @Test
     fun shuffled() {
-        assertInstanceOf(Cons::class.java, three.shuffled())
+        assertInstanceOf(ImmutableLazyList::class.java, three.shuffled())
 
         val seed = 0xDEADBEEF
         val rand = Random(seed)
@@ -551,28 +551,28 @@ class ConsCellTest {
 
     @Test
     fun plusElement() {
-        assertInstanceOf(Cons::class.java, one + 1)
-        assertInstanceOf(Cons::class.java, two + 2)
+        assertInstanceOf(ImmutableLazyList::class.java, one + 1)
+        assertInstanceOf(ImmutableLazyList::class.java, two + 2)
 
-        assertEquals(Cons.of(1, 1), one + 1)
-        assertEquals(Cons.of(3, 2, 1, 2), three + 2)
+        assertEquals(ImmutableLazyList.of(1, 1), one + 1)
+        assertEquals(ImmutableLazyList.of(3, 2, 1, 2), three + 2)
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(Cons::class.java, one + listOf(2, 3))
+        assertInstanceOf(ImmutableLazyList::class.java, one + listOf(2, 3))
 
         assertEquals(three, three + listOf())
 
-        assertEquals(Cons.of(2, 1), nullCons<Int>().cons(2) + listOf(1))
-        assertEquals(Cons.of(1, 2, 3), nullCons<Int>().cons(1) + listOf(2, 3))
+        assertEquals(ImmutableLazyList.of(2, 1), nullCons<Int>().cons(2) + listOf(1))
+        assertEquals(ImmutableLazyList.of(1, 2, 3), nullCons<Int>().cons(1) + listOf(2, 3))
 
-        assertEquals(Cons.of(1, 2, 3, 4, 5), one + (2..5))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), one + (2..<6))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), one + sequenceOf(2, 3, 4, 5))
+        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), one + (2..5))
+        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), one + (2..<6))
+        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), one + sequenceOf(2, 3, 4, 5))
 
-        assertEquals(Cons.of(1, 2, 3, 4, 5), one + Cons.of(2, 3, 4, 5))
-        assertEquals(Cons.of(3, 2, 1, 3, 4), three + CdrCodedList(listOf(3, 4)))
+        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), one + ImmutableLazyList.of(2, 3, 4, 5))
+        assertEquals(ImmutableLazyList.of(3, 2, 1, 3, 4), three + CdrCodedList(listOf(3, 4)))
     }
 
     @Test

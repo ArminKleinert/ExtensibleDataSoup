@@ -1,20 +1,20 @@
 package kleinert.soap.cons
 
-class ConsPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : Cons<T> {
+class ListPair<T> private constructor(val left: ImmutableLazyList<T>, val right: ImmutableLazyList<T>) : ImmutableLazyList<T> {
 
     companion object {
-        fun <T> concat(left: Cons<T>, right: Cons<T>): Cons<T> =
+        fun <T> concat(left: ImmutableLazyList<T>, right: ImmutableLazyList<T>): ImmutableLazyList<T> =
             when {
                 left.isEmpty() -> right
                 right.isEmpty() -> left
-                left is ConsPair<T> -> ConsPair(left.left, ConsPair(left.right, right))
-                else -> ConsPair(left, right)
+                left is ListPair<T> -> ListPair(left.left, ListPair(left.right, right))
+                else -> ListPair(left, right)
             }
     }
 
     override val car: T
         get() = left.car
-    override val cdr: Cons<T>
+    override val cdr: ImmutableLazyList<T>
         get() = concat(left.cdr, right)
     override val size: Int
         get() = left.size + right.size
@@ -32,9 +32,9 @@ class ConsPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : C
         }
     }
 
-    override fun cleared(): Cons<T> = VList()
+    override fun cleared(): ImmutableLazyList<T> = VList()
 
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> = CdrCodedList(list)
+    override fun <R> sameTypeFromList(list: List<R>): ImmutableLazyList<R> = CdrCodedList(list)
 
     override fun toString(): String = commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)
