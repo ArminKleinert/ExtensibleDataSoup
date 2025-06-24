@@ -33,7 +33,7 @@ class CdrCodedListTest {
         val list = CdrCodedList<Int>()
         assertEquals(0, list.size)
 
-        assertInstanceOf(ImmutableLazyList::class.java, list.cons(1))
+        assertInstanceOf(Cons::class.java, list.cons(1))
         assertEquals(CdrCodedList(arrayOf(1)), list.cons(1))
         assertEquals(CdrCodedList(arrayOf(2, 1)), list.cons(1).cons(2))
         assertEquals(CdrCodedList(arrayOf(3, 2, 1)), list.cons(1).cons(2).cons(3))
@@ -227,7 +227,7 @@ class CdrCodedListTest {
     @Test
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { CdrCodedList.of<Int>().subList(3, 6).size }
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(listOf<Int>(), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(0, 0))
         assertEquals(listOf(4, 5, 6), CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(3, CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
@@ -241,8 +241,8 @@ class CdrCodedListTest {
 
     @Test
     fun reversed() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().reversed())
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(3, 2, 1).reversed())
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().reversed())
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(3, 2, 1).reversed())
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().reversed())
         assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(3, 2, 1).reversed())
@@ -251,8 +251,8 @@ class CdrCodedListTest {
 
     @Test
     fun map() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().map { it })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1).map { it })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().map { it })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).map { it })
 
         assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).map { it })
         assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).map { it })
@@ -263,8 +263,8 @@ class CdrCodedListTest {
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().mapIndexed { _, elem -> elem })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1).mapIndexed { _, elem -> elem })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().mapIndexed { _, elem -> elem })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).mapIndexed { _, elem -> elem })
 
         assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).mapIndexed { _, elem -> elem })
         assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).mapIndexed { _, elem -> elem })
@@ -279,8 +279,8 @@ class CdrCodedListTest {
 
     @Test
     fun filter() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().filter { true })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1).filter { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().filter { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).filter { true })
 
         assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).filter { true })
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2).filter { false })
@@ -290,8 +290,8 @@ class CdrCodedListTest {
 
     @Test
     fun filterNot() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().filterNot { true })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1).filterNot { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().filterNot { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1).filterNot { true })
 
         assertEquals(CdrCodedList.of(1, 2), CdrCodedList.of(1, 2).filterNot { false })
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of(1, 2).filterNot { true })
@@ -349,18 +349,18 @@ class CdrCodedListTest {
 
     @Test
     fun flatMap() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().flatMap { listOf(it) })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().flatMap { listOf(it) })
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().flatMap { listOf(it) })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).flatMap { listOf(it) })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).flatMap { listOf(it) })
         assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(1, 2, 3).flatMap { listOf(it) })
         assertEquals(CdrCodedList.of(1, 2, 3), CdrCodedList.of(listOf(1, 2), listOf(3)).flatMap { it })
     }
 
     @Test
     fun take() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().take(10))
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).take(10))
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).take(2))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().take(10))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).take(10))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).take(2))
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(0))
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(10))
@@ -376,9 +376,9 @@ class CdrCodedListTest {
 
     @Test
     fun drop() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().drop(10))
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).drop(10))
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).drop(2))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().drop(10))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).drop(10))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).drop(2))
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(0))
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().drop(10))
@@ -394,10 +394,10 @@ class CdrCodedListTest {
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().takeWhile { true })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).takeWhile { true })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).takeWhile { false })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).takeWhile { it < 3 })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().takeWhile { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).takeWhile { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).takeWhile { false })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).takeWhile { it < 3 })
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().takeWhile { it < 3 })
 
@@ -414,10 +414,10 @@ class CdrCodedListTest {
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().dropWhile { true })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).dropWhile { true })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).dropWhile { false })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).dropWhile { it < 3 })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().dropWhile { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).dropWhile { true })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).dropWhile { false })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).dropWhile { it < 3 })
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().dropWhile { it < 3 })
 
@@ -455,8 +455,8 @@ class CdrCodedListTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().sortedBy { it })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).sortedBy { it })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().sortedBy { it })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedBy { it })
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().sortedBy { it })
         assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedBy { it })
@@ -470,8 +470,8 @@ class CdrCodedListTest {
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().sortedByDescending { it })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().sortedByDescending { it })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedByDescending { it })
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().sortedByDescending { it })
         assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedByDescending { it })
@@ -485,9 +485,9 @@ class CdrCodedListTest {
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).sortedWith { n, m -> n.compareTo(m) })
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).sortedWith { n, m -> -n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).sortedWith { n, m -> -n.compareTo(m) })
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().sortedWith { n, m -> n.compareTo(m) })
         assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).sortedWith { n, m -> n.compareTo(m) })
@@ -510,8 +510,8 @@ class CdrCodedListTest {
 
     @Test
     fun distinct() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().distinct())
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).distinct())
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().distinct())
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).distinct())
 
         assertEquals(CdrCodedList.of<Int>(), CdrCodedList.of<Int>().distinct())
         assertEquals(CdrCodedList.of(1), CdrCodedList.of(1).distinct())
@@ -524,8 +524,8 @@ class CdrCodedListTest {
 
     @Test
     fun shuffled() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>().shuffled())
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1, 2, 3).shuffled())
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>().shuffled())
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1, 2, 3).shuffled())
 
         val seed = 0xDEADBEEF
         val rand = Random(seed)
@@ -552,32 +552,32 @@ class CdrCodedListTest {
 
     @Test
     fun plusElement() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>() + 1)
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1) + 2)
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>() + 1)
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1) + 2)
 
-        assertEquals(ImmutableLazyList.of(1), CdrCodedList.of<Int>() + 1)
-        assertEquals(ImmutableLazyList.of(1, 2), CdrCodedList.of(1) + 2)
+        assertEquals(Cons.of(1), CdrCodedList.of<Int>() + 1)
+        assertEquals(Cons.of(1, 2), CdrCodedList.of(1) + 2)
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of<Int>() + listOf(1))
-        assertInstanceOf(ImmutableLazyList::class.java, CdrCodedList.of(1) + listOf(2, 3))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of<Int>() + listOf(1))
+        assertInstanceOf(Cons::class.java, CdrCodedList.of(1) + listOf(2, 3))
 
-        assertEquals(ImmutableLazyList.of<Int>(), CdrCodedList.of<Int>() + listOf())
-        assertEquals(ImmutableLazyList.of(1, 2, 3), CdrCodedList.of(1, 2, 3) + listOf())
+        assertEquals(Cons.of<Int>(), CdrCodedList.of<Int>() + listOf())
+        assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1, 2, 3) + listOf())
 
-        assertEquals(ImmutableLazyList.of(1), CdrCodedList.of<Int>() + listOf(1))
-        assertEquals(ImmutableLazyList.of(1, 2, 3), CdrCodedList.of(1) + listOf(2, 3))
+        assertEquals(Cons.of(1), CdrCodedList.of<Int>() + listOf(1))
+        assertEquals(Cons.of(1, 2, 3), CdrCodedList.of(1) + listOf(2, 3))
 
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), CdrCodedList.of<Int>() + (1..5))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), CdrCodedList.of<Int>() + (1..<6))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + (2..5))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + sequenceOf(2, 3, 4, 5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of<Int>() + (1..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of<Int>() + (1..<6))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + (2..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + sequenceOf(2, 3, 4, 5))
 
-        assertEquals(ImmutableLazyList.of<Int>(), CdrCodedList.of<Int>() + ImmutableLazyList.of())
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + ImmutableLazyList.of(2, 3, 4, 5))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + CdrCodedList(listOf(2, 3, 4, 5)))
+        assertEquals(Cons.of<Int>(), CdrCodedList.of<Int>() + Cons.of())
+        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + Cons.of(2, 3, 4, 5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), CdrCodedList.of(1) + CdrCodedList(listOf(2, 3, 4, 5)))
     }
 
     @Test

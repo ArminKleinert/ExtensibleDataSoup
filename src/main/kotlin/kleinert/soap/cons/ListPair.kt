@@ -1,9 +1,9 @@
 package kleinert.soap.cons
 
-class ListPair<T> private constructor(val left: ImmutableLazyList<T>, val right: ImmutableLazyList<T>) : ImmutableLazyList<T> {
+class ListPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : Cons<T> {
 
     companion object {
-        fun <T> concat(left: ImmutableLazyList<T>, right: ImmutableLazyList<T>): ImmutableLazyList<T> =
+        fun <T> concat(left: Cons<T>, right: Cons<T>): Cons<T> =
             when {
                 left.isEmpty() -> right
                 right.isEmpty() -> left
@@ -14,7 +14,7 @@ class ListPair<T> private constructor(val left: ImmutableLazyList<T>, val right:
 
     override val car: T
         get() = left.car
-    override val cdr: ImmutableLazyList<T>
+    override val cdr: Cons<T>
         get() = concat(left.cdr, right)
     override val size: Int
         get() = left.size + right.size
@@ -32,9 +32,9 @@ class ListPair<T> private constructor(val left: ImmutableLazyList<T>, val right:
         }
     }
 
-    override fun cleared(): ImmutableLazyList<T> = VList()
+    override fun cleared(): Cons<T> = VList()
 
-    override fun <R> sameTypeFromList(list: List<R>): ImmutableLazyList<R> = CdrCodedList(list)
+    override fun <R> sameTypeFromList(list: List<R>): Cons<R> = CdrCodedList(list)
 
     override fun toString(): String = commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)

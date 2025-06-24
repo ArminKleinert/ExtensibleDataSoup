@@ -1,6 +1,6 @@
 package kleinert.soap
 
-import kleinert.soap.cons.ImmutableLazyList
+import kleinert.soap.cons.Cons
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -208,7 +208,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseList(cpi: CodePointIterator, level: Int): Iterable<*> {
         val temp = parseVector(cpi, level, ')'.code)
-        if (options.emptySequenceToUse is ImmutableLazyList<*>) return options.emptySequenceToUse.sameTypeFromList(temp)
+        if (options.emptySequenceToUse is Cons<*>) return options.emptySequenceToUse.sameTypeFromList(temp)
         else options.emptySequenceToUse + temp
         return temp.asIterable()
     }

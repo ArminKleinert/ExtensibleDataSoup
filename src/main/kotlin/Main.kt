@@ -1,5 +1,5 @@
 import kleinert.soap.*
-import kleinert.soap.cons.ImmutableLazyList
+import kleinert.soap.cons.Cons
 import kleinert.soap.cons.LazyList
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -146,15 +146,15 @@ fun main(args: Array<String>) {
 //    }
 
     run {
-        val lst = ImmutableLazyList.concat(
-            ImmutableLazyList.of(1, 2, 3, 4, 5), ImmutableLazyList.of(6, 7, 8, 9, 10),
-            ImmutableLazyList.of(11, 12, 13, 14, 15), ImmutableLazyList.of(16, 17, 18, 19, 20)
+        val lst = Cons.concat(
+            Cons.of(1, 2, 3, 4, 5), Cons.of(6, 7, 8, 9, 10),
+            Cons.of(11, 12, 13, 14, 15), Cons.of(16, 17, 18, 19, 20)
         )
         println(lst)
     }
 
     run {
-        val lst = ImmutableLazyList.of(1, 2, 3, 4, 5)
+        val lst = Cons.of(1, 2, 3, 4, 5)
         val seq = LazyList.cycle(lst)
         println(seq.take(22))
     }
@@ -170,7 +170,7 @@ fun main(args: Array<String>) {
     }
 
     run {
-        val seq = ImmutableLazyList.from(sequenceOf(1, 2, 3, 4, 5))
+        val seq = Cons.from(sequenceOf(1, 2, 3, 4, 5))
         println(seq)
     }
 

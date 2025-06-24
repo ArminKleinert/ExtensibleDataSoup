@@ -228,7 +228,7 @@ class VListTest {
     @Test
     fun subList() {
         assertThrows(IndexOutOfBoundsException::class.java) { VList.of<Int>().subList(3, 6).size }
-        assertInstanceOf(ImmutableLazyList::class.java, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
+        assertInstanceOf(Cons::class.java, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(listOf<Int>(), VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(0, 0))
         assertEquals(listOf(4, 5, 6), VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6))
         assertEquals(3, VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).subList(3, 6).size)
@@ -560,32 +560,32 @@ class VListTest {
 
     @Test
     fun plusElement() {
-        assertInstanceOf(ImmutableLazyList::class.java, VList.of<Int>() + 1)
-        assertInstanceOf(ImmutableLazyList::class.java, VList.of(1) + 2)
+        assertInstanceOf(Cons::class.java, VList.of<Int>() + 1)
+        assertInstanceOf(Cons::class.java, VList.of(1) + 2)
 
-        assertEquals(ImmutableLazyList.of(1), VList.of<Int>() + 1)
-        assertEquals(ImmutableLazyList.of(1, 2), VList.of(1) + 2)
+        assertEquals(Cons.of(1), VList.of<Int>() + 1)
+        assertEquals(Cons.of(1, 2), VList.of(1) + 2)
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(ImmutableLazyList::class.java, VList.of<Int>() + listOf(1))
-        assertInstanceOf(ImmutableLazyList::class.java, VList.of(1) + listOf(2, 3))
+        assertInstanceOf(Cons::class.java, VList.of<Int>() + listOf(1))
+        assertInstanceOf(Cons::class.java, VList.of(1) + listOf(2, 3))
 
-        assertEquals(ImmutableLazyList.of<Int>(), VList.of<Int>() + listOf())
-        assertEquals(ImmutableLazyList.of(1, 2, 3), VList.of(1, 2, 3) + listOf())
+        assertEquals(Cons.of<Int>(), VList.of<Int>() + listOf())
+        assertEquals(Cons.of(1, 2, 3), VList.of(1, 2, 3) + listOf())
 
-        assertEquals(ImmutableLazyList.of(1), VList.of<Int>() + listOf(1))
-        assertEquals(ImmutableLazyList.of(1, 2, 3), VList.of(1) + listOf(2, 3))
+        assertEquals(Cons.of(1), VList.of<Int>() + listOf(1))
+        assertEquals(Cons.of(1, 2, 3), VList.of(1) + listOf(2, 3))
 
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), VList.of<Int>() + (1..5))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), VList.of<Int>() + (1..<6))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), VList.of(1) + (2..5))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), VList.of(1) + sequenceOf(2, 3, 4, 5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), VList.of<Int>() + (1..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), VList.of<Int>() + (1..<6))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), VList.of(1) + (2..5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), VList.of(1) + sequenceOf(2, 3, 4, 5))
 
-        assertEquals(ImmutableLazyList.of<Int>(), VList.of<Int>() + ImmutableLazyList.of())
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), VList.of(1) + ImmutableLazyList.of(2, 3, 4, 5))
-        assertEquals(ImmutableLazyList.of(1, 2, 3, 4, 5), VList.of(1) + CdrCodedList(listOf(2, 3, 4, 5)))
+        assertEquals(Cons.of<Int>(), VList.of<Int>() + Cons.of())
+        assertEquals(Cons.of(1, 2, 3, 4, 5), VList.of(1) + Cons.of(2, 3, 4, 5))
+        assertEquals(Cons.of(1, 2, 3, 4, 5), VList.of(1) + CdrCodedList(listOf(2, 3, 4, 5)))
     }
 
     @Test
