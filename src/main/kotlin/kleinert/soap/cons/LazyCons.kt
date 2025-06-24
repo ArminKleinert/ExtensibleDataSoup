@@ -43,15 +43,6 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
         return sv
     }
 
-
-    override fun cons(element: T): Cons<T> {
-        return ConsCell(element, this)
-    }
-
-    override fun cleared(): Cons<T> {
-        return Cons.of()
-    }
-
     override fun isEmpty(): Boolean {
         return evaluateStep()!!.isEmpty()
     }
@@ -61,70 +52,90 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
     }
 
     override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
-        return Cons.fromIterable(list)
+        return Cons.from(list)
     }
 
     override fun isLazyType(): Boolean = true
 
+    override fun toString(): String {
+        return toString(limit = 100000)
+    }
+
+    fun toString(limit: Int = 100000): String {
+        return commonToString(limit = limit)
+    }
+
     companion object {
-        fun <T, R> map(f: (T) -> R, lst: Cons<T>): Cons<R> {
-            return LazyCons {
-                if (lst.isEmpty()) nullCons()
-                else Cons.cons(f(lst.car), map(f, lst.cdr))
+//        fun <T, R> map(f: (T) -> R, lst: Cons<T>): Cons<R> {
+//            return LazyCons {
+//                if (lst.isEmpty()) nullCons()
+//                else Cons.cons(f(lst.car), map(f, lst.cdr))
+//            }
+//        }
+//
+//        fun <T> filter(p: (T) -> Boolean, lst: Cons<T>): Cons<T> {
+//            return LazyCons {
+//                when {
+//                    lst.isEmpty() -> nullCons()
+//                    p(lst.car) -> Cons.cons(lst.car, filter(p, lst.cdr))
+//                    else -> filter(p, lst.cdr)
+//                }
+//            }
+//        }
+//
+//        fun <T> take(n: Long, lst: Cons<T>): Cons<T> {
+//            return LazyCons {
+//                when {
+//                    lst.isEmpty() -> nullCons()
+//                    n == 1L -> Cons.cons(lst.car, nullCons())
+//                    n > 0 -> Cons.cons(lst.car, take(n - 1, lst.cdr))
+//                    else -> nullCons()
+//                }
+//            }
+//        }
+//
+//        fun <T> drop(n: Int, lst: Cons<T>): Cons<T> {
+//            return LazyCons {
+//                when {
+//                    lst.isEmpty() -> nullCons()
+//                    n > 0 -> drop(n - 1, lst.cdr)
+//                    else -> lst
+//                }
+//            }
+//        }
+
+        fun <T> of(iterator: Iterator<T>): Cons<T> = of {
+            when {
+                iterator.hasNext() -> Cons.cons(iterator.next(), of(iterator))
+                else -> nullCons()
             }
         }
 
-        fun <T> filter(p: (T) -> Boolean, lst: Cons<T>): Cons<T> {
-            return LazyCons {
-                when {
-                    lst.isEmpty() -> nullCons()
-                    p(lst.car) -> Cons.cons(lst.car, filter(p, lst.cdr))
-                    else -> filter(p, lst.cdr)
-                }
+        fun <T> of(seq: Sequence<T>): Cons<T> = of(seq.iterator())
+
+        fun <T> of(fn: () -> Cons<T>?): Cons<T> = LazyCons(fn)
+
+        fun <T> repeatedly(n: Int = -1, fn: () -> T): Cons<T> = of {
+            when (n) {
+                -1 -> Cons.cons(fn(), repeatedly(n, fn))
+                0 -> nullCons()
+                else -> Cons.cons(fn(), repeatedly(n - 1, fn))
             }
         }
 
-        fun <T> take(n: Long, lst: Cons<T>): Cons<T> {
-            return LazyCons {
-                when {
-                    lst.isEmpty() -> nullCons()
-                    n == 1L -> Cons.cons(lst.car, nullCons())
-                    n > 0 -> Cons.cons(lst.car, take(n - 1, lst.cdr))
-                    else -> nullCons()
-                }
-            }
+        fun <T> lazySeq(x: T, fn: () -> Cons<T>) = Cons.cons(x, fn)
+
+        fun <T> cycle(xs: Cons<T>): Cons<T> = of {
+            if (xs.isEmpty()) nullCons()
+            else lazySeq(xs.car) { Cons.concat(xs.cdr, cycle(xs)) }
         }
 
-        fun <T> drop(n: Int, lst: Cons<T>): Cons<T> {
-            return LazyCons {
-                when {
-                    lst.isEmpty() -> nullCons()
-                    n > 0 -> drop(n - 1, lst.cdr)
-                    else -> lst
-                }
-            }
+        fun <T> repeat(x: T): Cons<T> = of {
+            lazySeq(x, { repeat(x) })
         }
 
-        fun <T> fromIterator(iterator: Iterator<T>): Cons<T> {
-            return LazyCons {
-                when {
-                    iterator.hasNext() -> Cons.cons(iterator.next(), fromIterator(iterator))
-                    else -> nullCons()
-                }
-            }
-        }
-        fun <T> of(seq: Sequence<T>): Cons<T> {
-            return LazyCons.fromIterator(seq.iterator())
-        }
-
-        fun <T, R> fmap(f: (T) -> R, p: (T) -> Boolean, xs: Cons<T>): Cons<R> {
-            return LazyCons {
-                when {
-                    xs.isEmpty() -> nullCons()
-                    p(xs.car) -> Cons.cons(f(xs.car), fmap(f, p, xs.cdr))
-                    else -> fmap(f, p, xs.cdr)
-                }
-            }
+        fun <T> iterate(f: (T) -> T, x: T): Cons<T> = of {
+            lazySeq(x, { LazyCons.iterate(f, f(x)) })
         }
     }
 }

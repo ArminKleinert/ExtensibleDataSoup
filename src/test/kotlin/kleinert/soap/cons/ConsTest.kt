@@ -31,29 +31,29 @@ class ConsTest {
 
     @Test
     fun fromIterable() {
-        assertInstanceOf(Cons::class.java, Cons.fromIterable<Boolean>(arrayOf()))
-        assertInstanceOf(Cons::class.java, Cons.fromIterable<Boolean>(listOf()))
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(sequenceOf<Boolean>().asIterable()))
+        assertInstanceOf(Cons::class.java, Cons.from<Boolean>(arrayOf()))
+        assertInstanceOf(Cons::class.java, Cons.from<Boolean>(listOf()))
+        assertInstanceOf(Cons::class.java, Cons.from(sequenceOf<Boolean>().asIterable()))
 
-        assertEquals(nullCons<Boolean>(), Cons.fromIterable<Boolean>(arrayOf()))
-        assertEquals(nullCons<Boolean>(), Cons.fromIterable<Boolean>(listOf()))
-        assertEquals(nullCons<Boolean>(), Cons.fromIterable(sequenceOf<Boolean>().asIterable()))
+        assertEquals(nullCons<Boolean>(), Cons.from<Boolean>(arrayOf()))
+        assertEquals(nullCons<Boolean>(), Cons.from<Boolean>(listOf()))
+        assertEquals(nullCons<Boolean>(), Cons.from(sequenceOf<Boolean>().asIterable()))
 
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(arrayOf(true)))
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(listOf(true)))
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(sequenceOf(true).asIterable()))
+        assertInstanceOf(Cons::class.java, Cons.from(arrayOf(true)))
+        assertInstanceOf(Cons::class.java, Cons.from(listOf(true)))
+        assertInstanceOf(Cons::class.java, Cons.from(sequenceOf(true).asIterable()))
 
-        assertEquals(Cons.of(true), Cons.fromIterable(arrayOf(true)))
-        assertEquals(Cons.of(true), Cons.fromIterable(listOf(true)))
-        assertEquals(Cons.of(true), Cons.fromIterable(sequenceOf(true).asIterable()))
+        assertEquals(Cons.of(true), Cons.from(arrayOf(true)))
+        assertEquals(Cons.of(true), Cons.from(listOf(true)))
+        assertEquals(Cons.of(true), Cons.from(sequenceOf(true).asIterable()))
 
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(arrayOf(true, false)))
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(listOf(true, false)))
-        assertInstanceOf(Cons::class.java, Cons.fromIterable(sequenceOf(true, false).asIterable()))
+        assertInstanceOf(Cons::class.java, Cons.from(arrayOf(true, false)))
+        assertInstanceOf(Cons::class.java, Cons.from(listOf(true, false)))
+        assertInstanceOf(Cons::class.java, Cons.from(sequenceOf(true, false).asIterable()))
 
-        assertEquals(Cons.of(true, false), Cons.fromIterable(arrayOf(true, false)))
-        assertEquals(Cons.of(true, false), Cons.fromIterable(listOf(true, false)))
-        assertEquals(Cons.of(true, false), Cons.fromIterable(sequenceOf(true, false).asIterable()))
+        assertEquals(Cons.of(true, false), Cons.from(arrayOf(true, false)))
+        assertEquals(Cons.of(true, false), Cons.from(listOf(true, false)))
+        assertEquals(Cons.of(true, false), Cons.from(sequenceOf(true, false).asIterable()))
     }
 
     @Test
@@ -121,7 +121,7 @@ class ConsTest {
 
         assertEquals(
             Cons.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+            ConsPair.concat(Cons.from(1..5), Cons.from(6..10))
         )
     }
 
@@ -139,7 +139,7 @@ class ConsTest {
 
         assertEquals(
             CdrCodedList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+            ConsPair.concat(Cons.from(1..5), Cons.from(6..10))
         )
     }
 
@@ -171,7 +171,7 @@ class ConsTest {
                 )
             )
         )
-        assertEquals(oneToTen, ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10)))
+        assertEquals(oneToTen, ConsPair.concat(Cons.from(1..5), Cons.from(6..10)))
     }
 
     @Test
@@ -188,7 +188,7 @@ class ConsTest {
 
         assertEquals(
             VList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+            ConsPair.concat(Cons.from(1..5), Cons.from(6..10))
         )
     }
 
@@ -206,7 +206,7 @@ class ConsTest {
 
         assertEquals(
             listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            ConsPair.concat(Cons.fromIterable(1..5), Cons.fromIterable(6..10))
+            ConsPair.concat(Cons.from(1..5), Cons.from(6..10))
         )
     }
 }

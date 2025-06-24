@@ -1,6 +1,9 @@
 import kleinert.soap.*
 import kleinert.soap.cons.Cons
 import kleinert.soap.cons.LazyCons
+import kotlin.math.pow
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -41,7 +44,7 @@ fun examples1() {
 }
 
 fun examples2() {
-    fun mapOrListToPair(elem: Any?): Any? = when (elem) {
+    fun mapOrListToPair(elem: Any?): Any = when (elem) {
         is Map<*, *> -> (elem["first"] to elem["second"])
         is List<*> -> elem[0] to elem[1]
         else -> throw IllegalArgumentException()
@@ -49,19 +52,23 @@ fun examples2() {
 
     run {
         val decoders = mapOf("my/pair" to ::mapOrListToPair)
-        println(EDNSoapReader.readString(
-            "[ #my/pair {\"first\" 4 \"second\" 5} #my/pair [4 5] ] ",
-            EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
-        ))
+        println(
+            EDNSoapReader.readString(
+                "[ #my/pair {\"first\" 4 \"second\" 5} #my/pair [4 5] ] ",
+                EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
+            )
+        )
     } // Output: [(4, 5), (4, 5)]
 
     run {
         // Allowing more freedom in naming here.
         val decoders = mapOf("pair" to ::mapOrListToPair)
-        println(EDNSoapReader.readString(
-            "[ #pair {\"first\" 4 \"second\" 5} #pair [4 5] ] ",
-            EDNSoapOptions.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = decoders)
-        ))
+        println(
+            EDNSoapReader.readString(
+                "[ #pair {\"first\" 4 \"second\" 5} #pair [4 5] ] ",
+                EDNSoapOptions.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = decoders)
+            )
+        )
     } // Output: [(4, 5), (4, 5)]
 }
 
@@ -131,11 +138,51 @@ fun main(args: Array<String>) {
 //        println("Result: " + l.toList())
 //    }
 
+//    run {
+//        val biggerList = LazyCons.of((1..500).iterator())
+//        val l = LazyCons.take(4, LazyCons.filter({it > 100 && it % 2 == 0}, LazyCons.drop(4, LazyCons.map({ it + 1 }, biggerList))))
+//        println(l)
+//        println("Result: " + l.toList())
+//        println(biggerList.toList())
+//    }
+
     run {
-        val biggerList = LazyCons.fromIterator((1..500).iterator())
-        val l = LazyCons.take(4, LazyCons.filter({it > 100 && it % 2 == 0}, LazyCons.drop(4, LazyCons.map({ it + 1 }, biggerList))))
-        println(l)
-        println("Result: " + l.toList())
-        println(biggerList.toList())
+        val lst = Cons.concat(
+            Cons.of(1, 2, 3, 4, 5), Cons.of(6, 7, 8, 9, 10),
+            Cons.of(11, 12, 13, 14, 15), Cons.of(16, 17, 18, 19, 20)
+        )
+        println(lst)
+    }
+
+    run {
+        val lst = Cons.of(1, 2, 3, 4, 5)
+        val seq = LazyCons.cycle(lst)
+        println(seq.take(22))
+    }
+
+    run {
+        val seq = LazyCons.repeat(1)
+        println(seq.take(22))
+    }
+
+    run {
+        val seq = LazyCons.repeatedly { Random.nextInt(0..9) }
+        println(seq.take(22))
+    }
+
+    run {
+        val seq = Cons.from(sequenceOf(1, 2, 3, 4, 5))
+        println(seq)
+    }
+
+    run {
+        val seq = LazyCons.iterate({ it * 2 }, 1L)
+        println(seq.take(33))
+    }
+
+    run {
+        val seq = LazyCons.iterate({ it + 1 }, 1)
+        println(seq.take(10))
+        // println(seq.filter{it < 5}.take(5)) // This operation will always hang, which is the intended behaviour. :)
     }
 }
