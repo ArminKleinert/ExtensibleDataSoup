@@ -8,10 +8,13 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
     companion object {
         fun <T> of(vararg elements: T): Cons<T> = if (elements.isEmpty()) nullCons() else VList(elements.toList())
 
-        fun <T> from(coll: List<T>): Cons<T> = if (coll is Cons<T>) coll else CdrCodedList(coll)
+        fun <T> from(coll: List<T>): Cons<T> =
+            if (coll is Cons<T>) coll
+            else if (coll.isEmpty()) nullCons()
+            else CdrCodedList(coll)
         fun <T> from(coll: Iterable<T>): Cons<T> = if (coll is Cons<T>) coll else VList(coll)
         fun <T> from(arr: Array<T>): Cons<T> = VList(arr)
-        fun <T> from(seq: Sequence<T>): Cons<T> = LazyCons.of(seq)
+        fun <T> from(seq: Sequence<T>): Cons<T> = LazyCons.lazySeq(seq)
 
         fun <T> wrapList(list: List<T>): CdrCodedList<T> = CdrCodedList(list, true)
 
@@ -19,8 +22,8 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
         fun <T> log2Access(list: Iterable<T>): Cons<T> = VList(list)
 
-        fun <T> lazy(list: Iterable<T>): Cons<T> = LazyCons.of(list.iterator())
-        fun <T> lazy(list: Sequence<T>): Cons<T> = LazyCons.of(list)
+        fun <T> lazy(list: Iterable<T>): Cons<T> = LazyCons.fromIterator(list.iterator())
+        fun <T> lazy(list: Sequence<T>): Cons<T> = LazyCons.lazySeq(list)
 
         fun <T> singlyLinked(list: Iterable<T>): Cons<T> {
             var head: Cons<T> = nullCons()
@@ -30,11 +33,11 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
             return head
         }
 
-        fun <T> cons(element: T, seq: Cons<T>): Cons<T> = seq.cons(element)
-        fun <T> cons(element: T, seq: Iterable<T>): Cons<T> = from(seq).cons(element)
-        fun <T> cons(element: T, seq: Sequence<T>): Cons<T> = from(seq).cons(element)
-        fun <T> cons(element: T, seq: Array<T>): Cons<T> = from(seq).cons(element)
-        fun <T> cons(element: T, seq: () -> Cons<T>): Cons<T> = LazyCons(seq).cons(element)
+        fun <T> cons(x: T, xs: Cons<T>): Cons<T> = xs.cons(x)
+        fun <T> cons(x: T, xs: Iterable<T>): Cons<T> = from(xs).cons(x)
+        fun <T> cons(x: T, xs: Sequence<T>): Cons<T> = from(xs).cons(x)
+        fun <T> cons(x: T, xs: Array<T>): Cons<T> = from(xs).cons(x)
+        fun <T> cons(x: T, xs: () -> Cons<T>): Cons<T> = LazyCons(xs).cons(x)
 
         fun <T> concat(vararg conses: Cons<T>) =
             conses.foldRight(nullCons()) { ts: Cons<T>, acc: Cons<T> -> ConsPair.concat(ts, acc) }
@@ -288,58 +291,66 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
     fun chunked(size: Int): Cons<List<T>> =
         if (isLazyType()) from(asSequence().chunked(size))
-        else from(asIterable().chunked(size))
+        else sameTypeFromList(asIterable().chunked(size))
+
+    fun distinct(): Cons<T> =
+        if (isLazyType()) from(asSequence().distinct())
+        else sameTypeFromList(asIterable().distinct())
+
+    fun dropWhile(predicate: (T) -> Boolean): Cons<T> =
+        if (isLazyType()) from(asSequence().dropWhile(predicate))
+        else sameTypeFromList(asIterable().dropWhile(predicate))
 
     fun filter(predicate: (T) -> Boolean): Cons<T> =
         if (isLazyType()) from(asSequence().filter(predicate))
-        else from(asIterable().filter(predicate))
+        else sameTypeFromList(asIterable().filter(predicate))
 
     fun filterIndexed(predicate: (index: Int, T) -> Boolean): Cons<T> =
         if (isLazyType()) from(asSequence().filterIndexed(predicate))
-        else from(asIterable().filterIndexed(predicate))
+        else sameTypeFromList(asIterable().filterIndexed(predicate))
 
     fun filterNot(predicate: (T) -> Boolean): Cons<T> =
         if (isLazyType()) from(asSequence().filterNot(predicate))
-        else from(asIterable().filterNot(predicate))
+        else sameTypeFromList(asIterable().filterNot(predicate))
 
     fun filterNotNull(): Cons<T> =
         if (isLazyType()) from(asSequence().filterNotNull())
-        else from(asIterable().filterNotNull())
+        else sameTypeFromList(asIterable().filterNotNull())
 
     fun <R> flatMap(transform: (T) -> Iterable<R>): Cons<R> =
         if (isLazyType()) from(asSequence().flatMap(transform))
-        else from(asIterable().flatMap(transform))
+        else sameTypeFromList(asIterable().flatMap(transform))
 
     fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): Cons<R> =
         if (isLazyType()) from(asSequence().flatMapIndexed(transform))
-        else from(asIterable().flatMapIndexed(transform))
+        else sameTypeFromList(asIterable().flatMapIndexed(transform))
 
     fun ifEmpty(defaultValue: () -> Cons<T>): Cons<T> =
         from(asSequence().ifEmpty { defaultValue().asSequence() })
 
     fun <R> map(transform: (T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().map(transform))
-        else from(asIterable().map(transform))
+        else sameTypeFromList(asIterable().map(transform))
 
     fun <R> mapIndexed(transform: (index: Int, T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().mapIndexed(transform))
-        else from(asIterable().mapIndexed(transform))
+        else sameTypeFromList(asIterable().mapIndexed(transform))
 
     fun <R : Any> mapIndexedNotNull(transform: (index: Int, T) -> R?): Cons<R> =
         if (isLazyType()) from(asSequence().mapIndexedNotNull(transform))
-        else from(asIterable().mapIndexedNotNull(transform))
+        else sameTypeFromList(asIterable().mapIndexedNotNull(transform))
 
     fun <R : Any> mapNotNull(transform: (T) -> R?): Cons<R> =
         if (isLazyType()) from(asSequence().mapNotNull(transform))
-        else from(asIterable().mapNotNull(transform))
+        else sameTypeFromList(asIterable().mapNotNull(transform))
 
     fun minus(element: T): Cons<T> =
         if (isLazyType()) from(asSequence().minus(element))
-        else from(asIterable().minus(element))
+        else sameTypeFromList(asIterable().minus(element))
 
     fun minus(elements: Set<T>): Cons<T> =
         if (isLazyType()) from(asSequence().minus(elements.toSet()))
-        else from(asIterable().minus(elements.toSet()))
+        else sameTypeFromList(asIterable().minus(elements.toSet()))
 
     fun minus(elements: Iterable<T>): Cons<T> = minus(elements.toSet())
     fun onEach(action: (T) -> Unit): Cons<T> =
@@ -356,74 +367,74 @@ sealed interface Cons<T> : List<T>, Iterable<T> {
 
     fun <R> runningFold(initial: R, operation: (acc: R, T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().runningFold(initial, operation))
-        else from(asIterable().runningFold(initial, operation))
+        else sameTypeFromList(asIterable().runningFold(initial, operation))
 
     fun <R> runningFoldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().runningFoldIndexed(initial, operation))
-        else from(asIterable().runningFoldIndexed(initial, operation))
+        else sameTypeFromList(asIterable().runningFoldIndexed(initial, operation))
 
     fun runningReduce(operation: (acc: T, T) -> T): Cons<T> =
         if (isLazyType()) from(asSequence().runningReduce(operation))
-        else from(asIterable().runningReduce(operation))
+        else sameTypeFromList(asIterable().runningReduce(operation))
 
     fun runningReduceIndexed(operation: (index: Int, acc: T, T) -> T): Cons<T> =
         if (isLazyType()) from(asSequence().runningReduceIndexed(operation))
-        else from(asIterable().runningReduceIndexed(operation))
+        else sameTypeFromList(asIterable().runningReduceIndexed(operation))
 
     fun <R> scan(initial: R, operation: (acc: R, T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().scan(initial, operation))
-        else from(asIterable().scan(initial, operation))
+        else sameTypeFromList(asIterable().scan(initial, operation))
 
     fun <R> scanIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().scanIndexed(initial, operation))
-        else from(asIterable().scanIndexed(initial, operation))
+        else sameTypeFromList(asIterable().scanIndexed(initial, operation))
 
     fun <R : Comparable<R>> sortedBy(selector: (T) -> R?): Cons<T> =
         if (isLazyType()) from(asSequence().sortedBy(selector))
-        else from(asIterable().sortedBy(selector))
+        else sameTypeFromList(asIterable().sortedBy(selector))
 
     fun <R : Comparable<R>> sortedByDescending(selector: (T) -> R?): Cons<T> =
         if (isLazyType()) from(asSequence().sortedByDescending(selector))
-        else from(asIterable().sortedByDescending(selector))
+        else sameTypeFromList(asIterable().sortedByDescending(selector))
 
     fun sortedWith(comparator: Comparator<in T>): Cons<T> =
         if (isLazyType()) from(asSequence().sortedWith(comparator))
-        else from(asIterable().sortedWith(comparator))
+        else sameTypeFromList(asIterable().sortedWith(comparator))
 
     fun take(n: Int): Cons<T> =
         if (isLazyType()) from(asSequence().take(n))
-        else from(asIterable().take(n))
+        else sameTypeFromList(asIterable().take(n))
 
     fun takeWhile(predicate: (T) -> Boolean): Cons<T> =
         if (isLazyType()) from(asSequence().takeWhile(predicate))
-        else from(asIterable().takeWhile(predicate))
+        else sameTypeFromList(asIterable().takeWhile(predicate))
 
     fun windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): Cons<List<T>> =
         if (isLazyType()) from(asSequence().windowed(size, step, partialWindows))
-        else from(asIterable().windowed(size, step, partialWindows))
+        else sameTypeFromList(asIterable().windowed(size, step, partialWindows))
 
     fun <R> windowed(size: Int, step: Int = 1, partialWindows: Boolean = false, transform: (List<T>) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().windowed(size, step, partialWindows, transform))
-        else from(asIterable().windowed(size, step, partialWindows, transform))
+        else sameTypeFromList(asIterable().windowed(size, step, partialWindows, transform))
 
     fun withIndex(): Cons<IndexedValue<T>> =
         if (isLazyType()) from(asSequence().withIndex())
-        else from(asIterable().withIndex())
+        else sameTypeFromList(asIterable().withIndex().toList())
 
     fun <R> zip(other: Iterable<R>): Cons<Pair<T, R>> =
         if (isLazyType()) from(asSequence().zip(other.asSequence()))
-        else from(asIterable().zip(other.asIterable()))
+        else sameTypeFromList(asIterable().zip(other.asIterable()))
 
     fun <R, V> zip(other: Iterable<R>, transform: (a: T, b: R) -> V): Cons<V> =
         if (isLazyType()) from(asSequence().zip(other.asSequence(), transform))
-        else from(asIterable().zip(other.asIterable(), transform))
+        else sameTypeFromList(asIterable().zip(other.asIterable(), transform))
 
     fun zipWithNext(): Cons<Pair<T, T>> =
         if (isLazyType()) from(asSequence().zipWithNext())
-        else from(asIterable().zipWithNext())
+        else sameTypeFromList(asIterable().zipWithNext())
 
     fun <R> zipWithNext(transform: (a: T, b: T) -> R): Cons<R> =
         if (isLazyType()) from(asSequence().zipWithNext(transform))
-        else from(asIterable().zipWithNext(transform))
+        else sameTypeFromList(asIterable().zipWithNext(transform))
 
 }

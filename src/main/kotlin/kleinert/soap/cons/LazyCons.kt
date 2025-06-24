@@ -104,18 +104,20 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
 //            }
 //        }
 
-        fun <T> of(iterator: Iterator<T>): Cons<T> = of {
+        fun <T> of(vararg xs: T): Cons<T> = lazySeq(xs.asSequence())
+
+        fun <T> fromIterator(iterator: Iterator<T>): Cons<T> = lazySeq {
             when {
-                iterator.hasNext() -> Cons.cons(iterator.next(), of(iterator))
+                iterator.hasNext() -> Cons.cons(iterator.next(), fromIterator(iterator))
                 else -> nullCons()
             }
         }
 
-        fun <T> of(seq: Sequence<T>): Cons<T> = of(seq.iterator())
+        fun <T> lazySeq(seq: Sequence<T>): Cons<T> = fromIterator(seq.iterator())
 
-        fun <T> of(fn: () -> Cons<T>?): Cons<T> = LazyCons(fn)
+        fun <T> lazySeq(fn: () -> Cons<T>?): Cons<T> = LazyCons(fn)
 
-        fun <T> repeatedly(n: Int = -1, fn: () -> T): Cons<T> = of {
+        fun <T> repeatedly(n: Int = -1, fn: () -> T): Cons<T> = lazySeq {
             when (n) {
                 -1 -> Cons.cons(fn(), repeatedly(n, fn))
                 0 -> nullCons()
@@ -125,17 +127,17 @@ class LazyCons<T>(fn: () -> Cons<T>?) : Cons<T> {
 
         fun <T> lazySeq(x: T, fn: () -> Cons<T>) = Cons.cons(x, fn)
 
-        fun <T> cycle(xs: Cons<T>): Cons<T> = of {
+        fun <T> cycle(xs: Cons<T>): Cons<T> = lazySeq {
             if (xs.isEmpty()) nullCons()
             else lazySeq(xs.car) { Cons.concat(xs.cdr, cycle(xs)) }
         }
 
-        fun <T> repeat(x: T): Cons<T> = of {
-            lazySeq(x, { repeat(x) })
+        fun <T> repeat(x: T): Cons<T> = lazySeq {
+            lazySeq(x) { repeat(x) }
         }
 
-        fun <T> iterate(f: (T) -> T, x: T): Cons<T> = of {
-            lazySeq(x, { LazyCons.iterate(f, f(x)) })
+        fun <T> iterate(f: (T) -> T, x: T): Cons<T> = lazySeq {
+            lazySeq(x) { iterate(f, f(x)) }
         }
     }
 }
