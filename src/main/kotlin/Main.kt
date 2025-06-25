@@ -188,25 +188,52 @@ fun main(args: Array<String>) {
 //    run {
 //        val seq = LazyList.iterate({ it + 1 }, 1)
 //        println(seq.take(10))
+//        println(seq.take(10))
+//        println(seq.take(10))
+//
+//        val seq1 = LazyList.of(1,2,3,4,5,6,7,8,9,10)
+//        println(LazyList.splitAt(5, seq1))
+//
+//        val (f, s) = LazyList.splitAt(5,  seq)
+//        println(f + " " + s.take(10).toString())
 //        // println(seq.filter{it < 5}.take(5)) // This operation will always hang, which is the intended behaviour. :)
 //    }
 
+//    run {
+//        val obj = listOf(
+//            1,
+//            2.0,
+//            BigInteger.valueOf(100),
+//            BigDecimal.valueOf(100),
+//            "abc",
+//            '9',
+//            VList.of(1, 2, 3),
+//            sequenceOf(1, 2, 3),
+//            true,
+//            null
+//        )
+//        println(
+//            EDNSoapWriter.pprintS(
+//                obj,
+//                options = EDNSoapOptions.defaultOptions.copy(decodingSequenceSeparator = " ")
+//            )
+//        )
+//    }
+
     run {
-        val obj = listOf(
-            1,
-            2.0,
-            BigInteger.valueOf(100),
-            BigDecimal.valueOf(100),
-            "abc",
-            '9',
-            VList.of(1, 2, 3),
-            sequenceOf(1, 2, 3)
-        )
-        println(
-            EDNSoapWriter.pprintS(
-                obj,
-                options = EDNSoapOptions.defaultOptions.copy(decodingSequenceSeparator = " ")
-            )
-        )
+        data class AO(val n: Int)
+
+        val input = "#test/AO {:n 1}"
+        val options = EDNSoapOptions.defaultOptions.copy(ednClassDecoders = mapOf(
+            "test/AO" to { println("$it ${it?.javaClass}" )
+                AO(((it as Map<*, *>).getOrDefault(Keyword.keyword(":n"), 2) as Number).toInt()) }
+        ), ednClassEncoders = mapOf(
+            AO::class.java to { "test/AO" to mapOf(Keyword.keyword(":nma") to (it as AO).n) }
+        ))
+        println(Keyword.keyword(":nma"))
+        println(input)
+        val data = EDNSoapReader.readString(input, options)
+        println(data)
+        val output = EDNSoapWriter.pprint(data, options = options)
     }
 }

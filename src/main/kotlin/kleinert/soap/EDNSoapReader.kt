@@ -399,7 +399,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseDecode(cpi: CodePointIterator, level: Int, token: CharSequence, decoder: ((Any?) -> Any?)?): Any? {
-        val form = readForm(cpi, level + 1)
+        val form = readForm(cpi, level + 1, stopAfterOne = true)
 
         if (token == "uuid" || token == "inst") {
             try {

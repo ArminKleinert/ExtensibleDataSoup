@@ -29,6 +29,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
     private fun tryEncoder(obj: Any): String? {
         val encoder = options.ednClassEncoders[obj.javaClass] ?: return null
         val (prefix, output) = encoder(obj as Any?) ?: return null
+        println("Prefix: $prefix Output: $output")
         return "#$prefix ${encode(output)}"
     }
 

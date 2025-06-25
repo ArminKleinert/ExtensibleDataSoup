@@ -30,7 +30,10 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
             return Keyword(Symbol.symbol(prefix, name))
         }
 
-        operator fun get(s: String): Keyword = keyword(s) ?: throw IllegalStateException("Illegal keyword format: $s")
+        operator fun get(s: String): Keyword {
+            val name = if (s.startsWith(':')) s else ":$s"
+            return keyword(name) ?: throw IllegalStateException("Illegal keyword format: $s")
+        }
     }
 
     val length
@@ -46,7 +49,7 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
         get() = s.name
 
     override fun toString() = ":$s"
-    override fun hashCode() = definedKeywords[s.toString()]!!
+    override fun hashCode() = definedKeywords[s.toString()] ?: 0
 
     override fun compareTo(other: Keyword): Int =
         when {
@@ -109,7 +112,7 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
     val fullyQualified: Boolean
         get() = prefix?.isNotEmpty() ?: false
 
-    override fun toString() = if (prefix?.isEmpty() == true) name else "$prefix/$name"
+    override fun toString() = if (prefix.isNullOrEmpty()) name else "$prefix/$name"
 
     override fun compareTo(other: Symbol): Int {
         val prefixCompare = when {

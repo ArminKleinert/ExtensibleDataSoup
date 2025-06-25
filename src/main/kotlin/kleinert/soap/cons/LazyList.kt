@@ -1,5 +1,7 @@
 package kleinert.soap.cons
 
+import kleinert.soap.cons.EmptyList.sameTypeFromList
+
 
 class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
     private var fn: (() -> PersistentList<T>?)? = fn
@@ -83,6 +85,18 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
             }
         }
 
+        fun <T> splitAt(number: Int, lst: PersistentList<T>): Pair<PersistentList<T>, PersistentList<T>> {
+            var dest = VList.of<T>()
+            var src = lst
+            var n = number
+            while (n > 0 && src.isNotEmpty()) {
+                dest = dest.cons(src.car)
+                n--
+                src = src.cdr
+            }
+            return dest.reversed() to src
+        }
+
         fun <T> take(n: Int, lst: PersistentList<T>): PersistentList<T> {
             return lazySeq {
                 when {
@@ -137,5 +151,6 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
         fun <T> iterate(f: (T) -> T, x: T): PersistentList<T> = lazySeq {
             lazySeq(x) { iterate(f, f(x)) }
         }
+
     }
 }
