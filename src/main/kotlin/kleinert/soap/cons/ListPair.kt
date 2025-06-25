@@ -1,9 +1,9 @@
 package kleinert.soap.cons
 
-class ListPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : Cons<T> {
+class ListPair<T> private constructor(val left: PersistentList<T>, val right: PersistentList<T>) : PersistentList<T> {
 
     companion object {
-        fun <T> concat(left: Cons<T>, right: Cons<T>): Cons<T> =
+        fun <T> concat(left: PersistentList<T>, right: PersistentList<T>): PersistentList<T> =
             when {
                 left.isEmpty() -> right
                 right.isEmpty() -> left
@@ -14,7 +14,7 @@ class ListPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : C
 
     override val car: T
         get() = left.car
-    override val cdr: Cons<T>
+    override val cdr: PersistentList<T>
         get() = concat(left.cdr, right)
     override val size: Int
         get() = left.size + right.size
@@ -32,9 +32,9 @@ class ListPair<T> private constructor(val left: Cons<T>, val right: Cons<T>) : C
         }
     }
 
-    override fun cleared(): Cons<T> = VList()
+    override fun cleared(): PersistentList<T> = PersistentList.of()
 
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> = CdrCodedList(list)
+    override fun <R> sameTypeFromList(list: List<R>): PersistentList<R> = PersistentWrapper(list)
 
     override fun toString(): String = commonToString()
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)

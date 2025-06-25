@@ -1,6 +1,6 @@
 package kleinert.soap
 
-import kleinert.soap.cons.Cons
+import kleinert.soap.cons.PersistentList
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -206,11 +206,12 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
     }
 
-    private fun parseList(cpi: CodePointIterator, level: Int): Iterable<*> {
+    private fun parseList(cpi: CodePointIterator, level: Int): List<Any?> {
         val temp = parseVector(cpi, level, ')'.code)
-        if (options.emptySequenceToUse is Cons<*>) return options.emptySequenceToUse.sameTypeFromList(temp)
-        else options.emptySequenceToUse + temp
-        return temp.asIterable()
+        return if (options.emptySequenceToUse is PersistentList<*>)
+            options.emptySequenceToUse.sameTypeFromList(temp)
+        else
+            options.emptySequenceToUse + temp
     }
 
     private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {

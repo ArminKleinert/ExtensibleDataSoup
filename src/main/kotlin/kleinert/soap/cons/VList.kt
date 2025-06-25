@@ -1,6 +1,6 @@
 package kleinert.soap.cons
 
-class VList<T> : Cons<T> {
+class VList<T> private constructor(segment: Segment?, private val offset: Int) : PersistentList<T>, List<T> {
     private class Segment(val next: Segment?, val elements: Array<Any?>) {
         override fun toString(): String {
             return "Segment(next=$next, elements=${elements.contentToString()})"
@@ -49,9 +49,7 @@ class VList<T> : Cons<T> {
         }
     }
 
-    private val base: Segment?
-
-    private val offset: Int
+    private val base: Segment? = segment
 
     override val size: Int
         get() = if (base == null) 0 else base.elements.size * 2 - 1 - offset
@@ -71,42 +69,25 @@ class VList<T> : Cons<T> {
             return VList(base, offset + 1)
         }
 
-    private constructor(segment: Segment?, offset: Int): super() {
-        base = segment
-        this.offset = offset
-    }
-
-    constructor(vlist: VList<T>): this(vlist.base, vlist.offset)
-
-    constructor(): super() {
-        this.base = null
-        this.offset = 0
-    }
-
-    constructor(coll: Iterable<T>): super() {
-        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll)
-        this.base = baseSegment
-        this.offset = offset
-    }
-
-    constructor(coll: Array<T>): super() {
-        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll.asIterable())
-        this.base = baseSegment
-        this.offset = offset
-    }
-
-    constructor(coll: List<T>): super() {
-        val (baseSegment, offset) = segmentsAndOffsetFromReversedList(coll)
-        this.base = baseSegment
-        this.offset = offset
-    }
-
     fun split() = car to cdr
 
     companion object {
-        fun <T> of(vararg elements: T) = VList(elements.toList())
+        private val EMPTY = VList<Any?>(null, 0)
 
-        private fun <T> segmentsAndOffsetFromReversedList(inputList: Iterable<T>): Pair<Segment?, Int> {
+        fun <T> of(vararg elements: T) =
+            if (elements.isEmpty()) EMPTY as VList<T>
+            else segmentsAndOffsetFromReversedList(elements.asIterable())
+
+        fun <T> toVList(iterable: Iterable<T>) = when (iterable) {
+            is VList<T> -> iterable
+            else -> segmentsAndOffsetFromReversedList(iterable)
+        }
+
+        fun <T> toVList(iterable: Array<T>) =
+            if (iterable.isEmpty()) of()
+            else segmentsAndOffsetFromReversedList(iterable.asIterable())
+
+        private fun <T> segmentsAndOffsetFromReversedList(inputList: Iterable<T>): VList<T> {
             var reversedList =
                 if (inputList is List<*> && inputList is RandomAccess) inputList.asReversed()
                 else inputList.reversed()
@@ -131,7 +112,9 @@ class VList<T> : Cons<T> {
                 nextSegmentSize *= 2
             }
 
-            return segment to offset
+            if (segment == null) return of()
+
+            return VList(segment, offset)
         }
     }
 
@@ -139,9 +122,9 @@ class VList<T> : Cons<T> {
         return prepend(listOf(element))
     }
 
-    fun prepend(elements: Iterable<T>): VList<T> {
+    private fun prepend(elements: Iterable<T>): VList<T> {
         if (isEmpty())
-            return VList(elements)
+            return toVList(elements)
         base!!
 
         if (elements is List<T> && elements.isEmpty())
@@ -149,7 +132,7 @@ class VList<T> : Cons<T> {
 
         val reversedElementsIterator =
             when (elements) {
-                is Cons<T> -> elements.toList()
+                is PersistentList<T> -> elements.toList()
                 is List<T> -> elements
                 else -> elements.toList()
             }.asReversed().iterator()
@@ -170,7 +153,7 @@ class VList<T> : Cons<T> {
         return VList(newBase, newOffset)
     }
 
-    override fun cleared(): VList<T> = VList()
+    override fun cleared(): VList<T> = VList.of()
 
     override operator fun get(index: Int): T {
         if (index < 0 || index >= size)
@@ -195,7 +178,7 @@ class VList<T> : Cons<T> {
 
     override fun iterator(): Iterator<T> = VListIterator(this)
 
-    override fun subList(fromIndex: Int, toIndex: Int): VList<T> = VList(toList().subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): VList<T> = toVList(toList().subList(fromIndex, toIndex))
 
     override fun drop(n: Int): VList<T> {
         require(n >= 0) { "Requested element count $n is less than zero." }
@@ -222,10 +205,10 @@ class VList<T> : Cons<T> {
             restN -= segmentSize
         }
 
-        return VList()
+        return VList.of()
     }
 
-    override fun <R> sameTypeFromList(list: List<R>): VList<R> = VList(list)
+    override fun <R> sameTypeFromList(list: List<R>): VList<R> = toVList(list)
 
     override fun toMutableList(): MutableList<T> {
         val res = baseElementsAsMutableList()

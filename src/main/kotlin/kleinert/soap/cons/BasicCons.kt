@@ -1,11 +1,11 @@
 package kleinert.soap.cons
 
-object NullCons : Cons<Any?> {
+object EmptyList : PersistentList<Any?> {
     @get:Throws(NoSuchElementException::class)
     override val car: Any
         get() = throw NoSuchElementException("")
 
-    override val cdr: NullCons
+    override val cdr: EmptyList
         get() = this
 
     override val size: Int
@@ -13,11 +13,11 @@ object NullCons : Cons<Any?> {
 
     override fun isEmpty(): Boolean = true
 
-    override fun cleared(): NullCons = this
+    override fun cleared(): EmptyList = this
 
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
+    override fun <R> sameTypeFromList(list: List<R>): PersistentList<R> {
         if (list.isEmpty()) return nullCons()
-        return CdrCodedList(list)
+        return PersistentWrapper(list)
     }
 
     override fun toString(): String = commonToString()
@@ -27,18 +27,18 @@ object NullCons : Cons<Any?> {
     }
 }
 
-fun <T> nullCons(): Cons<T> = NullCons as Cons<T>
+fun <T> nullCons(): PersistentList<T> = EmptyList as PersistentList<T>
 
-class ConsCell<T> : Cons<T> {
+class PersistentListHead<T> : PersistentList<T> {
     companion object {
         fun <T> of(vararg elements: T) =
             if (elements.isEmpty()) nullCons()
-            else ConsCell(elements.asIterable())
+            else PersistentListHead(elements.asIterable())
     }
 
     override val car: T
 
-    override val cdr: Cons<T>
+    override val cdr: PersistentList<T>
 
     private var lazySize: Int = -1
 
@@ -48,7 +48,7 @@ class ConsCell<T> : Cons<T> {
             return lazySize
         }
 
-    constructor(car: T, cdr: Cons<T>) {
+    constructor(car: T, cdr: PersistentList<T>) {
         this.car = car
         this.cdr = cdr
     }
@@ -59,31 +59,15 @@ class ConsCell<T> : Cons<T> {
         this.car = iterator.next()
 
         val tail = mutableListOf<T>()
-        for (it in iterator) {
+        for (it in iterator)
             tail.add(it)
-        }
-        this.cdr = CdrCodedList(tail)
+        this.cdr = PersistentWrapper(tail)
     }
-
-    @Throws(NoSuchElementException::class)
-    constructor(arr: Array<T>) : this(arr.asIterable())
 
     override fun isEmpty(): Boolean = false
 
-    override fun asSequence(): Sequence<T> = sequence {
-        var rest: Cons<T> = this@ConsCell
-        while (rest is ConsCell<T>) {
-            yield(rest.car)
-            rest = rest.cdr
-        }
-        yieldAll(rest.asSequence())
-    }
-
-    override fun cleared(): Cons<T> = nullCons()
-
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> = CdrCodedList(list)
-
     override fun toString(): String = commonToString()
+
     override fun equals(other: Any?): Boolean = commonEqualityCheck(other)
     override fun hashCode(): Int {
         var result = car?.hashCode() ?: 0

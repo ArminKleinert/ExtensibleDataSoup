@@ -1,6 +1,6 @@
 package kleinert.soap.cons
 
-class CdrCodedList<T> : Cons<T>, RandomAccess {
+class PersistentWrapper<T> : PersistentList<T>, List<T>, RandomAccess {
     private val backingList: List<T>
     private val offset: Int
 
@@ -8,7 +8,7 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
         get() = if (offset == 0) backingList else backingList.drop(offset)
 
     companion object {
-        fun <T> of(vararg elements: T): CdrCodedList<T> = CdrCodedList(elements.toList())
+        fun <T> of(vararg elements: T): PersistentWrapper<T> = PersistentWrapper(elements.toList())
     }
 
     constructor(lst: List<T>, isSafe: Boolean, offset: Int = 0) {
@@ -34,22 +34,14 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
         }
     }
 
-    constructor(lst: List<T>) : this(lst, false)
-
-    constructor(lst: Array<T>) : this(lst.toList(), true)
-
     constructor(lst: Iterable<T>) : this(lst.toList(), true)
-
-    constructor(lst: Sequence<T>) : this(lst.toList(), true)
-
-    constructor() : this(listOf(), true)
 
     @get:Throws(NoSuchElementException::class)
     override val car: T
         get() = if (isEmpty()) throw NoSuchElementException() else backingList[offset]
 
-    override val cdr: CdrCodedList<T>
-        get() = if (isEmpty()) this else CdrCodedList(backingList, true, offset+1)
+    override val cdr: PersistentWrapper<T>
+        get() = if (isEmpty()) this else PersistentWrapper(backingList, true, offset+1)
 
     override val size: Int
         get() = backingList.size - offset
@@ -58,23 +50,19 @@ class CdrCodedList<T> : Cons<T>, RandomAccess {
 
     override fun iterator(): Iterator<T> = actualList.iterator()
 
-    override fun cleared(): Cons<T> = CdrCodedList()
-
-    override fun <R> sameTypeFromList(list: List<R>): CdrCodedList<R> = CdrCodedList(list)
-
     override fun asIterable() = actualList
 
     override fun toList(): List<T> = actualList
 
     override fun asSequence() = actualList.asSequence()
 
-    override fun reversed(): CdrCodedList<T> = CdrCodedList(actualList.asReversed())
+    override fun reversed(): PersistentWrapper<T> = PersistentWrapper(actualList.asReversed())
 
-    override fun drop(n: Int): Cons<T>  {
+    override fun drop(n: Int): PersistentList<T> {
         require(n >= 0) { "Requested element count $n is less than zero." }
         if (n == 0) return this
-        if (offset + n >= backingList.size) return CdrCodedList()
-        return CdrCodedList(backingList, true, offset + n)
+        if (offset + n >= backingList.size) return nullCons()
+        return PersistentWrapper(backingList, true, offset + n)
     }
 
     override fun toString(): String = commonToString()

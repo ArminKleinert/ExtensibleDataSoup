@@ -1,8 +1,9 @@
 import kleinert.soap.*
-import kleinert.soap.cons.Cons
 import kleinert.soap.cons.LazyList
-import kotlin.random.Random
-import kotlin.random.nextInt
+import kleinert.soap.cons.PersistentList
+import kleinert.soap.cons.VList
+import java.math.BigDecimal
+import java.math.BigInteger
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -145,43 +146,67 @@ fun main(args: Array<String>) {
 //        println(biggerList.toList())
 //    }
 
+//    run {
+//        val lst = Cons.concat(
+//            Cons.of(1, 2, 3, 4, 5), Cons.of(6, 7, 8, 9, 10),
+//            Cons.of(11, 12, 13, 14, 15), Cons.of(16, 17, 18, 19, 20)
+//        )
+//        println(lst)
+//    }
+//
+//    run {
+//        val lst = PersistentList.of(1, 2, 3, 4, 5)
+//        println("????")
+//        val seq = LazyList.cycle(lst)
+//        println("!!!!")
+//        println(seq.take(22))
+//        println(seq.take(22))
+//        println(seq.take(22).javaClass)
+//        println(seq)
+//    }
+//
+//    run {
+//        val seq = LazyList.repeat(1)
+//        println(seq.take(22))
+//    }
+//
+//    run {
+//        val seq = LazyList.repeatedly { Random.nextInt(0..9) }
+//        println(seq.take(22))
+//    }
+//
+//    run {
+//        val seq = Cons.from(sequenceOf(1, 2, 3, 4, 5))
+//        println(seq)
+//    }
+//
+//    run {
+//        val seq = LazyList.iterate({ it * 2 }, 1L)
+//        println(seq.take(33))
+//    }
+//
+//    run {
+//        val seq = LazyList.iterate({ it + 1 }, 1)
+//        println(seq.take(10))
+//        // println(seq.filter{it < 5}.take(5)) // This operation will always hang, which is the intended behaviour. :)
+//    }
+
     run {
-        val lst = Cons.concat(
-            Cons.of(1, 2, 3, 4, 5), Cons.of(6, 7, 8, 9, 10),
-            Cons.of(11, 12, 13, 14, 15), Cons.of(16, 17, 18, 19, 20)
+        val obj = listOf(
+            1,
+            2.0,
+            BigInteger.valueOf(100),
+            BigDecimal.valueOf(100),
+            "abc",
+            '9',
+            VList.of(1, 2, 3),
+            sequenceOf(1, 2, 3)
         )
-        println(lst)
-    }
-
-    run {
-        val lst = Cons.of(1, 2, 3, 4, 5)
-        val seq = LazyList.cycle(lst)
-        println(seq.take(22))
-    }
-
-    run {
-        val seq = LazyList.repeat(1)
-        println(seq.take(22))
-    }
-
-    run {
-        val seq = LazyList.repeatedly { Random.nextInt(0..9) }
-        println(seq.take(22))
-    }
-
-    run {
-        val seq = Cons.from(sequenceOf(1, 2, 3, 4, 5))
-        println(seq)
-    }
-
-    run {
-        val seq = LazyList.iterate({ it * 2 }, 1L)
-        println(seq.take(33))
-    }
-
-    run {
-        val seq = LazyList.iterate({ it + 1 }, 1)
-        println(seq.take(10))
-        // println(seq.filter{it < 5}.take(5)) // This operation will always hang, which is the intended behaviour. :)
+        println(
+            EDNSoapWriter.pprintS(
+                obj,
+                options = EDNSoapOptions.defaultOptions.copy(decodingSequenceSeparator = " ")
+            )
+        )
     }
 }

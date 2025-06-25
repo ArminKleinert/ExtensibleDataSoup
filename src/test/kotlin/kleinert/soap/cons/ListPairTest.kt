@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.*
 import kotlin.random.Random
 
 class ListPairTest {
-    private val oneTwoThree = Cons.of(1, 2, 3)
+    private val oneTwoThree = PersistentList.of(1, 2, 3)
     private val oneTwoThreeOneTwoThree = ListPair.concat(oneTwoThree, oneTwoThree)
 
     @Test
@@ -19,32 +19,32 @@ class ListPairTest {
             val lst = nullCons<Int>().cons(1).cons(2).cons(3)
             assertSame(lst, ListPair.concat(lst, nullCons()))
             assertSame(lst, ListPair.concat(nullCons(), lst))
-            assertSame(lst, ListPair.concat(lst, VList()))
-            assertSame(lst, ListPair.concat(VList(), lst))
+            assertSame(lst, ListPair.concat(lst, VList.of()))
+            assertSame(lst, ListPair.concat(VList.of(), lst))
             assertEquals(lst + lst, ListPair.concat(lst, lst))
         }
         run {
-            val lst = Cons.of(1, 2, 3)
+            val lst = PersistentList.of(1, 2, 3)
             assertSame(lst, ListPair.concat(lst, nullCons()))
             assertSame(lst, ListPair.concat(nullCons(), lst))
-            assertSame(lst, ListPair.concat(lst, VList()))
-            assertSame(lst, ListPair.concat(VList(), lst))
+            assertSame(lst, ListPair.concat(lst, VList.of()))
+            assertSame(lst, ListPair.concat(VList.of(), lst))
             assertEquals(lst + lst, ListPair.concat(lst, lst))
         }
         run {
-            val lst = CdrCodedList.of(1, 2, 3)
+            val lst = PersistentWrapper.of(1, 2, 3)
             assertSame(lst, ListPair.concat(lst, nullCons()))
             assertSame(lst, ListPair.concat(nullCons(), lst))
-            assertSame(lst, ListPair.concat(lst, VList()))
-            assertSame(lst, ListPair.concat(VList(), lst))
+            assertSame(lst, ListPair.concat(lst, VList.of()))
+            assertSame(lst, ListPair.concat(VList.of(), lst))
             assertEquals(lst + lst, ListPair.concat(lst, lst))
         }
         run {
             val lst = VList.of(1, 2, 3)
             assertSame(lst, ListPair.concat(lst, nullCons()))
             assertSame(lst, ListPair.concat(nullCons(), lst))
-            assertSame(lst, ListPair.concat(lst, VList()))
-            assertSame(lst, ListPair.concat(VList(), lst))
+            assertSame(lst, ListPair.concat(lst, VList.of()))
+            assertSame(lst, ListPair.concat(VList.of(), lst))
             assertEquals(lst + lst, ListPair.concat(lst, lst))
         }
     }
@@ -59,16 +59,16 @@ class ListPairTest {
 
     @Test
     fun cons() {
-        assertEquals(Cons.of(1, 1, 2, 3, 1, 2, 3), oneTwoThreeOneTwoThree.cons(1))
+        assertEquals(PersistentList.of(1, 1, 2, 3, 1, 2, 3), oneTwoThreeOneTwoThree.cons(1))
     }
 
     @Test
     fun cdr() {
         val lst = oneTwoThreeOneTwoThree
-        assertEquals(Cons.of(1, 2, 3, 1, 2, 3), lst)
-        assertEquals(Cons.of(2, 3, 1, 2, 3), lst.cdr)
-        assertEquals(Cons.of(3, 1, 2, 3), lst.cdr.cdr)
-        assertEquals(Cons.of(1, 2, 3), lst.cdr.cdr.cdr)
+        assertEquals(PersistentList.of(1, 2, 3, 1, 2, 3), lst)
+        assertEquals(PersistentList.of(2, 3, 1, 2, 3), lst.cdr)
+        assertEquals(PersistentList.of(3, 1, 2, 3), lst.cdr.cdr)
+        assertEquals(PersistentList.of(1, 2, 3), lst.cdr.cdr.cdr)
         assertSame(oneTwoThree, lst.cdr.cdr.cdr)
         assertEquals(oneTwoThree.cdr, lst.cdr.cdr.cdr.cdr)
     }
@@ -76,9 +76,9 @@ class ListPairTest {
     @Test
     fun car() {
         assertEquals(1, oneTwoThreeOneTwoThree.car)
-        assertEquals(2, ListPair.concat(Cons.of(2, 3), oneTwoThree).car)
-        assertEquals(3, ListPair.concat(Cons.of(3), oneTwoThree).car)
-        assertEquals(oneTwoThree.car, ListPair.concat(Cons.of(), oneTwoThree).car)
+        assertEquals(2, ListPair.concat(PersistentList.of(2, 3), oneTwoThree).car)
+        assertEquals(3, ListPair.concat(PersistentList.of(3), oneTwoThree).car)
+        assertEquals(oneTwoThree.car, ListPair.concat(PersistentList.of(), oneTwoThree).car)
 
     }
 
@@ -90,8 +90,8 @@ class ListPairTest {
         assertTrue(oneTwoThreeOneTwoThree.contains(3))
         assertFalse(oneTwoThreeOneTwoThree.contains(4))
 
-        assertTrue(ListPair.concat(oneTwoThree, Cons.of(4)).contains(4))
-        assertTrue(ListPair.concat(Cons.of(0), oneTwoThree).contains(0))
+        assertTrue(ListPair.concat(oneTwoThree, PersistentList.of(4)).contains(4))
+        assertTrue(ListPair.concat(PersistentList.of(0), oneTwoThree).contains(0))
     }
 
     @Test
@@ -105,38 +105,38 @@ class ListPairTest {
         assertFalse(oneTwoThreeOneTwoThree.containsAll(listOf(1, 4)))
         assertFalse(oneTwoThreeOneTwoThree.containsAll(listOf(1, 2, 3, 4)))
 
-        assertTrue(ListPair.concat(oneTwoThree, Cons.of(4)).containsAll(listOf(1, 2, 3, 4)))
-        assertTrue(ListPair.concat(Cons.of(0), oneTwoThree).containsAll(listOf(1, 2, 3, 0)))
+        assertTrue(ListPair.concat(oneTwoThree, PersistentList.of(4)).containsAll(listOf(1, 2, 3, 4)))
+        assertTrue(ListPair.concat(PersistentList.of(0), oneTwoThree).containsAll(listOf(1, 2, 3, 0)))
     }
 
     @Test
     fun get() {
-        assertEquals(oneTwoThree.car, ListPair.concat(oneTwoThree, Cons.of(0, 8, 9))[0])
-        assertEquals(0, ListPair.concat(oneTwoThree, Cons.of(0, 8, 9))[3])
+        assertEquals(oneTwoThree.car, ListPair.concat(oneTwoThree, PersistentList.of(0, 8, 9))[0])
+        assertEquals(0, ListPair.concat(oneTwoThree, PersistentList.of(0, 8, 9))[3])
         assertThrows(IndexOutOfBoundsException::class.java) { oneTwoThreeOneTwoThree[6] }
     }
 
     @Test
     fun isEmpty() {
         assertFalse(oneTwoThreeOneTwoThree.isEmpty())
-        assertFalse(ListPair.concat(Cons.of(0), Cons.of(9)).cdr.isEmpty())
-        assertTrue(ListPair.concat(Cons.of(0), Cons.of(9)).cdr.cdr.isEmpty())
+        assertFalse(ListPair.concat(PersistentList.of(0), PersistentList.of(9)).cdr.isEmpty())
+        assertTrue(ListPair.concat(PersistentList.of(0), PersistentList.of(9)).cdr.cdr.isEmpty())
     }
 
     @Test
     fun indexOf() {
-        assertEquals(0, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).indexOf(1))
-        assertEquals(1, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).indexOf(2))
-        assertEquals(2, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).indexOf(3))
-        assertEquals(-1, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).indexOf(4))
+        assertEquals(0, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).indexOf(1))
+        assertEquals(1, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).indexOf(2))
+        assertEquals(2, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).indexOf(3))
+        assertEquals(-1, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).indexOf(4))
     }
 
     @Test
     fun lastIndexOf() {
-        assertEquals(3, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).lastIndexOf(1))
-        assertEquals(4, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).lastIndexOf(2))
-        assertEquals(5, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).lastIndexOf(3))
-        assertEquals(-1, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).lastIndexOf(4))
+        assertEquals(3, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).lastIndexOf(1))
+        assertEquals(4, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).lastIndexOf(2))
+        assertEquals(5, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).lastIndexOf(3))
+        assertEquals(-1, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).lastIndexOf(4))
     }
 
     @Test
@@ -204,7 +204,7 @@ class ListPairTest {
         }
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.subList(0, oneTwoThreeOneTwoThree.size))
         assertEquals(oneTwoThree, oneTwoThreeOneTwoThree.subList(0, oneTwoThree.size))
-        assertEquals(Cons.of(2, 3, 4, 5), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).subList(1, 5))
+        assertEquals(PersistentList.of(2, 3, 4, 5), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).subList(1, 5))
     }
 
     @Test
@@ -217,21 +217,21 @@ class ListPairTest {
 
     @Test
     fun reversed() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.reversed())
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.reversed())
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.reversed().reversed())
-        assertEquals(Cons.of(6, 5, 4, 3, 2, 1), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).reversed())
+        assertEquals(PersistentList.of(6, 5, 4, 3, 2, 1), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).reversed())
     }
 
     @Test
     fun map() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.map { it })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.map { it })
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.map { it })
         assertEquals(oneTwoThreeOneTwoThree.toList().map { it + 1 }, oneTwoThreeOneTwoThree.map { it + 1 })
     }
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.mapIndexed { i, e -> e + i })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.mapIndexed { i, e -> e + i })
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.mapIndexed { _, e -> e })
         assertEquals(
             oneTwoThreeOneTwoThree.toList().mapIndexed { i, e -> e + i },
@@ -240,11 +240,11 @@ class ListPairTest {
 
     @Test
     fun filter() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.filter { true })
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.filter { false })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.filter { true })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.filter { false })
 
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.filter { true })
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.filter { false })
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.filter { false })
         assertEquals(
             ListPair.concat(oneTwoThree.filter { it % 2 == 1 }, oneTwoThree.filter { it % 2 == 1 }),
             oneTwoThreeOneTwoThree.filter { it % 2 == 1 })
@@ -255,11 +255,11 @@ class ListPairTest {
 
     @Test
     fun filterNot() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.filterNot { true })
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.filterNot { false })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.filterNot { true })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.filterNot { false })
 
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.filterNot { false })
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.filterNot { true })
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.filterNot { true })
         assertEquals(
             ListPair.concat(oneTwoThree.filterNot { it % 2 == 1 }, oneTwoThree.filterNot { it % 2 == 1 }),
             oneTwoThreeOneTwoThree.filterNot { it % 2 == 1 })
@@ -270,7 +270,7 @@ class ListPairTest {
 
     @Test
     fun flatMap() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.flatMap { listOf(it) })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.flatMap { listOf(it) })
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.flatMap { listOf(it) })
         assertEquals(oneTwoThreeOneTwoThree.map { it + 1 }, oneTwoThreeOneTwoThree.flatMap { listOf(it + 1) })
         assertEquals(
@@ -283,15 +283,15 @@ class ListPairTest {
 
     @Test
     fun take() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.take(0))
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.take(oneTwoThree.size))
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.take(0))
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.take(oneTwoThree.size))
 
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.take(0))
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.take(0))
         assertEquals(oneTwoThree, oneTwoThreeOneTwoThree.take(oneTwoThree.size))
 
-        assertEquals(Cons.of(1, 2), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).take(2))
-        assertEquals(Cons.of(1, 2, 3), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).take(3))
-        assertEquals(Cons.of(1, 2, 3, 4), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).take(4))
+        assertEquals(PersistentList.of(1, 2), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).take(2))
+        assertEquals(PersistentList.of(1, 2, 3), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).take(3))
+        assertEquals(PersistentList.of(1, 2, 3, 4), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).take(4))
 
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.take(oneTwoThreeOneTwoThree.size))
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.take(999))
@@ -299,56 +299,56 @@ class ListPairTest {
 
     @Test
     fun drop() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.drop(0))
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.drop(oneTwoThree.size))
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.drop(0))
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.drop(oneTwoThree.size))
 
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.drop(0))
         assertEquals(oneTwoThree, oneTwoThreeOneTwoThree.drop(oneTwoThree.size))
 
-        assertEquals(Cons.of(3, 4, 5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).drop(2))
-        assertEquals(Cons.of(4, 5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).drop(3))
-        assertEquals(Cons.of(5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).drop(4))
+        assertEquals(PersistentList.of(3, 4, 5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).drop(2))
+        assertEquals(PersistentList.of(4, 5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).drop(3))
+        assertEquals(PersistentList.of(5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).drop(4))
 
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.drop(oneTwoThreeOneTwoThree.size))
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.drop(999))
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.drop(oneTwoThreeOneTwoThree.size))
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.drop(999))
     }
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.takeWhile { true })
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.takeWhile { false })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.takeWhile { true })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.takeWhile { false })
         assertInstanceOf(
-            Cons::class.java,
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).takeWhile { it % 2 == 1 })
+            PersistentList::class.java,
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).takeWhile { it % 2 == 1 })
 
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.takeWhile { true })
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.takeWhile { false })
-        assertEquals(Cons.of<Int>(), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).takeWhile { it < 0 })
-        assertEquals(Cons.of(1, 2), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).takeWhile { it < 3 })
-        assertEquals(Cons.of(1, 2, 3), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).takeWhile { it < 4 })
-        assertEquals(Cons.of(1, 2, 3, 4), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).takeWhile { it < 5 })
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.takeWhile { false })
+        assertEquals(PersistentList.of<Int>(), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).takeWhile { it < 0 })
+        assertEquals(PersistentList.of(1, 2), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).takeWhile { it < 3 })
+        assertEquals(PersistentList.of(1, 2, 3), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).takeWhile { it < 4 })
+        assertEquals(PersistentList.of(1, 2, 3, 4), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).takeWhile { it < 5 })
         assertEquals(
-            Cons.of(1, 2, 3, 4, 5, 6),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).takeWhile { it < 99 })
+            PersistentList.of(1, 2, 3, 4, 5, 6),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).takeWhile { it < 99 })
     }
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.dropWhile { true })
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.dropWhile { false })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.dropWhile { true })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.dropWhile { false })
         assertInstanceOf(
-            Cons::class.java,
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).dropWhile { it % 2 == 1 })
+            PersistentList::class.java,
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).dropWhile { it % 2 == 1 })
 
-        assertEquals(Cons.of<Int>(), oneTwoThreeOneTwoThree.dropWhile { true })
+        assertEquals(PersistentList.of<Int>(), oneTwoThreeOneTwoThree.dropWhile { true })
         assertEquals(oneTwoThreeOneTwoThree, oneTwoThreeOneTwoThree.dropWhile { false })
         assertEquals(
-            Cons.of(1, 2, 3, 4, 5, 6),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).dropWhile { it < 0 })
-        assertEquals(Cons.of(3, 4, 5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).dropWhile { it < 3 })
-        assertEquals(Cons.of(4, 5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).dropWhile { it < 4 })
-        assertEquals(Cons.of(5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).dropWhile { it < 5 })
-        assertEquals(Cons.of<Int>(), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).dropWhile { it < 99 })
+            PersistentList.of(1, 2, 3, 4, 5, 6),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).dropWhile { it < 0 })
+        assertEquals(PersistentList.of(3, 4, 5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).dropWhile { it < 3 })
+        assertEquals(PersistentList.of(4, 5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).dropWhile { it < 4 })
+        assertEquals(PersistentList.of(5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).dropWhile { it < 5 })
+        assertEquals(PersistentList.of<Int>(), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).dropWhile { it < 99 })
     }
 
 //    @Test
@@ -374,56 +374,56 @@ class ListPairTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.sortedBy { it })
-        assertEquals(Cons.of(1, 2, 3, 4, 5, 6), ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).sortedBy { it })
-        assertEquals(Cons.of(1, 2, 3, 4, 5, 6), ListPair.concat(Cons.of(4, 5, 6), Cons.of(1, 2, 3)).sortedBy { it })
-        assertEquals(Cons.of(6, 5, 4, 3, 2, 1), ListPair.concat(Cons.of(4, 5, 6), Cons.of(1, 2, 3)).sortedBy { -it })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.sortedBy { it })
+        assertEquals(PersistentList.of(1, 2, 3, 4, 5, 6), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).sortedBy { it })
+        assertEquals(PersistentList.of(1, 2, 3, 4, 5, 6), ListPair.concat(PersistentList.of(4, 5, 6), PersistentList.of(1, 2, 3)).sortedBy { it })
+        assertEquals(PersistentList.of(6, 5, 4, 3, 2, 1), ListPair.concat(PersistentList.of(4, 5, 6), PersistentList.of(1, 2, 3)).sortedBy { -it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.sortedByDescending { it })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.sortedByDescending { it })
         assertEquals(
-            Cons.of(6, 5, 4, 3, 2, 1),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).sortedByDescending { it })
+            PersistentList.of(6, 5, 4, 3, 2, 1),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).sortedByDescending { it })
         assertEquals(
-            Cons.of(6, 5, 4, 3, 2, 1),
-            ListPair.concat(Cons.of(4, 5, 6), Cons.of(1, 2, 3)).sortedByDescending { it })
+            PersistentList.of(6, 5, 4, 3, 2, 1),
+            ListPair.concat(PersistentList.of(4, 5, 6), PersistentList.of(1, 2, 3)).sortedByDescending { it })
         assertEquals(
-            Cons.of(1, 2, 3, 4, 5, 6),
-            ListPair.concat(Cons.of(4, 5, 6), Cons.of(1, 2, 3)).sortedByDescending { -it })
+            PersistentList.of(1, 2, 3, 4, 5, 6),
+            ListPair.concat(PersistentList.of(4, 5, 6), PersistentList.of(1, 2, 3)).sortedByDescending { -it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.sortedWith { n, m -> n.compareTo(m) })
         assertEquals(
-            Cons.of(1, 2, 3, 4, 5, 6),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(4, 5, 6)).sortedWith { n, m -> n.compareTo(m) })
+            PersistentList.of(1, 2, 3, 4, 5, 6),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(4, 5, 6)).sortedWith { n, m -> n.compareTo(m) })
         assertEquals(
-            Cons.of(1, 2, 3, 4, 5, 6),
-            ListPair.concat(Cons.of(4, 5, 6), Cons.of(1, 2, 3)).sortedWith { n, m -> n.compareTo(m) })
+            PersistentList.of(1, 2, 3, 4, 5, 6),
+            ListPair.concat(PersistentList.of(4, 5, 6), PersistentList.of(1, 2, 3)).sortedWith { n, m -> n.compareTo(m) })
         assertEquals(
-            Cons.of(6, 5, 4, 3, 2, 1),
-            ListPair.concat(Cons.of(4, 5, 6), Cons.of(1, 2, 3)).sortedWith { n, m -> -n.compareTo(m) })
+            PersistentList.of(6, 5, 4, 3, 2, 1),
+            ListPair.concat(PersistentList.of(4, 5, 6), PersistentList.of(1, 2, 3)).sortedWith { n, m -> -n.compareTo(m) })
     }
 
     @Test
     fun distinct() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.distinct())
-        assertInstanceOf(Cons::class.java, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).distinct())
-        assertEquals(Cons.of(1, 2, 3), ListPair.concat(Cons.of(1, 2, 3), Cons.of(3, 2, 1)).distinct())
-        assertEquals(Cons.of(3, 2, 1), ListPair.concat(Cons.of(3, 2, 1), Cons.of(1, 2, 3)).distinct())
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.distinct())
+        assertInstanceOf(PersistentList::class.java, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).distinct())
+        assertEquals(PersistentList.of(1, 2, 3), ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(3, 2, 1)).distinct())
+        assertEquals(PersistentList.of(3, 2, 1), ListPair.concat(PersistentList.of(3, 2, 1), PersistentList.of(1, 2, 3)).distinct())
     }
 
     @Test
     fun shuffled() {
-        assertInstanceOf(Cons::class.java, oneTwoThreeOneTwoThree.shuffled())
+        assertInstanceOf(PersistentList::class.java, oneTwoThreeOneTwoThree.shuffled())
 
         val seed = 0xDEADBEEF
         val rand = Random(seed)
 
-        val oneOneOne = Cons.of(1, 1, 1, 1, 1)
+        val oneOneOne = PersistentList.of(1, 1, 1, 1, 1)
         val oneOneOneTimesTwo = ListPair.concat(oneOneOne, oneOneOne)
         assertEquals(oneOneOneTimesTwo, oneOneOneTimesTwo.shuffled(rand))
     }
@@ -437,72 +437,72 @@ class ListPairTest {
 
         assertEquals(
             listOf(1, 2, 3, 1, 2, 3),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).asSequence().toList()
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).asSequence().toList()
         )
         assertEquals(
             listOf(2, 3, 4, 2, 3, 4),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).asSequence().map { it + 1 }.toList()
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).asSequence().map { it + 1 }.toList()
         )
     }
 
     @Test
     fun plusElement() {
-        assertInstanceOf(Cons::class.java, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + 1)
+        assertInstanceOf(PersistentList::class.java, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + 1)
 
         assertEquals(
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3, 1)),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + 1
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3, 1)),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + 1
         )
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(Cons::class.java, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + listOf(1))
+        assertInstanceOf(PersistentList::class.java, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + listOf(1))
 
         assertEquals(
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3, 1)),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + listOf(1)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3, 1)),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + listOf(1)
         )
         assertEquals(
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3, 1, 2, 3)),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + listOf(1, 2, 3)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3, 1, 2, 3)),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + listOf(1, 2, 3)
         )
         assertEquals(
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3, 1, 2, 3)),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + (1..3)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3, 1, 2, 3)),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + (1..3)
         )
         assertEquals(
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3, 1, 2, 3)),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + sequenceOf(1,2,3)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3, 1, 2, 3)),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + sequenceOf(1,2,3)
         )
         assertEquals(
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3, 1, 2, 3)),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + Cons.of(1,2,3)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3, 1, 2, 3)),
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + PersistentList.of(1,2,3)
         )
     }
 
     @Test
     fun plusVList() {
-        assertInstanceOf(VList::class.java, ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + VList.of())
+        assertInstanceOf(VList::class.java, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of())
         assertEquals(
             VList.of(1,2,3,1,2,3),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + VList.of()
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of()
         )
         assertEquals(
             VList.of(1,2,3,1,2,3,1),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + VList.of(1)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of(1)
         )
         assertEquals(
             VList.of(1,2,3,1,2,3,1,2,3),
-            ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)) + VList.of(1,2,3)
+            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of(1,2,3)
         )
     }
 
     @Test
     fun isSingleton() {
-        assertFalse(ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).isSingleton())
-        assertFalse(ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).drop(3).isSingleton())
-        assertTrue(ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).drop(5).isSingleton())
-        assertFalse(ListPair.concat(Cons.of(1, 2, 3), Cons.of(1, 2, 3)).drop(6).isSingleton())
+        assertFalse(ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).isSingleton())
+        assertFalse(ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).drop(3).isSingleton())
+        assertTrue(ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).drop(5).isSingleton())
+        assertFalse(ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).drop(6).isSingleton())
     }
 }

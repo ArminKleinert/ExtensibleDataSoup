@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
 
-class NullConsTest {
+class EmptyListTest {
 
     private val instance = nullCons<Boolean>()
 
@@ -20,15 +20,15 @@ class NullConsTest {
 
     @Test
     fun cons() {
-        assertInstanceOf(Cons::class.java, instance.cons(true))
-        assertEquals(Cons.of(true), instance.cons(true))
-        assertEquals(Cons.of(false, true), instance.cons(true).cons(false))
-        assertEquals(Cons.of(true, false, true), instance.cons(true).cons(false).cons(true))
+        assertInstanceOf(PersistentList::class.java, instance.cons(true))
+        assertEquals(PersistentList.of(true), instance.cons(true))
+        assertEquals(PersistentList.of(false, true), instance.cons(true).cons(false))
+        assertEquals(PersistentList.of(true, false, true), instance.cons(true).cons(false).cons(true))
     }
 
     @Test
     fun cdr() {
-        assertInstanceOf(NullCons::class.java, instance.cdr)
+        assertInstanceOf(EmptyList::class.java, instance.cdr)
         assertTrue(instance.isEmpty())
         assertTrue(instance.cdr.isEmpty())
         assertSame(instance, instance.cdr)
@@ -117,13 +117,13 @@ class NullConsTest {
 
     @Test
     fun reversed() {
-        assertInstanceOf(NullCons::class.java, instance.reversed())
+        assertInstanceOf(EmptyList::class.java, instance.reversed())
         assertEquals(instance, instance.reversed())
     }
 
     @Test
     fun map() {
-        assertInstanceOf(Cons::class.java, instance.map { it })
+        assertInstanceOf(PersistentList::class.java, instance.map { it })
 
         assertEquals(instance, instance.map { it })
         assertEquals(instance, instance.map { false })
@@ -131,8 +131,8 @@ class NullConsTest {
 
     @Test
     fun mapIndexed() {
-        assertInstanceOf(Cons::class.java, instance.mapIndexed { _, elem -> elem })
-        assertInstanceOf(Cons::class.java, CdrCodedList.of(true).mapIndexed { _, elem -> elem })
+        assertInstanceOf(PersistentList::class.java, instance.mapIndexed { _, elem -> elem })
+        assertInstanceOf(PersistentList::class.java, PersistentWrapper.of(true).mapIndexed { _, elem -> elem })
 
         assertEquals(instance, instance.mapIndexed { _, elem -> elem })
         assertEquals(nullCons<Int>(), instance.mapIndexed { i, _ -> i })
@@ -140,8 +140,8 @@ class NullConsTest {
 
     @Test
     fun filter() {
-        assertInstanceOf(NullCons::class.java, instance.filter { true })
-        assertInstanceOf(NullCons::class.java, instance.filter { false })
+        assertInstanceOf(EmptyList::class.java, instance.filter { true })
+        assertInstanceOf(EmptyList::class.java, instance.filter { false })
 
         assertEquals(instance, instance.filter { true })
         assertEquals(instance, instance.filter { it })
@@ -149,8 +149,8 @@ class NullConsTest {
 
     @Test
     fun filterNot() {
-        assertInstanceOf(NullCons::class.java, instance.filterNot { true })
-        assertInstanceOf(NullCons::class.java, instance.filterNot { false })
+        assertInstanceOf(EmptyList::class.java, instance.filterNot { true })
+        assertInstanceOf(EmptyList::class.java, instance.filterNot { false })
 
         assertEquals(instance, instance.filterNot { true })
         assertEquals(instance, instance.filterNot { it })
@@ -188,15 +188,15 @@ class NullConsTest {
 
     @Test
     fun flatMap() {
-        assertInstanceOf(Cons::class.java, instance.flatMap { listOf(it) })
+        assertInstanceOf(PersistentList::class.java, instance.flatMap { listOf(it) })
         assertEquals(instance, instance.flatMap { listOf(it) })
         assertEquals(instance, instance.flatMap { listOf(false, true) })
     }
 
     @Test
     fun take() {
-        assertInstanceOf(Cons::class.java, instance.take(0))
-        assertInstanceOf(Cons::class.java, instance.take(10))
+        assertInstanceOf(PersistentList::class.java, instance.take(0))
+        assertInstanceOf(PersistentList::class.java, instance.take(10))
 
         assertEquals(instance, instance.take(0))
         assertEquals(instance, instance.take(10))
@@ -204,8 +204,8 @@ class NullConsTest {
 
     @Test
     fun drop() {
-        assertInstanceOf(Cons::class.java, instance.drop(0))
-        assertInstanceOf(Cons::class.java, instance.drop(10))
+        assertInstanceOf(PersistentList::class.java, instance.drop(0))
+        assertInstanceOf(PersistentList::class.java, instance.drop(10))
 
         assertEquals(instance, instance.drop(0))
         assertEquals(instance, instance.drop(10))
@@ -213,9 +213,9 @@ class NullConsTest {
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(Cons::class.java, instance.takeWhile { true })
-        assertInstanceOf(Cons::class.java, instance.takeWhile { false })
-        assertInstanceOf(Cons::class.java, instance.takeWhile { it })
+        assertInstanceOf(PersistentList::class.java, instance.takeWhile { true })
+        assertInstanceOf(PersistentList::class.java, instance.takeWhile { false })
+        assertInstanceOf(PersistentList::class.java, instance.takeWhile { it })
 
         assertEquals(instance, instance.takeWhile { true })
         assertEquals(instance, instance.takeWhile { false })
@@ -223,9 +223,9 @@ class NullConsTest {
 
     @Test
     fun dropWhile() {
-        assertInstanceOf(Cons::class.java, instance.dropWhile { true })
-        assertInstanceOf(Cons::class.java, instance.dropWhile { false })
-        assertInstanceOf(Cons::class.java, instance.dropWhile { it })
+        assertInstanceOf(PersistentList::class.java, instance.dropWhile { true })
+        assertInstanceOf(PersistentList::class.java, instance.dropWhile { false })
+        assertInstanceOf(PersistentList::class.java, instance.dropWhile { it })
 
         assertEquals(instance, instance.dropWhile { true })
         assertEquals(instance, instance.dropWhile { false })
@@ -254,31 +254,31 @@ class NullConsTest {
 
     @Test
     fun sortedBy() {
-        assertInstanceOf(Cons::class.java, nullCons<Int>().sortedBy { it })
+        assertInstanceOf(PersistentList::class.java, nullCons<Int>().sortedBy { it })
         assertEquals(nullCons<Int>(), nullCons<Int>().sortedBy { it })
     }
 
     @Test
     fun sortedByDescending() {
-        assertInstanceOf(Cons::class.java, nullCons<Int>().sortedByDescending { it })
+        assertInstanceOf(PersistentList::class.java, nullCons<Int>().sortedByDescending { it })
         assertEquals(nullCons<Int>(), nullCons<Int>().sortedByDescending { it })
     }
 
     @Test
     fun sortedWith() {
-        assertInstanceOf(Cons::class.java, nullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
+        assertInstanceOf(PersistentList::class.java, nullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
         assertEquals(nullCons<Int>(), nullCons<Int>().sortedWith { n, m -> n.compareTo(m) })
     }
 
     @Test
     fun distinct() {
-        assertInstanceOf(Cons::class.java, instance.distinct())
+        assertInstanceOf(PersistentList::class.java, instance.distinct())
         assertEquals(instance, instance.distinct())
     }
 
     @Test
     fun shuffled() {
-        assertInstanceOf(Cons::class.java, instance.shuffled())
+        assertInstanceOf(PersistentList::class.java, instance.shuffled())
 
         val seed = 0xDEADBEEF
         val rand = Random(seed)
@@ -295,22 +295,22 @@ class NullConsTest {
 
     @Test
     fun plusElement() {
-        assertInstanceOf(Cons::class.java, instance + true)
-        assertEquals(Cons.of(true), instance + true)
+        assertInstanceOf(PersistentList::class.java, instance + true)
+        assertEquals(PersistentList.of(true), instance + true)
     }
 
     @Test
     fun plusIterable() {
-        assertInstanceOf(Cons::class.java, instance + listOf(true))
+        assertInstanceOf(PersistentList::class.java, instance + listOf(true))
 
         assertEquals(instance, instance + listOf())
 
-        assertEquals(Cons.of(true), instance + listOf(true))
-        assertEquals(Cons.of(1, 2, 3, 4, 5), nullCons<Int>() + (1..5))
+        assertEquals(PersistentList.of(true), instance + listOf(true))
+        assertEquals(PersistentList.of(1, 2, 3, 4, 5), nullCons<Int>() + (1..5))
 
-        assertEquals(instance, instance + Cons.of())
-        assertEquals(Cons.of(false, true, false, true), instance + Cons.of(false, true, false, true))
-        assertEquals(Cons.of(false, true, false, true), instance + CdrCodedList(listOf(false, true, false, true)))
+        assertEquals(instance, instance + PersistentList.of())
+        assertEquals(PersistentList.of(false, true, false, true), instance + PersistentList.of(false, true, false, true))
+        assertEquals(PersistentList.of(false, true, false, true), instance + PersistentWrapper(listOf(false, true, false, true)))
     }
 
     @Test

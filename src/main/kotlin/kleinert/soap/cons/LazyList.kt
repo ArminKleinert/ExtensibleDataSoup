@@ -1,9 +1,9 @@
 package kleinert.soap.cons
 
 
-class LazyList<T>(fn: () -> Cons<T>?) : Cons<T> {
-    private var fn: (() -> Cons<T>?)? = fn
-    private var sv: Cons<T>? = null
+class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
+    private var fn: (() -> PersistentList<T>?)? = fn
+    private var sv: PersistentList<T>? = null
     private var lazySize: Int = -1
 
     override val car: T
@@ -12,7 +12,7 @@ class LazyList<T>(fn: () -> Cons<T>?) : Cons<T> {
             return sv!!.car
         }
 
-    override val cdr: Cons<T>
+    override val cdr: PersistentList<T>
         get() {
             evaluateStep()
             return sv!!.cdr
@@ -33,7 +33,7 @@ class LazyList<T>(fn: () -> Cons<T>?) : Cons<T> {
         }
 
     @Synchronized
-    fun evaluateStep(): Cons<T>? {
+    fun evaluateStep(): PersistentList<T>? {
         if (fn != null) {
             val tfn = fn!!
             fn = null
@@ -47,96 +47,94 @@ class LazyList<T>(fn: () -> Cons<T>?) : Cons<T> {
         return evaluateStep()!!.isEmpty()
     }
 
-    override fun iterator(): Iterator<T> {
-        return asSequence().iterator()
-    }
+    override fun drop(n: Int): PersistentList<T> = drop(n, this)
 
-    override fun <R> sameTypeFromList(list: List<R>): Cons<R> {
-        return Cons.from(list)
-    }
+    override fun take(n: Int): PersistentList<T> = take(n, this)
+
+    override fun <R> map(transform: (T) -> R): PersistentList<R> = map(transform, this)
+
+    override fun filter(predicate: (T) -> Boolean): PersistentList<T> = filter(predicate, this)
 
     override fun isLazyType(): Boolean = true
 
     override fun toString(): String {
-        return toString(limit = 100000)
+        return toString(limit = 10000)
     }
 
-    fun toString(limit: Int = 100000): String {
+    fun toString(limit: Int = 10000): String {
         return commonToString(limit = limit)
     }
 
     companion object {
-//        fun <T, R> map(f: (T) -> R, lst: Cons<T>): Cons<R> {
-//            return LazyCons {
-//                if (lst.isEmpty()) nullCons()
-//                else Cons.cons(f(lst.car), map(f, lst.cdr))
-//            }
-//        }
-//
-//        fun <T> filter(p: (T) -> Boolean, lst: Cons<T>): Cons<T> {
-//            return LazyCons {
-//                when {
-//                    lst.isEmpty() -> nullCons()
-//                    p(lst.car) -> Cons.cons(lst.car, filter(p, lst.cdr))
-//                    else -> filter(p, lst.cdr)
-//                }
-//            }
-//        }
-//
-//        fun <T> take(n: Long, lst: Cons<T>): Cons<T> {
-//            return LazyCons {
-//                when {
-//                    lst.isEmpty() -> nullCons()
-//                    n == 1L -> Cons.cons(lst.car, nullCons())
-//                    n > 0 -> Cons.cons(lst.car, take(n - 1, lst.cdr))
-//                    else -> nullCons()
-//                }
-//            }
-//        }
-//
-//        fun <T> drop(n: Int, lst: Cons<T>): Cons<T> {
-//            return LazyCons {
-//                when {
-//                    lst.isEmpty() -> nullCons()
-//                    n > 0 -> drop(n - 1, lst.cdr)
-//                    else -> lst
-//                }
-//            }
-//        }
+        fun <T, R> map(f: (T) -> R, lst: PersistentList<T>): PersistentList<R> {
+            return lazySeq {
+                if (lst.isEmpty()) nullCons()
+                else PersistentList.cons(f(lst.car), map(f, lst.cdr))
+            }
+        }
 
-        fun <T> of(vararg xs: T): Cons<T> = lazySeq(xs.asSequence())
+        fun <T> filter(p: (T) -> Boolean, lst: PersistentList<T>): PersistentList<T> {
+            return lazySeq {
+                when {
+                    lst.isEmpty() -> nullCons()
+                    p(lst.car) -> PersistentList.cons(lst.car, filter(p, lst.cdr))
+                    else -> filter(p, lst.cdr)
+                }
+            }
+        }
 
-        fun <T> fromIterator(iterator: Iterator<T>): Cons<T> = lazySeq {
+        fun <T> take(n: Int, lst: PersistentList<T>): PersistentList<T> {
+            return lazySeq {
+                when {
+                    lst.isEmpty() -> nullCons()
+                    n == 1 -> PersistentList.cons(lst.car, nullCons())
+                    n > 0 -> PersistentList.cons(lst.car, take(n - 1, lst.cdr))
+                    else -> nullCons()
+                }
+            }
+        }
+
+        fun <T> drop(n: Int, lst: PersistentList<T>): PersistentList<T> {
+            return lazySeq {
+                when {
+                    lst.isEmpty() -> nullCons()
+                    n > 0 -> drop(n - 1, lst.cdr)
+                    else -> lst
+                }
+            }
+        }
+
+        fun <T> of(vararg xs: T): PersistentList<T> = lazySeq(xs.iterator())
+
+        private fun <T> lazySeq(iterator: Iterator<T>): PersistentList<T> = lazySeq {
             when {
-                iterator.hasNext() -> Cons.cons(iterator.next(), fromIterator(iterator))
+                iterator.hasNext() -> PersistentList.cons(iterator.next(), lazySeq(iterator))
                 else -> nullCons()
             }
         }
 
-        fun <T> lazySeq(seq: Sequence<T>): Cons<T> = fromIterator(seq.iterator())
+        fun <T> lazySeq(fn: () -> PersistentList<T>?): PersistentList<T> = LazyList(fn)
 
-        fun <T> lazySeq(fn: () -> Cons<T>?): Cons<T> = LazyList(fn)
-
-        fun <T> repeatedly(n: Int = -1, fn: () -> T): Cons<T> = lazySeq {
+        fun <T> repeatedly(n: Int = -1, fn: () -> T): PersistentList<T> = lazySeq {
             when (n) {
-                -1 -> Cons.cons(fn(), repeatedly(n, fn))
+                -1 -> PersistentList.cons(fn(), repeatedly(n, fn))
                 0 -> nullCons()
-                else -> Cons.cons(fn(), repeatedly(n - 1, fn))
+                else -> PersistentList.cons(fn(), repeatedly(n - 1, fn))
             }
         }
 
-        fun <T> lazySeq(x: T, fn: () -> Cons<T>) = Cons.cons(x, fn)
+        fun <T> lazySeq(x: T, fn: () -> PersistentList<T>) = PersistentList.cons(x, fn)
 
-        fun <T> cycle(xs: Cons<T>): Cons<T> = lazySeq {
+        fun <T> cycle(xs: PersistentList<T>): PersistentList<T> = lazySeq {
             if (xs.isEmpty()) nullCons()
-            else lazySeq(xs.car) { Cons.concat(xs.cdr, cycle(xs)) }
+            else lazySeq(xs.car) { PersistentList.concat(xs.cdr, cycle(xs)) }
         }
 
-        fun <T> repeat(x: T): Cons<T> = lazySeq {
+        fun <T> repeat(x: T): PersistentList<T> = lazySeq {
             lazySeq(x) { repeat(x) }
         }
 
-        fun <T> iterate(f: (T) -> T, x: T): Cons<T> = lazySeq {
+        fun <T> iterate(f: (T) -> T, x: T): PersistentList<T> = lazySeq {
             lazySeq(x) { iterate(f, f(x)) }
         }
     }
