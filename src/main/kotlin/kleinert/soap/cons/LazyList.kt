@@ -67,6 +67,9 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
         return commonToString(limit = limit)
     }
 
+    override fun equals(other: Any?) =
+        commonEqualityCheck(other)
+
     companion object {
         fun <T, R> map(f: (T) -> R, lst: PersistentList<T>): PersistentList<R> {
             return lazySeq {
@@ -78,7 +81,7 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
         fun <T> filter(p: (T) -> Boolean, lst: PersistentList<T>): PersistentList<T> {
             return lazySeq {
                 when {
-                    lst.isEmpty() -> nullCons()
+                    lst.isEmpty() -> lst
                     p(lst.car) -> PersistentList.cons(lst.car, filter(p, lst.cdr))
                     else -> filter(p, lst.cdr)
                 }
@@ -152,5 +155,17 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
             lazySeq(x) { iterate(f, f(x)) }
         }
 
+        fun <T> distinct(xs: PersistentList<T>, memo: MutableSet<T> = mutableSetOf()): PersistentList<T> =
+            lazySeq {
+                println("$memo ${xs.firstOrNull()}")
+                when {
+                    xs.isEmpty() -> nullCons()
+                    memo.contains(xs.car) -> distinct(xs.cdr, memo)
+                    else -> {
+                        memo.add(xs.car)
+                        lazySeq(xs.car) { distinct(xs.cdr, memo) }
+                    }
+                }
+            }
     }
 }

@@ -33,9 +33,9 @@ class PersistentListHeadTest {
         assertEquals(0, list.size)
 
         assertInstanceOf(PersistentList::class.java, one)
-        assertEquals(PersistentWrapper(arrayOf(1)), one)
-        assertEquals(PersistentWrapper(arrayOf(2, 1)), two)
-        assertEquals(PersistentWrapper(arrayOf(3, 2, 1)), three)
+        assertEquals(PersistentWrapper(listOf(1)), one)
+        assertEquals(PersistentWrapper(listOf(2, 1)), two)
+        assertEquals(PersistentWrapper(listOf(3, 2, 1)), three)
     }
 
     @Test

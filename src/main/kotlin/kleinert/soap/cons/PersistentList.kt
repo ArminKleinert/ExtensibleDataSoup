@@ -356,4 +356,9 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
     fun <R> zipWithNext(transform: (a: T, b: T) -> R): PersistentList<R> =
         sameTypeFromList(asIterable().zipWithNext(transform))
 
+    fun cycle(): PersistentList<T> =
+        LazyList.cycle(this)
+
+    fun splitAt(n: Int): Pair<PersistentList<T>, PersistentList<T>> = LazyList.splitAt(n, this)
+
 }

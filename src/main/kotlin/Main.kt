@@ -184,20 +184,6 @@ fun main(args: Array<String>) {
 //        val seq = LazyList.iterate({ it * 2 }, 1L)
 //        println(seq.take(33))
 //    }
-//
-//    run {
-//        val seq = LazyList.iterate({ it + 1 }, 1)
-//        println(seq.take(10))
-//        println(seq.take(10))
-//        println(seq.take(10))
-//
-//        val seq1 = LazyList.of(1,2,3,4,5,6,7,8,9,10)
-//        println(LazyList.splitAt(5, seq1))
-//
-//        val (f, s) = LazyList.splitAt(5,  seq)
-//        println(f + " " + s.take(10).toString())
-//        // println(seq.filter{it < 5}.take(5)) // This operation will always hang, which is the intended behaviour. :)
-//    }
 
 //    run {
 //        val obj = listOf(
@@ -220,20 +206,27 @@ fun main(args: Array<String>) {
 //        )
 //    }
 
-    run {
-        data class AO(val n: Int)
+//    run {
+//        data class AO(val n: Int)
+//
+//        val input = "#test/AO 99"
+//        val options = EDNSoapOptions.defaultOptions.copy(
+//            allowMoreEncoderDecoderNames = true,
+//            ednClassDecoders = mapOf(
+//                "test/AO" to { AO((it as Number).toInt()) }
+//            ), ednClassEncoders = mapOf(
+//                AO::class.java to { "test/AO" to mapOf(Keyword.keyword(":n") to (it as AO).n) }
+//            ))
+//        println(Keyword.keyword(":nma"))
+//        println(input)
+//        val data = EDNSoapReader.readString(input, options)
+//        println(data)
+//        val output = EDNSoapWriter.pprint(data, options = options)
+//    }
 
-        val input = "#test/AO {:n 1}"
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassDecoders = mapOf(
-            "test/AO" to { println("$it ${it?.javaClass}" )
-                AO(((it as Map<*, *>).getOrDefault(Keyword.keyword(":n"), 2) as Number).toInt()) }
-        ), ednClassEncoders = mapOf(
-            AO::class.java to { "test/AO" to mapOf(Keyword.keyword(":nma") to (it as AO).n) }
-        ))
-        println(Keyword.keyword(":nma"))
-        println(input)
-        val data = EDNSoapReader.readString(input, options)
-        println(data)
-        val output = EDNSoapWriter.pprint(data, options = options)
+    run {
+        val seq = LazyList.distinct(LazyList.of(1,2,3,3,2,1,4))
+        println(LazyList.distinct(seq))
+
     }
 }
