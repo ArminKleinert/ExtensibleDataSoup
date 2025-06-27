@@ -178,20 +178,20 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
         return res
     }
 
-     fun<R>fold(initial: R, operation: (R, T)->R): R {
+    fun <R> fold(initial: R, operation: (R, T) -> R): R {
         var accumulator = initial
         for (element in this) accumulator = operation(accumulator, element)
         return accumulator
     }
 
-    fun < R> foldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): R {
+    fun <R> foldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): R {
         var index = 0
         var accumulator = initial
         for (element in this) accumulator = operation(index++, accumulator, element)
         return accumulator
     }
 
-    fun < R> foldRight(initial: R, operation: (T, acc: R) -> R): R {
+    fun <R> foldRight(initial: R, operation: (T, acc: R) -> R): R {
         var accumulator = initial
         if (!isEmpty()) {
             val iterator = listIterator(size)
@@ -303,28 +303,34 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
         sameTypeFromList(asIterable().dropWhile(predicate))
 
     fun filter(predicate: (T) -> Boolean): PersistentList<T> =
+        LazyList.filter(predicate, this)
+
+    fun filterv(predicate: (T) -> Boolean): PersistentList<T> =
         sameTypeFromList(asIterable().filter(predicate))
 
     fun filterIndexed(predicate: (index: Int, T) -> Boolean): PersistentList<T> =
-        sameTypeFromList(asIterable().filterIndexed(predicate))
+        LazyList.filterIndexed(predicate, this)
 
     fun filterNot(predicate: (T) -> Boolean): PersistentList<T> =
-        sameTypeFromList(asIterable().filterNot(predicate))
+        LazyList.filterNot(predicate, this)
 
     fun filterNotNull(): PersistentList<T> =
-        sameTypeFromList(asIterable().filterNotNull())
+        LazyList.filterNotNull(this)
 
     fun <R> flatMap(transform: (T) -> Iterable<R>): PersistentList<R> =
-        sameTypeFromList(asIterable().flatMap(transform))
+        LazyList.flatMap(transform, this)
 
     fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): PersistentList<R> =
-        sameTypeFromList(asIterable().flatMapIndexed(transform))
+        LazyList.flatMapIndexed(transform, this)
 
     fun ifEmpty(defaultValue: () -> PersistentList<T>): PersistentList<T> =
         if (isEmpty()) defaultValue()
         else this
 
     fun <R> map(transform: (T) -> R): PersistentList<R> =
+        LazyList.map(transform, this)
+
+    fun <R> mapv(transform: (T) -> R): PersistentList<R> =
         sameTypeFromList(asIterable().map(transform))
 
     fun <R> mapIndexed(transform: (index: Int, T) -> R): PersistentList<R> =
@@ -387,21 +393,27 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
     fun sortedWith(comparator: Comparator<in T>): PersistentList<T> =
         sameTypeFromList(asIterable().sortedWith(comparator))
 
-    fun take(n: Int): PersistentList<T> = sameTypeFromList(asIterable().take(n))
+    fun take(n: Int): PersistentList<T> =
+        if (isLazyType()) LazyList.take(n, this)
+        else sameTypeFromList(asIterable().take(n))
 
     fun takeWhile(predicate: (T) -> Boolean): PersistentList<T> =
-        sameTypeFromList(asIterable().takeWhile(predicate))
-
-    fun windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): PersistentList<List<T>> =
-        sameTypeFromList(asIterable().windowed(size, step, partialWindows))
+        LazyList.takeWhile(predicate, this)
 
     fun <R> windowed(
         size: Int,
         step: Int = 1,
         partialWindows: Boolean = false,
-        transform: (List<T>) -> R
+        transform: (PersistentList<T>) -> R
     ): PersistentList<R> =
-        sameTypeFromList(asIterable().windowed(size, step, partialWindows, transform))
+        LazyList.windowed(size, this, step, partialWindows, transform)
+
+    fun windowed(
+        size: Int,
+        step: Int = 1,
+        partialWindows: Boolean = false
+    ): PersistentList<PersistentList<T>> =
+        LazyList.windowed(size, this, step, partialWindows)
 
     fun withIndex(): PersistentList<IndexedValue<T>> =
         sameTypeFromList(asIterable().withIndex().toList())

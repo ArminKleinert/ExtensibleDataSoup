@@ -206,22 +206,22 @@ fun main(args: Array<String>) {
 //        )
 //    }
 
-    run {
-        data class AO(val n: Int)
-
-        val input = "#test/AO 99"
-        val options = EDNSoapOptions.defaultOptions.copy(
-            //allowMoreEncoderDecoderNames = true,
-            ednClassDecoders = mapOf(
-                "test/AO" to { AO((it as Number).toInt()) }
-            ), ednClassEncoders = mapOf(
-                AO::class.java to { "test/AO" to mapOf(Keyword.keyword(":n") to (it as AO).n) }
-            ))
-        println(input)
-        val data = EDNSoapReader.readString(input, options)
-        println(data)
-        val output = EDNSoapWriter.pprintln(data, options = options)
-    }
+//    run {
+//        data class AO(val n: Int)
+//
+//        val input = "#test/AO 99"
+//        val options = EDNSoapOptions.defaultOptions.copy(
+//            //allowMoreEncoderDecoderNames = true,
+//            ednClassDecoders = mapOf(
+//                "test/AO" to { AO((it as Number).toInt()) }
+//            ), ednClassEncoders = mapOf(
+//                AO::class.java to { "test/AO" to mapOf(Keyword.keyword(":n") to (it as AO).n) }
+//            ))
+//        println(input)
+//        val data = EDNSoapReader.readString(input, options)
+//        println(data)
+//        val output = EDNSoapWriter.pprintln(data, options = options)
+//    }
 
 //    run {
 //        val seq = LazyList.distinct(LazyList.of(1,2,3,3,2,1,4))
@@ -229,8 +229,8 @@ fun main(args: Array<String>) {
 //    }
 
     run {
-        val seq = LazyList.cycle(LazyList.of(1, 2, 3))
-        val zipped = seq.zip(LazyList.of(4, 5, 6, 7))
-        println(zipped)
+        val lst =  PersistentList.of(1,2,3,4,5,6,7,8, 9).cycle()
+        val seq = LazyList.windowed(2, lst, step = 1, partialEndWindow = true).take(9)
+        println(seq)
     }
 }

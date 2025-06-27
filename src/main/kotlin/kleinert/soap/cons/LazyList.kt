@@ -47,6 +47,8 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
         return evaluateStep()!!.isEmpty()
     }
 
+    private fun evaluate(): PersistentList<T> = PersistentList.from(toList())
+
     override fun drop(n: Int): PersistentList<T> = drop(n, this)
 
     override fun take(n: Int): PersistentList<T> = take(n, this)
@@ -100,20 +102,28 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
         commonEqualityCheck(other)
 
     companion object {
-        fun <T, R> map(f: (T) -> R, lst: PersistentList<T>): PersistentList<R> {
-            return lazySeq {
-                if (lst.isEmpty()) nullCons()
-                else PersistentList.cons(f(lst.car), map(f, lst.cdr))
+        fun <T, R> map(f: (T) -> R, lst: PersistentList<T>): PersistentList<R> = lazySeq {
+            if (lst.isEmpty()) nullCons()
+            else PersistentList.cons(f(lst.car), map(f, lst.cdr))
+        }
+
+        fun <T> filter(p: (T) -> Boolean, lst: PersistentList<T>): PersistentList<T> = lazySeq {
+            when {
+                lst.isEmpty() -> lst
+                p(lst.car) -> PersistentList.cons(lst.car, filter(p, lst.cdr))
+                else -> filter(p, lst.cdr)
             }
         }
 
-        fun <T> filter(p: (T) -> Boolean, lst: PersistentList<T>): PersistentList<T> {
-            return lazySeq {
-                when {
-                    lst.isEmpty() -> lst
-                    p(lst.car) -> PersistentList.cons(lst.car, filter(p, lst.cdr))
-                    else -> filter(p, lst.cdr)
-                }
+        fun <T> filterIndexed(
+            predicate: (index: Int, T) -> Boolean,
+            xs: PersistentList<T>,
+            index: Int = 0
+        ): PersistentList<T> = lazySeq {
+            when {
+                xs.isEmpty() -> nullCons()
+                predicate(index, xs.car) -> PersistentList.cons(xs.car, filterIndexed(predicate, xs.cdr, index + 1))
+                else -> filterIndexed(predicate, xs.cdr, index + 1)
             }
         }
 
@@ -143,7 +153,7 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                     n > 0 -> PersistentList.cons(lst.car, take(n - 1, lst.cdr))
                     else -> nullCons()
                 }
-            }
+            }.evaluate()
         }
 
         fun <T> drop(n: Int, lst: PersistentList<T>): PersistentList<T> {
@@ -223,7 +233,7 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                 predicate(xs.car) -> PersistentList.cons(xs.car, takeWhile(predicate, xs.cdr))
                 else -> nullCons()
             }
-        }
+        }.evaluate()
 
         fun <T, R> flatMap(transform: (T) -> Iterable<R>, xs: PersistentList<T>): PersistentList<R> = lazySeq {
             when {
@@ -265,5 +275,46 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                 else -> PersistentList.cons(xs.car to ys.car, zip(xs.cdr, ys.cdr))
             }
         }
+
+        fun <R, T> windowed(
+            size: Int,
+            xs: PersistentList<T>,
+            step: Int = 1,
+            partialEndWindow: Boolean = false,
+            transform: (PersistentList<T>) -> R
+        ): PersistentList<R> =
+            lazySeq {
+                val front = xs.take(size)
+                when {
+                    front.isEmpty() -> nullCons()
+                    front.size < size -> if (partialEndWindow) PersistentList.of(transform(front)) else nullCons() // The entire list was iterated.
+                    front.size == size -> PersistentList.cons(
+                        transform(front),
+                        windowed(size, xs.drop(step), step, partialEndWindow, transform)
+                    )
+
+                    else -> throw IllegalStateException()
+                }
+            }
+
+        fun <T> windowed(
+            size: Int,
+            xs: PersistentList<T>,
+            step: Int = 1,
+            partialEndWindow: Boolean = false
+        ): PersistentList<PersistentList<T>> =
+            lazySeq {
+                val front = xs.take(size)
+                when {
+                    front.isEmpty() -> nullCons()
+                    front.size < size -> if (partialEndWindow) PersistentList.of(front) else nullCons() // The entire list was iterated.
+                    front.size == size -> PersistentList.cons(
+                        front,
+                        windowed(size, xs.drop(step), step, partialEndWindow)
+                    )
+
+                    else -> throw IllegalStateException()
+                }
+            }
     }
 }

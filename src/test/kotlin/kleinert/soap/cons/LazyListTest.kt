@@ -320,4 +320,34 @@ class LazyListTest {
         assertEquals(LazyList.of(1, 2, 1, 2), LazyList.cycle(LazyList.of(1, 2, 3)).minus(listOf(3)).take(4))
         assertEquals(LazyList.of(1, 2, 1, 2), LazyList.cycle(LazyList.of(1, 2, 3)).minus(setOf(3)).take(4))
     }
+
+    @Test
+    fun windowed() {
+        run { //Tests on empty inputs
+            assertEquals(PersistentList.of<PersistentList<Int>>(), PersistentList.of<Int>().windowed(2))
+
+            assertEquals(
+                PersistentList.of<PersistentList<Int>>(),
+                PersistentList.of<Int>().windowed(2, partialWindows = true)
+            )
+        }
+
+        run { // Tests on basic, finite inputs
+            val seq = PersistentList.of(1, 2, 3, 4)
+            assertEquals(listOf(listOf(1, 2), listOf(2, 3), listOf(3, 4)), seq.windowed(2))
+            assertEquals(listOf(listOf(1, 2), listOf(3, 4)), seq.windowed(2, step = 2))
+            assertEquals(listOf(listOf(1, 2, 3)), seq.windowed(3, step = 3))
+            assertEquals(listOf(listOf(1, 2, 3), listOf(4)), seq.windowed(3, step = 3, partialWindows = true))
+
+            assertEquals(listOf(3), seq.windowed(3, step = 3, transform = {it.size}))
+            assertEquals(listOf(3, 1), seq.windowed(3, step = 3, partialWindows = true, transform = {it.size}))
+        }
+        run { // Test on infinite input
+            val seq = PersistentList.of(1, 2, 3).cycle()
+            assertEquals(listOf(listOf(1, 2, 3, 1), listOf(2, 3, 1, 2), listOf(3, 1, 2, 3)), seq.windowed(4).take(3))
+
+            val windowsXP = seq.windowed(4, transform={ (it as Iterable<Int>).sum()})
+            assertEquals(listOf(7, 8, 9), windowsXP.take(3))
+        }
+    }
 }
