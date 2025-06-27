@@ -297,7 +297,7 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
         sameTypeFromList(asIterable().chunked(size))
 
     fun distinct(): PersistentList<T> =
-        sameTypeFromList(asIterable().distinct())
+       LazyList.distinct(this)
 
     fun dropWhile(predicate: (T) -> Boolean): PersistentList<T> =
         sameTypeFromList(asIterable().dropWhile(predicate))
