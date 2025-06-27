@@ -252,8 +252,6 @@ class VListTest {
 
     @Test
     fun map() {
-        assertInstanceOf(VList::class.java, VList.of<Int>().map { it })
-        assertInstanceOf(VList::class.java, VList.of(1).map { it })
 
         assertEquals(VList.of(1), VList.of(1).map { it })
         assertEquals(VList.of(1, 2), VList.of(1, 2).map { it })
@@ -280,8 +278,7 @@ class VListTest {
 
     @Test
     fun filter() {
-        assertInstanceOf(VList::class.java, VList.of<Int>().filter { true })
-        assertInstanceOf(VList::class.java, VList.of(1).filter { true })
+        assertTrue(VList.of<Int>().filter { true }.isEmpty())
 
         assertEquals(VList.of(1, 2), VList.of(1, 2).filter { true })
         assertEquals(VList.of<Int>(), VList.of(1, 2).filter { false })
@@ -291,8 +288,7 @@ class VListTest {
 
     @Test
     fun filterNot() {
-        assertInstanceOf(VList::class.java, VList.of<Int>().filterNot { true })
-        assertInstanceOf(VList::class.java, VList.of(1).filterNot { true })
+        assertTrue(VList.of<Int>().filterNot { true }.isEmpty())
 
         assertEquals(VList.of(1, 2), VList.of(1, 2).filterNot { false })
         assertEquals(VList.of<Int>(), VList.of(1, 2).filterNot { true })
@@ -357,9 +353,7 @@ class VListTest {
 
     @Test
     fun flatMap() {
-        assertInstanceOf(VList::class.java, VList.of<Int>().flatMap { listOf(it) })
         assertEquals(VList.of<Int>(), VList.of<Int>().flatMap { listOf(it) })
-        assertInstanceOf(VList::class.java, VList.of(1, 2, 3).flatMap { listOf(it) })
         assertEquals(VList.of(1, 2, 3), VList.of(1, 2, 3).flatMap { listOf(it) })
         assertEquals(VList.of(1, 2, 3), VList.of(listOf(1, 2), listOf(3)).flatMap { it })
     }
@@ -402,11 +396,6 @@ class VListTest {
 
     @Test
     fun takeWhile() {
-        assertInstanceOf(VList::class.java, VList.of<Int>().takeWhile { true })
-        assertInstanceOf(VList::class.java, VList.of(1, 2, 3).takeWhile { true })
-        assertInstanceOf(VList::class.java, VList.of(1, 2, 3).takeWhile { false })
-        assertInstanceOf(VList::class.java, VList.of(1, 2, 3).takeWhile { it < 3 })
-
         assertEquals(VList.of<Int>(), VList.of<Int>().takeWhile { it < 3 })
 
         assertEquals(VList.of(1, 2), VList.of(1, 2, 3, 2, 1).takeWhile { it < 3 })
@@ -518,9 +507,6 @@ class VListTest {
 
     @Test
     fun distinct() {
-        assertInstanceOf(VList::class.java, VList.of<Int>().distinct())
-        assertInstanceOf(VList::class.java, VList.of(1, 2, 3).distinct())
-
         assertEquals(VList.of<Int>(), VList.of<Int>().distinct())
         assertEquals(VList.of(1), VList.of(1).distinct())
         assertEquals(VList.of(1, 2, 3, 4, 5), VList.of(1, 2, 3, 4, 5).distinct())

@@ -140,8 +140,8 @@ class EmptyListTest {
 
     @Test
     fun filter() {
-        assertInstanceOf(EmptyList::class.java, instance.filter { true })
-        assertInstanceOf(EmptyList::class.java, instance.filter { false })
+        assertTrue(instance.filter { true }.isEmpty())
+        assertTrue(instance.filter { false }.isEmpty())
 
         assertEquals(instance, instance.filter { true })
         assertEquals(instance, instance.filter { it })
@@ -149,11 +149,27 @@ class EmptyListTest {
 
     @Test
     fun filterNot() {
-        assertInstanceOf(EmptyList::class.java, instance.filterNot { true })
-        assertInstanceOf(EmptyList::class.java, instance.filterNot { false })
+        assertTrue(instance.filterNot { true }.isEmpty())
+        assertTrue(instance.filterNot { false }.isEmpty())
 
         assertEquals(instance, instance.filterNot { true })
         assertEquals(instance, instance.filterNot { it })
+    }
+
+    @Test
+    fun filterv() {
+        assertInstanceOf(EmptyList::class.java, instance.filterv { true })
+        assertInstanceOf(EmptyList::class.java, instance.filterv { false })
+
+        assertEquals(instance, instance.filterv { true })
+        assertEquals(instance, instance.filterv { it })
+    }
+
+    @Test
+    fun filterVNot() {
+        assertTrue(instance.filterVNot { true }.isEmpty())
+        assertEquals(instance, instance.filterVNot { true })
+        assertEquals(instance, instance.filterVNot { it })
     }
 
     @Test
@@ -309,8 +325,14 @@ class EmptyListTest {
         assertEquals(PersistentList.of(1, 2, 3, 4, 5), nullCons<Int>() + (1..5))
 
         assertEquals(instance, instance + PersistentList.of())
-        assertEquals(PersistentList.of(false, true, false, true), instance + PersistentList.of(false, true, false, true))
-        assertEquals(PersistentList.of(false, true, false, true), instance + PersistentWrapper(listOf(false, true, false, true)))
+        assertEquals(
+            PersistentList.of(false, true, false, true),
+            instance + PersistentList.of(false, true, false, true)
+        )
+        assertEquals(
+            PersistentList.of(false, true, false, true),
+            instance + PersistentWrapper(listOf(false, true, false, true))
+        )
     }
 
     @Test

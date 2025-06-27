@@ -314,6 +314,9 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
     fun filterNot(predicate: (T) -> Boolean): PersistentList<T> =
         LazyList.filterNot(predicate, this)
 
+    fun filterVNot(predicate: (T) -> Boolean): PersistentList<T> =
+        sameTypeFromList(asIterable().filterNot(predicate))
+
     fun filterNotNull(): PersistentList<T> =
         LazyList.filterNotNull(this)
 
