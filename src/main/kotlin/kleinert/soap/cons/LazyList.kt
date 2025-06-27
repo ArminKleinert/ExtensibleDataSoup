@@ -71,13 +71,20 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
     override fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): PersistentList<R> =
         flatMapIndexed(transform, this)
 
-    override fun ifEmpty(defaultValue: () -> PersistentList<T>): PersistentList<T> = ifEmpty(defaultValue, this)
-
     override fun withIndex(): PersistentList<IndexedValue<T>> =
         mapIndexed { index: Int, t: T -> IndexedValue(index, t) }
 
     override fun <R> zip(other: PersistentList<R>): PersistentList<Pair<T, R>> =
         zip(this, other)
+
+    override operator fun minus(element: T): PersistentList<T> = minus(setOf(element))
+
+    override operator fun minus(elements: Iterable<T>): PersistentList<T> = minus(elements.toSet())
+
+
+    // TODO: Test
+    override operator fun minus(elements: Set<T>): PersistentList<T> =
+        minus(elements, this)
 
     override fun isLazyType(): Boolean = true
 
@@ -168,7 +175,7 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
             }
         }
 
-        fun <T> lazySeq(x: T, fn: () -> PersistentList<T>) = PersistentList.cons(x, fn)
+        private fun <T> lazySeq(x: T, fn: () -> PersistentList<T>) = PersistentList.cons(x, fn)
 
         fun <T> cycle(xs: PersistentList<T>): PersistentList<T> = lazySeq {
             if (xs.isEmpty()) nullCons()
@@ -194,6 +201,12 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                     }
                 }
             }
+
+        fun <T> minus(elements: Set<T>, xs: PersistentList<T>): PersistentList<T> = when {
+            xs.isEmpty() -> xs
+            elements.isEmpty() -> xs
+            else -> filterNot({ it in elements }, xs)
+        }
 
         fun <T> dropWhile(predicate: (T) -> Boolean, xs: PersistentList<T>): PersistentList<T> = lazySeq {
             when {
@@ -233,30 +246,24 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                 flatMapIndexed(transform, xs.cdr, init + 1)
             )
         }
-    }
 
-    // TODO: Test
-    fun <T> ifEmpty(defaultValue: () -> PersistentList<T>, xs: PersistentList<T>): PersistentList<T> = lazySeq {
-        if (xs.isEmpty()) defaultValue()
-        else xs
-    }
-
-    // TODO: Test
-    fun <T, R : Any> mapNotNull(transform: (T) -> R?, xs: PersistentList<T>): PersistentList<R> = lazySeq {
-        if (xs.isEmpty()) nullCons()
-        else {
-            val temp = transform(xs.car)
-            if (temp == null) mapNotNull(transform, xs.cdr)
-            else PersistentList.cons(temp as R, mapNotNull(transform, xs.cdr))
+        // TODO: Test
+        fun <T, R : Any> mapNotNull(transform: (T) -> R?, xs: PersistentList<T>): PersistentList<R> = lazySeq {
+            if (xs.isEmpty()) nullCons()
+            else {
+                val temp = transform(xs.car)
+                if (temp == null) mapNotNull(transform, xs.cdr)
+                else PersistentList.cons(temp as R, mapNotNull(transform, xs.cdr))
+            }
         }
-    }
 
-    // TODO: Test
-    fun <R, T> zip(xs: PersistentList<T>, ys: PersistentList<R>): PersistentList<Pair<T, R>> = lazySeq {
-        when {
-            xs.isEmpty() -> nullCons()
-            ys.isEmpty() -> nullCons()
-            else -> PersistentList.cons(xs.car to ys.car, zip(xs.cdr, ys.cdr))
+        // TODO: Test
+        fun <R, T> zip(xs: PersistentList<T>, ys: PersistentList<R>): PersistentList<Pair<T, R>> = lazySeq {
+            when {
+                xs.isEmpty() -> nullCons()
+                ys.isEmpty() -> nullCons()
+                else -> PersistentList.cons(xs.car to ys.car, zip(xs.cdr, ys.cdr))
+            }
         }
     }
 }

@@ -178,6 +178,60 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
         return res
     }
 
+     fun<R>fold(initial: R, operation: (R, T)->R): R {
+        var accumulator = initial
+        for (element in this) accumulator = operation(accumulator, element)
+        return accumulator
+    }
+
+    fun < R> foldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): R {
+        var index = 0
+        var accumulator = initial
+        for (element in this) accumulator = operation(index++, accumulator, element)
+        return accumulator
+    }
+
+    fun < R> foldRight(initial: R, operation: (T, acc: R) -> R): R {
+        var accumulator = initial
+        if (!isEmpty()) {
+            val iterator = listIterator(size)
+            while (iterator.hasPrevious()) {
+                accumulator = operation(iterator.previous(), accumulator)
+            }
+        }
+        return accumulator
+    }
+
+    fun <R> foldRightIndexed(initial: R, operation: (index: Int, T, acc: R) -> R): R {
+        var accumulator = initial
+        if (isNotEmpty()) {
+            val iterator = listIterator(size)
+            while (iterator.hasPrevious()) {
+                val index = iterator.previousIndex()
+                accumulator = operation(index, iterator.previous(), accumulator)
+            }
+        }
+        return accumulator
+    }
+
+    fun all(predicate: (T) -> Boolean): Boolean {
+        for (e in this)
+            if (!predicate(e)) return false
+        return true
+    }
+
+    fun any(predicate: (T) -> Boolean): Boolean {
+        for (e in this)
+            if (predicate(e)) return true
+        return false
+    }
+
+    fun none(predicate: (T) -> Boolean): Boolean {
+        for (e in this)
+            if (predicate(e)) return false
+        return true
+    }
+
     fun commonToString(
         separator: CharSequence = ", ",
         prefix: CharSequence = "[",
@@ -267,7 +321,8 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
         sameTypeFromList(asIterable().flatMapIndexed(transform))
 
     fun ifEmpty(defaultValue: () -> PersistentList<T>): PersistentList<T> =
-        from(asSequence().ifEmpty { defaultValue().asSequence() }.toList())
+        if (isEmpty()) defaultValue()
+        else this
 
     fun <R> map(transform: (T) -> R): PersistentList<R> =
         sameTypeFromList(asIterable().map(transform))

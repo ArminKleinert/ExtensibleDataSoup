@@ -54,10 +54,10 @@ class LazyListTest {
         }
         run {
             val ll = LazyList.of(1, 2, 3, 2, 1, 4, 4)
-            assertEquals(listOf<Int>(), ll.takeWhile{false})
+            assertEquals(listOf<Int>(), ll.takeWhile { false })
             assertEquals(listOf(1, 2), ll.takeWhile { it < 3 })
             assertEquals(listOf(1, 2, 3, 2, 1, 4, 4), ll.takeWhile { it < 5 })
-            assertEquals(listOf(1, 2, 3, 2, 1, 4, 4), ll.takeWhile{true})
+            assertEquals(listOf(1, 2, 3, 2, 1, 4, 4), ll.takeWhile { true })
         }
     }
 
@@ -84,9 +84,9 @@ class LazyListTest {
         }
         run {
             val ll = LazyList.of(1, 2, 3, 2, 1, 4)
-            assertEquals(listOf<Int>(1, 2, 3, 2, 1, 4), ll.dropWhile{false})
-            assertEquals(listOf<Int>(4), ll.dropWhile{it <= 3})
-            assertEquals(listOf<Int>(), ll.dropWhile{true})
+            assertEquals(listOf<Int>(1, 2, 3, 2, 1, 4), ll.dropWhile { false })
+            assertEquals(listOf<Int>(4), ll.dropWhile { it <= 3 })
+            assertEquals(listOf<Int>(), ll.dropWhile { true })
         }
     }
 
@@ -161,7 +161,7 @@ class LazyListTest {
             assertEquals(ll, ll.filterNotNull())
         }
         run {
-            val ll = LazyList.of<Int?>(1,2,3)
+            val ll = LazyList.of<Int?>(1, 2, 3)
             assertEquals(ll, ll.filterNotNull())
         }
         run {
@@ -283,9 +283,41 @@ class LazyListTest {
 
     @Test
     fun flatMapIndexed() {
-        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().flatMapIndexed { i, it-> listOf(it) })
-        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).flatMapIndexed { i, it->listOf(it) })
-        assertEquals(LazyList.of(1, 3, 5), LazyList.of(1, 2, 3).flatMapIndexed { i, it->listOf(i+it) })
-        assertEquals(LazyList.of(1, 2, 3), LazyList.of(listOf(1, 2), listOf(3)).flatMapIndexed {i, it-> it })
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().flatMapIndexed { _, it -> listOf(it) })
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).flatMapIndexed { _, it -> listOf(it) })
+        assertEquals(LazyList.of(1, 3, 5), LazyList.of(1, 2, 3).flatMapIndexed { i, it -> listOf(i + it) })
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(listOf(1, 2), listOf(3)).flatMapIndexed { _, it -> it })
+    }
+
+    @Test
+    fun minus() {
+        // Minus with xs empty
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().minus(1))
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().minus(listOf(1, 2, 3)))
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().minus(setOf(1, 2, 3)))
+
+        // Minus nothing
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).minus(listOf()))
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).minus(setOf()))
+
+        // Minus but none of the elements match
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).minus(4))
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).minus(listOf(4, 5, 6)))
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).minus(setOf(4, 5, 6)))
+
+        // Minus all
+        assertEquals(LazyList.of<Int>(), LazyList.of(1, 2, 3).minus(1).minus(2).minus(3))
+        assertEquals(LazyList.of<Int>(), LazyList.of(1, 2, 3).minus(listOf(1, 2, 3)))
+        assertEquals(LazyList.of<Int>(), LazyList.of(1, 2, 3).minus(setOf(1, 2, 3)))
+
+        // Minus partial match
+        assertEquals(LazyList.of(1, 3), LazyList.of(1, 2, 3).minus(2))
+        assertEquals(LazyList.of(3), LazyList.of(1, 2, 3).minus(listOf(1, 2, 4)))
+        assertEquals(LazyList.of(3), LazyList.of(1, 2, 3).minus(setOf(1, 2, 4)))
+
+        // Works on infinite lists
+        assertEquals(LazyList.of(1, 2, 1, 2), LazyList.cycle(LazyList.of(1, 2, 3)).minus(3).take(4))
+        assertEquals(LazyList.of(1, 2, 1, 2), LazyList.cycle(LazyList.of(1, 2, 3)).minus(listOf(3)).take(4))
+        assertEquals(LazyList.of(1, 2, 1, 2), LazyList.cycle(LazyList.of(1, 2, 3)).minus(setOf(3)).take(4))
     }
 }
