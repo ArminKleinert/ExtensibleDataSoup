@@ -40,9 +40,24 @@ class LazyListTest {
         run {
             val ll = LazyList.of(1, 2, 3, 2, 1, 4)
             assertEquals(listOf<Int>(), ll.take(0))
-            assertEquals(listOf<Int>(1,2,3), ll.take(3))
-            assertEquals(listOf<Int>(1,2,3,2,1,4), ll.take(6))
-            assertEquals(listOf<Int>(1,2,3,2,1,4), ll.take(128))
+            assertEquals(listOf<Int>(1, 2, 3), ll.take(3))
+            assertEquals(listOf<Int>(1, 2, 3, 2, 1, 4), ll.take(6))
+            assertEquals(listOf<Int>(1, 2, 3, 2, 1, 4), ll.take(128))
+        }
+    }
+
+    @Test
+    fun takeWhile() {
+        run {
+            val ll = LazyList.of<Int>().takeWhile { false }
+            assertTrue(ll.isEmpty())
+        }
+        run {
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4, 4)
+            assertEquals(listOf<Int>(), ll.takeWhile{false})
+            assertEquals(listOf(1, 2), ll.takeWhile { it < 3 })
+            assertEquals(listOf(1, 2, 3, 2, 1, 4, 4), ll.takeWhile { it < 5 })
+            assertEquals(listOf(1, 2, 3, 2, 1, 4, 4), ll.takeWhile{true})
         }
     }
 
@@ -54,10 +69,24 @@ class LazyListTest {
         }
         run {
             val ll = LazyList.of(1, 2, 3, 2, 1, 4)
-            assertEquals(listOf<Int>(1,2,3,2,1,4), ll.drop(0))
-            assertEquals(listOf<Int>(2,1,4), ll.drop(3))
+            assertEquals(listOf<Int>(1, 2, 3, 2, 1, 4), ll.drop(0))
+            assertEquals(listOf<Int>(2, 1, 4), ll.drop(3))
             assertEquals(listOf<Int>(), ll.drop(6))
             assertEquals(listOf<Int>(), ll.drop(128))
+        }
+    }
+
+    @Test
+    fun dropWhile() {
+        run {
+            val ll = LazyList.of<Int>().dropWhile { false }
+            assertTrue(ll.isEmpty())
+        }
+        run {
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4)
+            assertEquals(listOf<Int>(1, 2, 3, 2, 1, 4), ll.dropWhile{false})
+            assertEquals(listOf<Int>(4), ll.dropWhile{it <= 3})
+            assertEquals(listOf<Int>(), ll.dropWhile{true})
         }
     }
 
@@ -72,7 +101,7 @@ class LazyListTest {
         }
         run {
             val ll = LazyList.of(1, 2, 3, 2, 1, 4)
-            assertEquals(listOf(2, 3, 4, 3, 2, 5), ll.map{it+1})
+            assertEquals(listOf(2, 3, 4, 3, 2, 5), ll.map { it + 1 })
         }
     }
 
@@ -86,17 +115,62 @@ class LazyListTest {
             assertTrue(ll.isLazyType())
         }
         run {
-            val ll = LazyList.of(1,2,3,2,1,4)
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4)
             val ll2 = ll.filter { it > 1 }
             assertNotSame(ll, ll2)
-            assertEquals(listOf(2,3,2,4),ll2)
+            assertEquals(listOf(2, 3, 2, 4), ll2)
         }
         run {
-            val ll = LazyList.of(1,2,3,2,1,4)
-            val ll2 = ll.filter {false}
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4)
+            val ll2 = ll.filter { false }
             assertNotSame(ll, ll2)
             assertTrue(ll2.isEmpty())
-            assertEquals(listOf<Int>(),ll2)
+            assertEquals(listOf<Int>(), ll2)
+        }
+    }
+
+    @Test
+    fun filterNot() {
+        run {
+            val ll = LazyList.of<Int>()
+            val ll2 = ll.filterNot { it > 1 }
+            assertEquals(ll, ll2)
+            assertTrue(ll.isEmpty())
+            assertTrue(ll.isLazyType())
+        }
+        run {
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4)
+            assertInstanceOf(LazyList::class.java, ll)
+            val ll2 = ll.filterNot { it <= 1 }
+            assertNotSame(ll, ll2)
+            assertEquals(listOf(2, 3, 2, 4), ll2)
+        }
+        run {
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4)
+            val ll2 = ll.filterNot { true }
+            assertNotSame(ll, ll2)
+            assertTrue(ll2.isEmpty())
+            assertEquals(listOf<Int>(), ll2)
+        }
+    }
+
+    @Test
+    fun filterNotNull() {
+        run {
+            val ll = LazyList.of<Int?>()
+            assertEquals(ll, ll.filterNotNull())
+        }
+        run {
+            val ll = LazyList.of<Int?>(1,2,3)
+            assertEquals(ll, ll.filterNotNull())
+        }
+        run {
+            val ll = LazyList.of<Int?>(null)
+            assertEquals(listOf<Any?>(), ll.filterNotNull())
+        }
+        run {
+            val ll = LazyList.of<Int?>(1, null, 2)
+            assertEquals(listOf<Int>(1, 2), ll.filterNotNull())
         }
     }
 
@@ -106,8 +180,8 @@ class LazyListTest {
             val ll = LazyList.repeat(1)
             assertTrue(ll.isLazyType()) // Must not hang
             assertTrue(ll.isNotEmpty()) // Must not hang
-            assertEquals(listOf(1,1,1,1,1,1), ll.take(6))
-            assertEquals(listOf(1,1,1,1,1,1,1,1,1,1,1,1), ll.take(12))
+            assertEquals(listOf(1, 1, 1, 1, 1, 1), ll.take(6))
+            assertEquals(listOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), ll.take(12))
         }
     }
 
@@ -117,11 +191,11 @@ class LazyListTest {
             val ll = LazyList.repeatedly { 1 }
             assertTrue(ll.isLazyType()) // Must not hang
             assertTrue(ll.isNotEmpty()) // Must not hang
-            assertEquals(listOf(1,1,1,1,1,1), ll.take(6))
+            assertEquals(listOf(1, 1, 1, 1, 1, 1), ll.take(6))
         }
         run {
             val rand = Random(0xDEADBEEF)
-                val ll = LazyList.repeatedly { rand.nextInt() }
+            val ll = LazyList.repeatedly { rand.nextInt() }
             assertTrue(ll.isLazyType()) // Must not hang
             assertTrue(ll.isNotEmpty()) // Must not hang
             assertEquals(6, ll.take(6).size)
@@ -130,19 +204,22 @@ class LazyListTest {
 
     @Test
     fun splitAt() {
-        run { val ll = LazyList.of<Int>()
+        run {
+            val ll = LazyList.of<Int>()
             require(ll is LazyList<Int>)
             val (head, tail) = ll.splitAt(5)
             assertEquals(listOf<Int>(), head)
             assertEquals(listOf<Int>(), head.take(8))
         }
-        run { val ll = LazyList.repeat(1)
+        run {
+            val ll = LazyList.repeat(1)
             require(ll is LazyList<Int>)
             val (head, tail) = ll.splitAt(5)
-            assertEquals(listOf(1,1,1,1,1), head)
-            assertEquals(listOf(1,1,1,1,1,1,1,1), tail.take(8))
+            assertEquals(listOf(1, 1, 1, 1, 1), head)
+            assertEquals(listOf(1, 1, 1, 1, 1, 1, 1, 1), tail.take(8))
         }
-        run { val ll = LazyList.of<Int>()
+        run {
+            val ll = LazyList.of<Int>()
             require(ll is LazyList<Int>)
             val (head, tail) = ll.splitAt(5)
             assertTrue(head.isEmpty())
@@ -150,26 +227,65 @@ class LazyListTest {
             assertTrue(tail.isEmpty())
             assertEquals(listOf<Int>(), tail.take(8))
         }
-        run { val ll = LazyList.of(1,2,3)
+        run {
+            val ll = LazyList.of(1, 2, 3)
             require(ll is LazyList<Int>)
             val (head, tail) = ll.splitAt(0)
             assertEquals(listOf<Int>(), head)
-            assertEquals(listOf(1,2,3), tail)
+            assertEquals(listOf(1, 2, 3), tail)
         }
     }
 
     @Test
     fun cycle() {
-        run { val ll = LazyList.of<Int>()
+        run {
+            val ll = LazyList.of<Int>()
             assertTrue(ll.cycle().isEmpty()) // Tests constraint: list.cycle() == [] <=> list == []
         }
-        run { val ll = LazyList.of(1,2,3)
+        run {
+            val ll = LazyList.of(1, 2, 3)
             val cycled = ll.cycle()
-            assertEquals(listOf(1,2,3,1,2,3), cycled.take(6))
+            assertEquals(listOf(1, 2, 3, 1, 2, 3), cycled.take(6))
         }
-        run { val ll = LazyList.iterate({it+1}, 1)
+        run {
+            val ll = LazyList.iterate({ it + 1 }, 1)
             val cycled = ll.cycle() // If the list is infinite and never repeats, then list.cycle() still never repeats.
-            assertEquals(listOf(1,2,3,4,5,6,7,8,9,10), cycled.take(10))
+            assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), cycled.take(10))
         }
+    }
+
+    @Test
+    fun distinct() {
+        run {
+            val ll = LazyList.of<Int>().distinct()
+            assertTrue(ll.isEmpty())
+        }
+        run {
+            val ll = LazyList.of(1).distinct()
+            assertEquals(listOf(1), ll)
+        }
+        run {
+            val ll = LazyList.of(1, 2, 3)
+            assertEquals(ll, ll.distinct())
+        }
+        run {
+            val ll = LazyList.of(1, 2, 3, 2, 1, 4)
+            assertEquals(listOf(1, 2, 3, 4), ll.distinct())
+        }
+    }
+
+    @Test
+    fun flatMap() {
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().flatMap { listOf(it) })
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).flatMap { listOf(it) })
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(listOf(1, 2), listOf(3)).flatMap { it })
+    }
+
+    @Test
+    fun flatMapIndexed() {
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().flatMapIndexed { i, it-> listOf(it) })
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(1, 2, 3).flatMapIndexed { i, it->listOf(it) })
+        assertEquals(LazyList.of(1, 3, 5), LazyList.of(1, 2, 3).flatMapIndexed { i, it->listOf(i+it) })
+        assertEquals(LazyList.of(1, 2, 3), LazyList.of(listOf(1, 2), listOf(3)).flatMapIndexed {i, it-> it })
     }
 }

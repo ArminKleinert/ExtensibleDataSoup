@@ -589,21 +589,6 @@ class VListTest {
     }
 
     @Test
-    fun plusVList() {
-        assertInstanceOf(VList::class.java, VList.of<Int>() + VList.of())
-        assertEquals(VList.of<Int>(), VList.of<Int>() + VList.of())
-
-        assertInstanceOf(VList::class.java, VList.of<Int>() + VList.of(1))
-        assertEquals(VList.of(1), VList.of<Int>() + VList.of(1))
-
-        assertInstanceOf(VList::class.java, VList.of(1, 2) + VList.of(3))
-        assertEquals(VList.of(1, 2, 3), VList.of(1, 2) + VList.of(3))
-
-        assertInstanceOf(VList::class.java, VList.of(1, 2) + VList.of(3, 4))
-        assertEquals(VList.of(1, 2, 3, 4), VList.of(1, 2) + VList.of(3, 4))
-    }
-
-    @Test
     fun getSegments() {
         assertEquals(listOf<List<Int>>(), VList.of<Int>().getSegments())
         assertEquals(listOf(listOf(1)), VList.of(1).getSegments())

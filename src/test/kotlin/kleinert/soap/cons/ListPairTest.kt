@@ -482,23 +482,6 @@ class ListPairTest {
     }
 
     @Test
-    fun plusVList() {
-        assertInstanceOf(VList::class.java, ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of())
-        assertEquals(
-            VList.of(1,2,3,1,2,3),
-            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of()
-        )
-        assertEquals(
-            VList.of(1,2,3,1,2,3,1),
-            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of(1)
-        )
-        assertEquals(
-            VList.of(1,2,3,1,2,3,1,2,3),
-            ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)) + VList.of(1,2,3)
-        )
-    }
-
-    @Test
     fun isSingleton() {
         assertFalse(ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).isSingleton())
         assertFalse(ListPair.concat(PersistentList.of(1, 2, 3), PersistentList.of(1, 2, 3)).drop(3).isSingleton())

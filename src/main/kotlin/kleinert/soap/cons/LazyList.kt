@@ -1,7 +1,5 @@
 package kleinert.soap.cons
 
-import kleinert.soap.cons.EmptyList.sameTypeFromList
-
 
 class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
     private var fn: (() -> PersistentList<T>?)? = fn
@@ -57,6 +55,30 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
 
     override fun filter(predicate: (T) -> Boolean): PersistentList<T> = filter(predicate, this)
 
+    override fun filterNot(predicate: (T) -> Boolean): PersistentList<T> = filterNot(predicate, this)
+
+    override fun filterNotNull(): PersistentList<T> = filterNotNull(this)
+
+    override fun distinct(): PersistentList<T> = distinct(this)
+
+    override fun dropWhile(predicate: (T) -> Boolean): PersistentList<T> = dropWhile(predicate, this)
+
+    override fun takeWhile(predicate: (T) -> Boolean): PersistentList<T> = takeWhile(predicate, this)
+
+    override fun <R> flatMap(transform: (T) -> Iterable<R>): PersistentList<R> = flatMap(transform, this)
+
+
+    override fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): PersistentList<R> =
+        flatMapIndexed(transform, this)
+
+    override fun ifEmpty(defaultValue: () -> PersistentList<T>): PersistentList<T> = ifEmpty(defaultValue, this)
+
+    override fun withIndex(): PersistentList<IndexedValue<T>> =
+        mapIndexed { index: Int, t: T -> IndexedValue(index, t) }
+
+    override fun <R> zip(other: PersistentList<R>): PersistentList<Pair<T, R>> =
+        zip(this, other)
+
     override fun isLazyType(): Boolean = true
 
     override fun toString(): String {
@@ -87,6 +109,12 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                 }
             }
         }
+
+        fun <T> filterNotNull(lst: PersistentList<T>): PersistentList<T> =
+            filter({ it != null }, lst)
+
+        fun <T> filterNot(p: (T) -> Boolean, lst: PersistentList<T>): PersistentList<T> =
+            filter({ !p(it) }, lst)
 
         fun <T> splitAt(number: Int, lst: PersistentList<T>): Pair<PersistentList<T>, PersistentList<T>> {
             var dest = VList.of<T>()
@@ -121,16 +149,16 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
             }
         }
 
-        fun <T> of(vararg xs: T): PersistentList<T> = lazySeq(xs.iterator())
+        fun <T> of(vararg xs: T): LazyList<T> = lazySeq(xs.iterator())
 
-        private fun <T> lazySeq(iterator: Iterator<T>): PersistentList<T> = lazySeq {
+        private fun <T> lazySeq(iterator: Iterator<T>): LazyList<T> = lazySeq {
             when {
                 iterator.hasNext() -> PersistentList.cons(iterator.next(), lazySeq(iterator))
                 else -> nullCons()
             }
         }
 
-        fun <T> lazySeq(fn: () -> PersistentList<T>?): PersistentList<T> = LazyList(fn)
+        fun <T> lazySeq(fn: () -> PersistentList<T>?): LazyList<T> = LazyList(fn)
 
         fun <T> repeatedly(n: Int = -1, fn: () -> T): PersistentList<T> = lazySeq {
             when (n) {
@@ -157,7 +185,6 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
 
         fun <T> distinct(xs: PersistentList<T>, memo: MutableSet<T> = mutableSetOf()): PersistentList<T> =
             lazySeq {
-                println("$memo ${xs.firstOrNull()}")
                 when {
                     xs.isEmpty() -> nullCons()
                     memo.contains(xs.car) -> distinct(xs.cdr, memo)
@@ -167,5 +194,69 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
                     }
                 }
             }
+
+        fun <T> dropWhile(predicate: (T) -> Boolean, xs: PersistentList<T>): PersistentList<T> = lazySeq {
+            when {
+                xs.isEmpty() -> nullCons<T>()
+                !predicate(xs.car) -> xs
+                else -> dropWhile(predicate, xs.cdr)
+            }
+        }
+
+
+        fun <T> takeWhile(predicate: (T) -> Boolean, xs: PersistentList<T>): PersistentList<T> = lazySeq {
+            when {
+                xs.isEmpty() -> nullCons<T>()
+                predicate(xs.car) -> PersistentList.cons(xs.car, takeWhile(predicate, xs.cdr))
+                else -> nullCons()
+            }
+        }
+
+        fun <T, R> flatMap(transform: (T) -> Iterable<R>, xs: PersistentList<T>): PersistentList<R> = lazySeq {
+            when {
+                xs.isEmpty() -> nullCons<R>()
+                else -> PersistentList.concat(
+                    PersistentList.from(transform(xs.car)),
+                    flatMap(transform, xs.cdr)
+                )
+            }
+        }
+
+        fun <T, R> flatMapIndexed(
+            transform: (index: Int, T) -> Iterable<R>,
+            xs: PersistentList<T>,
+            init: Int = 0
+        ): PersistentList<R> = lazySeq {
+            if (xs.isEmpty()) nullCons()
+            else PersistentList.concat(
+                PersistentList.from(transform(init, xs.car)),
+                flatMapIndexed(transform, xs.cdr, init + 1)
+            )
+        }
+    }
+
+    // TODO: Test
+    fun <T> ifEmpty(defaultValue: () -> PersistentList<T>, xs: PersistentList<T>): PersistentList<T> = lazySeq {
+        if (xs.isEmpty()) defaultValue()
+        else xs
+    }
+
+    // TODO: Test
+    fun <T, R : Any> mapNotNull(transform: (T) -> R?, xs: PersistentList<T>): PersistentList<R> = lazySeq {
+        if (xs.isEmpty()) nullCons()
+        else {
+            val temp = transform(xs.car)
+            if (temp == null) mapNotNull(transform, xs.cdr)
+            else PersistentList.cons(temp as R, mapNotNull(transform, xs.cdr))
+        }
+    }
+
+    // TODO: Test
+    fun <R, T> zip(xs: PersistentList<T>, ys: PersistentList<R>): PersistentList<Pair<T, R>> = lazySeq {
+        when {
+            xs.isEmpty() -> nullCons()
+            ys.isEmpty() -> nullCons()
+            else -> PersistentList.cons(xs.car to ys.car, zip(xs.cdr, ys.cdr))
+        }
     }
 }

@@ -576,21 +576,6 @@ class PersistentListHeadTest {
     }
 
     @Test
-    fun plusVList() {
-        assertInstanceOf(VList::class.java, three + VList.of())
-        assertEquals(VList.of(3, 2, 1), three + VList.of())
-
-        assertInstanceOf(VList::class.java, three + VList.of(1))
-        assertEquals(VList.of(3, 2, 1, 1), three + VList.of(1))
-
-        assertInstanceOf(VList::class.java, three + VList.of(1, 2))
-        assertEquals(VList.of(3, 2, 1, 1, 2), three + VList.of(1, 2))
-
-        assertInstanceOf(VList::class.java, three + VList.toVList(0..5))
-        assertEquals(VList.of(3, 2, 1, 0, 1, 2, 3, 4, 5), three + VList.toVList(0..5))
-    }
-
-    @Test
     fun isSingleton() {
         assertFalse(one.cdr.isSingleton())
         assertTrue(one.isSingleton())

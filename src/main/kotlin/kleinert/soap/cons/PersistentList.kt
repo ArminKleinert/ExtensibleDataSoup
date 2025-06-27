@@ -23,6 +23,7 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
 
                 else -> VList.toVList(coll)
             }
+
         fun <T> from(arr: Array<T>): PersistentList<T> = VList.toVList(arr)
 
         fun <T> randomAccess(list: Iterable<T>): PersistentList<T> = PersistentWrapper(list.toList())
@@ -289,11 +290,17 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
     operator fun minus(elements: Iterable<T>): PersistentList<T> =
         minus(elements.toSet())
 
-    fun onEach(action: (T) -> Unit): PersistentList<T> =
-        from(asIterable().onEach(action))
+    fun onEach(action: (T) -> Unit): PersistentList<T> {
+        for (e in this)
+            action(e)
+        return this
+    }
 
-    fun onEachIndexed(action: (index: Int, T) -> Unit): PersistentList<T> =
-        from(asIterable().onEachIndexed(action))
+    fun onEachIndexed(action: (index: Int, T) -> Unit): PersistentList<T> {
+        for ((index, e) in withIndex())
+            action(index, e)
+        return this
+    }
 
     fun requireNoNulls(): PersistentList<T> =
         from(asIterable().requireNoNulls())
@@ -344,7 +351,7 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
     fun withIndex(): PersistentList<IndexedValue<T>> =
         sameTypeFromList(asIterable().withIndex().toList())
 
-    fun <R> zip(other: Iterable<R>): PersistentList<Pair<T, R>> =
+    fun <R> zip(other: PersistentList<R>): PersistentList<Pair<T, R>> =
         sameTypeFromList(asIterable().zip(other.asIterable()))
 
     fun <R, V> zip(other: Iterable<R>, transform: (a: T, b: R) -> V): PersistentList<V> =
