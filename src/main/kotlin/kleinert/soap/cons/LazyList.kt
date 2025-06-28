@@ -79,15 +79,6 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
     override fun <R> zip(other: PersistentList<R>): PersistentList<Pair<T, R>> =
         zip(this, other)
 
-    override operator fun minus(element: T): PersistentList<T> = minus(setOf(element))
-
-    override operator fun minus(elements: Iterable<T>): PersistentList<T> = minus(elements.toSet())
-
-
-    // TODO: Test
-    override operator fun minus(elements: Set<T>): PersistentList<T> =
-        minus(elements, this)
-
     override fun isLazyType(): Boolean = true
 
     override fun toString(): String {
@@ -257,7 +248,6 @@ class LazyList<T>(fn: () -> PersistentList<T>?) : PersistentList<T> {
             )
         }
 
-        // TODO: Test
         fun <T, R : Any> mapNotNull(transform: (T) -> R?, xs: PersistentList<T>): PersistentList<R> = lazySeq {
             if (xs.isEmpty()) nullCons()
             else {

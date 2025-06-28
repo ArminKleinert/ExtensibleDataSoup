@@ -290,6 +290,16 @@ class LazyListTest {
     }
 
     @Test
+    fun mapNotNull() {
+        assertEquals(LazyList.of<Int>(), LazyList.of<Int>().mapNotNull { it })
+        assertEquals(LazyList.of(2), LazyList.of(1, 2, 5).mapNotNull { if (it % 2 == 0) it else null })
+        assertEquals(LazyList.of(1,5), LazyList.of(1, 2, 5).mapNotNull { if (it % 2 != 0) it else null })
+
+        val seq = LazyList.iterate({it+1}, 0).mapNotNull { if (it % 2 != 0) it else null }.take(5)
+        assertEquals(LazyList.of(1,3, 5, 7, 9), seq)
+    }
+
+    @Test
     fun minus() {
         // Minus with xs empty
         assertEquals(LazyList.of<Int>(), LazyList.of<Int>().minus(1))

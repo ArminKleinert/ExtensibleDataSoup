@@ -343,13 +343,13 @@ sealed interface PersistentList<T> : List<T>, Iterable<T> {
         sameTypeFromList(asIterable().mapIndexedNotNull(transform))
 
     fun <R : Any> mapNotNull(transform: (T) -> R?): PersistentList<R> =
-        sameTypeFromList(asIterable().mapNotNull(transform))
+        LazyList.mapNotNull(transform, this)
 
     operator fun minus(element: T): PersistentList<T> =
-        sameTypeFromList(asIterable().minus(element))
+        LazyList.minus(setOf(element), this)
 
     operator fun minus(elements: Set<T>): PersistentList<T> =
-        sameTypeFromList(asIterable().minus(elements.toSet()))
+        LazyList.minus(elements, this)
 
     operator fun minus(elements: Iterable<T>): PersistentList<T> =
         minus(elements.toSet())
