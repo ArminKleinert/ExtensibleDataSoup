@@ -1,4 +1,4 @@
-package kleinert.soap
+package kleinert.soap.data
 
 import java.math.BigDecimal
 import java.math.BigInteger

@@ -2,6 +2,8 @@ package kleinert.soap.cons
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.util.*
+import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -256,6 +258,8 @@ class LazyListTest {
 
     @Test
     fun distinct() {
+        TreeMap<Int, Int>().clone()
+        LinkedHashMap<Int, Int>().clone()
         run {
             val ll = LazyList.of<Int>().distinct()
             assertTrue(ll.isEmpty())

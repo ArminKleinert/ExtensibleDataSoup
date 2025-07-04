@@ -2,6 +2,7 @@ package kleinert.soap
 
 import kleinert.soap.cons.LazyList
 import kleinert.soap.cons.PersistentList
+import kleinert.soap.data.Ratio
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -81,11 +82,11 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
         return temp.toString()
     }
 
-    fun encodeString(obj: String) = StringBuilder().append('"').append(obj).append('"').toString()
+    private fun encodeString(obj: String) = StringBuilder().append('"').append(obj).append('"').toString()
 
-    fun encodeChar(obj: Char) = StringBuilder().append('\\').append(obj).toString()
+    private fun encodeChar(obj: Char) = StringBuilder().append('\\').append(obj).toString()
 
-    fun encodeSequence(obj: Sequence<*>) = obj.joinToString(
+    private fun encodeSequence(obj: Sequence<*>) = obj.joinToString(
         separator = options.decodingSequenceSeparator,
         limit = 10000,
         prefix = "(",
@@ -93,7 +94,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
         transform = {encode(it)},
     )
 
-    fun encodeLazyList(obj: LazyList<*>) = obj.joinToString (
+    private fun encodeLazyList(obj: LazyList<*>) = obj.joinToString (
         separator = options.decodingSequenceSeparator,
         prefix = "(",
         postfix = ")",
@@ -101,35 +102,35 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
         transform = {encode(it)},
     )
 
-    fun encodePersistentList(obj: PersistentList<*>) = obj.joinToString (
+    private fun encodePersistentList(obj: PersistentList<*>) = obj.joinToString (
         separator = options.decodingSequenceSeparator,
         prefix = "(",
         postfix = ")",
         transform = {encode(it)},
     )
 
-    fun encodeOtherIterable(obj: Iterable<*>) = obj.joinToString (
+    private fun encodeOtherIterable(obj: Iterable<*>) = obj.joinToString (
         separator = options.decodingSequenceSeparator,
         prefix = "(",
         postfix = ")",
         transform = {encode(it)},
     )
 
-    fun encodeList(obj: List<*>) = obj.joinToString (
+    private fun encodeList(obj: List<*>) = obj.joinToString (
         separator = options.decodingSequenceSeparator,
         prefix = "[",
         postfix = "]",
         transform = {encode(it)},
     )
 
-    fun encodeSet(obj: Set<*>) = obj.joinToString (
+    private fun encodeSet(obj: Set<*>) = obj.joinToString (
         separator = options.decodingSequenceSeparator,
         prefix = "#{",
         postfix = "}",
         transform = {encode(it)},
     )
 
-    fun encodeMap(obj: Map<*, *>) = obj.map{it}.joinToString (
+    private fun encodeMap(obj: Map<*, *>) = obj.map{it}.joinToString (
         separator = options.decodingSequenceSeparator,
         prefix = "{",
         postfix = "}",

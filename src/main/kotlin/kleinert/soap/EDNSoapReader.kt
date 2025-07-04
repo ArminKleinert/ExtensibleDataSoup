@@ -1,12 +1,17 @@
 package kleinert.soap
 
 import kleinert.soap.cons.PersistentList
+import kleinert.soap.data.Keyword
+import kleinert.soap.data.Ratio
+import kleinert.soap.data.Symbol
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
 import java.util.*
+import kotlin.collections.LinkedHashMap
+import kotlin.jvm.functions.FunctionN
 
 class EDNSoapReader private constructor(private val options: EDNSoapOptions = EDNSoapOptions.extendedOptions) {
     companion object {
@@ -234,59 +239,42 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         if (options.forceImmutableCollections) Collections.unmodifiableList(it) else it
     }
 
-    private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int): Map<*, *> = buildMap {
+    private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Map<*, *> {
+        val result = LinkedHashMap<Any?, Any?>()
+        val lst = parseVector(cpi, level, separator)
+        var i = 0
         do {
-            cpi.skipWhile(::isWhitespace)
-            if (!cpi.hasNext())
-                throw EdnReaderException("Unclosed map. Expected '${Char(separator)}', got EOF.")
-            if (cpi.peek() == separator) {
-                cpi.nextInt()
+            if (i >= lst.size)
                 break
-            }
-
-            val key: Any? = readForm(cpi, level + 1, true)
-            if (key == NOTHING) continue
-
-            if (contains(key))
+            val key = lst[i]
+            if (result.contains(key))
                 throw EdnReaderException("Illegal map. Duplicate key $key.")
-
-            if (cpi.peek() == separator)
+            i++
+            if (i >= lst.size)
                 throw EdnReaderException("Odd number of elements in map. Last key was $key.")
-
-            var value: Any?
-            do {
-                value = readForm(cpi, level + 1, true)
-            } while (value == NOTHING)
-
-            put(key, value)
+            val value = lst[i]
+            result[key] = value
+            i++
         } while (true)
-    }.toMap().let {
-        if (options.forceImmutableCollections) Collections.unmodifiableMap(it) else it
+        if (options.forceImmutableCollections) return Collections.unmodifiableMap(result)
+        return result
     }
 
     private fun parseSet(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Set<*> {
-        val temp = if (options.useFasterSetConstruction) {
-            parseVector(cpi, level, separator)
-        } else {
-            buildSet {
-                do {
-                    cpi.skipWhile(::isWhitespace)
-                    if (!cpi.hasNext())
-                        throw EdnReaderException("Unclosed set. Expected '${Char(separator)}', got EOF.")
-                    if (cpi.peek() == separator) {
-                        cpi.nextInt()
-                        break
-                    }
-
-                    val elem = readForm(cpi, level + 1, true)
-                    if (contains(elem)) throw EdnReaderException("Illegal set. Duplicate element $elem.")
-                    if (elem != NOTHING) add(elem)
-                } while (true)
-            }
-        }
-        return temp.toSet().let {
-            if (options.forceImmutableCollections) Collections.unmodifiableSet(it) else it
-        }
+        val result = LinkedHashSet<Any?>()
+        val lst = parseVector(cpi, level, separator)
+        var i = 0
+        do {
+            if (i >= lst.size)
+                break
+            val key = lst[i]
+            if (result.contains(key))
+                throw EdnReaderException("Illegal set. Duplicate value $key.")
+            result.add(key)
+            i++
+        }while (true)
+        if (options.forceImmutableCollections) return Collections.unmodifiableSet(result)
+        return result
     }
 
     private fun parseChar(cpi: CodePointIterator): Char {

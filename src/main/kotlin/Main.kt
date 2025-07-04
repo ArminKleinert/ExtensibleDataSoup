@@ -1,9 +1,6 @@
 import kleinert.soap.*
-import kleinert.soap.cons.LazyList
-import kleinert.soap.cons.PersistentList
-import kleinert.soap.cons.VList
-import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.jvm.functions.FunctionN
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -229,8 +226,23 @@ fun main(args: Array<String>) {
 //    }
 
     run {
-        val lst =  PersistentList.of(1,2,3,4,5,6,7,8, 9).cycle()
-        val seq = LazyList.windowed(2, lst, step = 1, partialEndWindow = true).take(9)
-        println(seq)
+        val text = "{}"
+        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
+        println(parsed?.javaClass ?: "null")
+        println(parsed)
+    }
+    run {
+        val text = "#{1 2 3 4}"
+        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions.copy(forceImmutableCollections = false))
+        println(parsed?.javaClass ?: "null")
+        println(parsed)
+    }
+    run {
+        fun a() = 1
+        fun b(a: Int) = a
+        fun c(a: Int, b: Int) = b
+
+        val n: Int = 1
+        require(n is Int)
     }
 }

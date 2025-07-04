@@ -1,4 +1,4 @@
-package kleinert.soap
+package kleinert.soap.data
 
 class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
     companion object {
