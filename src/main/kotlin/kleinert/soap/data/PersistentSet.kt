@@ -1,7 +1,6 @@
 package kleinert.soap.data
 
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T> {
     constructor(coll: Collection<T>) : this(if (coll is List<T>) coll.listIterator() else coll.toList().listIterator())
@@ -110,72 +109,89 @@ class PersistentList<T>(private val inner: List<T>) : MutableList<T> {
     override fun contains(element: T): Boolean = inner.contains(element)
 }
 
-class PersistentMatrix(private val inner: List<Number>) : List<Number> {
+class PersistentMatrix : List<List<BigDecimal>> {
+
     override val size: Int
         get() {
-            return inner.size
+            return rows.size
         }
 
-    fun defaultAdd(a: Number, b: Number): Number {
-        return when (a) {
-            is Double -> {
-                when (b) {
-                    is Double -> BigDecimal.valueOf(a) + BigDecimal.valueOf(b)
-                    is BigDecimal -> BigDecimal.valueOf(a) + b
-                    is Ratio -> BigDecimal.valueOf(a) + b.toBigDecimal()
-                    is Long -> a + b
-                    is BigInteger -> BigDecimal.valueOf(a) + BigDecimal(b)
-                    else -> throw IllegalArgumentException()
-                }
-            }
+    private val rows: List<List<BigDecimal>>
 
-            is BigInteger -> {
-                when (b) {
-                    is Double -> BigDecimal(a) + BigDecimal.valueOf(b)
-                    is BigDecimal -> BigDecimal(a) + b
-                    is Ratio -> BigDecimal(a) + b.toBigDecimal()
-                    is Long -> a + BigInteger.valueOf(b)
-                    is BigInteger -> a + b
-                    else -> throw IllegalArgumentException()
-                }
-            }
-
-            is BigDecimal -> {
-                when (b) {
-                    is Double -> a + BigDecimal.valueOf(b)
-                    is BigDecimal -> a + b
-                    is Ratio -> a + b.toBigDecimal()
-                    is Long -> a + BigDecimal.valueOf(b)
-                    is BigInteger -> a + BigDecimal(b)
-                    else -> throw IllegalArgumentException()
-                }
-            }
-
-            is Ratio -> {
-                when (b) {
-                    is Double -> a.toBigDecimal() + BigDecimal.valueOf(b)
-                    is BigDecimal -> a.toBigDecimal() + b
-                    is Ratio -> a + b
-                    is Long -> a + Ratio.of(b)
-                    is BigInteger -> a + Ratio.of(b)
-                    else -> throw IllegalArgumentException()
-                }
-            }
-
-            else -> 2
+    constructor(rows: List<List<BigDecimal>>) {
+        var firstSize: Int = -1
+        for (row in rows) {
+            if (firstSize == -1) firstSize = row.size
+            require(row.size == firstSize)
         }
+        this.rows = rows.map { it.toList() }
     }
 
-    override fun get(index: Int): Number = inner[index]
-    override fun isEmpty(): Boolean = inner.isEmpty()
-    override fun iterator(): MutableIterator<Number> = inner.toMutableList().iterator()
-    override fun listIterator(): MutableListIterator<Number> = inner.toMutableList().listIterator()
-    override fun listIterator(index: Int): MutableListIterator<Number> = inner.toMutableList().listIterator(index)
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<Number> =
-        inner.toMutableList().subList(fromIndex, toIndex)
+    val dim: Pair<Int, Int>
+        get() =
+            if (rows.isEmpty()) 0 to 0
+            else rows.size to rows[0].size
 
-    override fun lastIndexOf(element: Number): Int = inner.lastIndexOf(element)
-    override fun indexOf(element: Number): Int = inner.indexOf(element)
-    override fun containsAll(elements: Collection<Number>): Boolean = inner.containsAll(elements)
-    override fun contains(element: Number): Boolean = inner.contains(element)
+    override fun get(index: Int): List<BigDecimal> = rows[index]
+    override fun isEmpty(): Boolean = rows.isEmpty()
+    override fun iterator(): Iterator<List<BigDecimal>> = rows.toMutableList().iterator()
+    override fun listIterator(): ListIterator<List<BigDecimal>> = rows.toMutableList().listIterator()
+    override fun listIterator(index: Int): ListIterator<List<BigDecimal>> = rows.toMutableList().listIterator(index)
+    override fun subList(fromIndex: Int, toIndex: Int): List<List<BigDecimal>> =
+        rows.toMutableList().subList(fromIndex, toIndex)
+
+    override fun lastIndexOf(element: List<BigDecimal>): Int = rows.lastIndexOf(element)
+    override fun indexOf(element: List<BigDecimal>): Int = rows.indexOf(element)
+    override fun containsAll(elements: Collection<List<BigDecimal>>): Boolean = rows.containsAll(elements)
+    override fun contains(element: List<BigDecimal>): Boolean = rows.contains(element)
 }
+
+//    fun defaultAdd(a: Number, b: Number): Number {
+//        return when (a) {
+//            is Double -> {
+//                when (b) {
+//                    is Double -> BigDecimal.valueOf(a) + BigDecimal.valueOf(b)
+//                    is BigDecimal -> BigDecimal.valueOf(a) + b
+//                    is Ratio -> BigDecimal.valueOf(a) + b.toBigDecimal()
+//                    is Long -> a + b
+//                    is BigInteger -> BigDecimal.valueOf(a) + BigDecimal(b)
+//                    else -> throw IllegalArgumentException()
+//                }
+//            }
+//
+//            is BigInteger -> {
+//                when (b) {
+//                    is Double -> BigDecimal(a) + BigDecimal.valueOf(b)
+//                    is BigDecimal -> BigDecimal(a) + b
+//                    is Ratio -> BigDecimal(a) + b.toBigDecimal()
+//                    is Long -> a + BigInteger.valueOf(b)
+//                    is BigInteger -> a + b
+//                    else -> throw IllegalArgumentException()
+//                }
+//            }
+//
+//            is BigDecimal -> {
+//                when (b) {
+//                    is Double -> a + BigDecimal.valueOf(b)
+//                    is BigDecimal -> a + b
+//                    is Ratio -> a + b.toBigDecimal()
+//                    is Long -> a + BigDecimal.valueOf(b)
+//                    is BigInteger -> a + BigDecimal(b)
+//                    else -> throw IllegalArgumentException()
+//                }
+//            }
+//
+//            is Ratio -> {
+//                when (b) {
+//                    is Double -> a.toBigDecimal() + BigDecimal.valueOf(b)
+//                    is BigDecimal -> a.toBigDecimal() + b
+//                    is Ratio -> a + b
+//                    is Long -> a + Ratio.of(b)
+//                    is BigInteger -> a + Ratio.of(b)
+//                    else -> throw IllegalArgumentException()
+//                }
+//            }
+//
+//            else -> 2
+//        }
+//    }
