@@ -109,6 +109,42 @@ class PersistentList<T>(private val inner: List<T>) : MutableList<T> {
     override fun contains(element: T): Boolean = inner.contains(element)
 }
 
+class PersistentVector<T>(private val inner: List<T>) : MutableList<T> {
+    override val size: Int
+        get() = inner.size
+
+    override fun clear() = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun addAll(elements: Collection<T>): Boolean =
+        throw UnsupportedOperationException("Not possible on persistent map.")
+
+    override fun addAll(index: Int, elements: Collection<T>): Boolean =
+        throw UnsupportedOperationException("Not possible on persistent map.")
+
+    override fun add(index: Int, element: T) = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun add(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun get(index: Int): T = inner[index]
+    override fun isEmpty(): Boolean = inner.isEmpty()
+    override fun iterator(): MutableIterator<T> = inner.toMutableList().iterator()
+    override fun listIterator(): MutableListIterator<T> = inner.toMutableList().listIterator()
+    override fun listIterator(index: Int): MutableListIterator<T> = inner.toMutableList().listIterator(index)
+    override fun removeAt(index: Int): T = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
+        inner.toMutableList().subList(fromIndex, toIndex)
+
+    override fun set(index: Int, element: T): T = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun retainAll(elements: Collection<T>): Boolean =
+        throw UnsupportedOperationException("Not possible on persistent map.")
+
+    override fun removeAll(elements: Collection<T>): Boolean =
+        throw UnsupportedOperationException("Not possible on persistent map.")
+
+    override fun remove(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun lastIndexOf(element: T): Int = inner.lastIndexOf(element)
+    override fun indexOf(element: T): Int = inner.indexOf(element)
+    override fun containsAll(elements: Collection<T>): Boolean = inner.containsAll(elements)
+    override fun contains(element: T): Boolean = inner.contains(element)
+}
+
 class PersistentMatrix : List<List<BigDecimal>> {
 
     override val size: Int

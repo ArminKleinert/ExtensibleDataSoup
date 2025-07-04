@@ -233,16 +233,15 @@ fun main(args: Array<String>) {
     }
     run {
         val text = "#{1 2 3 4}"
-        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions.copy(forceImmutableCollections = false))
+        val parsed =
+            EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions.copy(forceImmutableCollections = false))
         println(parsed?.javaClass ?: "null")
         println(parsed)
     }
     run {
-        fun a() = 1
-        fun b(a: Int) = a
-        fun c(a: Int, b: Int) = b
-
-        val n: Int = 1
-        require(n is Int)
+        val text = "+2"
+        val parsed = EDNSoapReader.readString(text)
+        println(parsed?.javaClass ?: "null")
+        println(parsed)
     }
 }

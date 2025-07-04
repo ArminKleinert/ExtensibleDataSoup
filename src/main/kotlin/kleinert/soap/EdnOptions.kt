@@ -1,6 +1,7 @@
 package kleinert.soap
 
-import kleinert.soap.cons.VList
+import kleinert.soap.data.PersistentList
+import kleinert.soap.data.PersistentVector
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -176,9 +177,10 @@ data class EDNSoapOptions(
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
-    val emptySequenceToUse: List<*> = VList.of<Any?>(),
     val useFasterSetConstruction: Boolean = false,
     val forceImmutableCollections: Boolean = true,
+    val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList(it) },
+    val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector(it) },
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions
@@ -192,7 +194,6 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = false,
                 allowMoreEncoderDecoderNames = false,
                 decodingSequenceSeparator = ", ",
-                emptySequenceToUse = VList.of<Any?>(),
                 forceImmutableCollections = true,
                 useFasterSetConstruction = false,
                 ednClassDecoders = mapOf(),
@@ -207,7 +208,6 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
-                emptySequenceToUse = VList.of<Any?>(),
                 forceImmutableCollections = true,
                 useFasterSetConstruction = true,
                 ednClassDecoders = ednClassDecoder,
@@ -222,7 +222,6 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
-                emptySequenceToUse = VList.of<Any?>(),
                 forceImmutableCollections = true,
                 useFasterSetConstruction = false,
                 ednClassDecoders = mapOf(),
