@@ -30,21 +30,15 @@ class EDNReaderSetsMapsTest {
     fun parseBasicList() {
         soap("{a b c d}").let {
             Assertions.assertInstanceOf(Map::class.java, it)
-            println("${mapOf(1 to 2, 3 to 4)} ${mapOf(1 to 2, 3 to 4).javaClass} ${(it as Map<*, *>)} ${(it as Map<*, *>).javaClass}")
-            println("${mapOf(1 to 2, 3 to 4) == mapOf(1 to 2, 3 to 4)}")
             Assertions.assertEquals(it,
                 mapOf(Symbol.symbol("a") to Symbol.symbol("b"), Symbol.symbol("c") to Symbol.symbol("d")))
         }
         soap("{1 2 3 4}").let {
-            Assertions.assertInstanceOf(Map::class.java, it)
-            println("${mapOf(1 to 2, 3 to 4)} ${mapOf(1 to 2, 3 to 4).javaClass} ${(it as Map<*, *>)} ${(it as Map<*, *>).javaClass}")
-            println("${mapOf(1 to 2, 3 to 4) == mapOf(1 to 2, 3 to 4)}")
-            Assertions.assertEquals(it, mapOf(1 to 2, 3 to 4))
-            Assertions.assertEquals(mapOf(1 to 2, 3 to 4), it)
+            Assertions.assertEquals(mapOf(1L to 2L, 3L to 4L), it)
         }
         soap("#{1 2 3 4}").let {
             Assertions.assertInstanceOf(Set::class.java, it)
-            Assertions.assertEquals(setOf(1, 2, 3, 4), (it as Set<*>))
+            Assertions.assertEquals(setOf(1L, 2L, 3L, 4L), (it as Set<*>))
         }
     }
 

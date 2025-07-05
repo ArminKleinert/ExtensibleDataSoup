@@ -59,19 +59,19 @@ class EDNReaderListsVectorsTest {
     fun parseBasicList() {
         soap("(1)").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(1), (it as List<*>))
+            Assertions.assertEquals(listOf(1L), (it as List<*>))
         }
         soap("[1]").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(1), (it as List<*>))
+            Assertions.assertEquals(listOf(1L), (it as List<*>))
         }
         soap("(1 2 3)").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(1, 2, 3), (it as List<*>))
+            Assertions.assertEquals(listOf(1L, 2L, 3L), (it as List<*>))
         }
         soap("[1 2 3]").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(1, 2, 3), (it as List<*>))
+            Assertions.assertEquals(listOf(1L, 2L, 3L), (it as List<*>))
         }
     }
 
@@ -79,27 +79,27 @@ class EDNReaderListsVectorsTest {
     fun parseNestedList() {
         soap("((1))").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(listOf(1)), (it as List<*>))
+            Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         soap("([1])").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(listOf(1)), (it as List<*>))
+            Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         soap("[(1)]").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(listOf(1)), (it as List<*>))
+            Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         soap("[(1)]").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(listOf(1)), (it as List<*>))
+            Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         soap("(1 (2 3))").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(1, listOf(2, 3)), (it as List<*>))
+            Assertions.assertEquals(listOf(1L, listOf(2L, 3L)), (it as List<*>))
         }
         soap("[1 (2 3)]").let {
             Assertions.assertInstanceOf(List::class.java, it)
-            Assertions.assertEquals(listOf(1, listOf(2, 3)), (it as List<*>))
+            Assertions.assertEquals(listOf(1L, listOf(2L, 3L)), (it as List<*>))
         }
     }
 
