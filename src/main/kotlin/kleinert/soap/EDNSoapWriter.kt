@@ -1,7 +1,6 @@
 package kleinert.soap
 
-import kleinert.soap.cons.LazyList
-import kleinert.soap.cons.PersistentList
+import kleinert.soap.data.PersistentList
 import kleinert.soap.data.Ratio
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -44,7 +43,6 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
             is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> encodePredefinedNumberType(obj as Number)
             is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
             is Map.Entry<*, *> -> "${encode(obj.key)} ${encode(obj.value)}"
-            is LazyList<*> -> tryEncoder(obj) ?: encodeLazyList(obj)
             is PersistentList<*> -> tryEncoder(obj) ?: encodePersistentList(obj)
             is ByteArray -> tryEncoder(obj) ?: encode(obj.toList())
             is ShortArray -> tryEncoder(obj) ?: encode(obj.toList())
@@ -91,14 +89,6 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
         limit = 10000,
         prefix = "(",
         postfix = ")",
-        transform = {encode(it)},
-    )
-
-    private fun encodeLazyList(obj: LazyList<*>) = obj.joinToString (
-        separator = options.decodingSequenceSeparator,
-        prefix = "(",
-        postfix = ")",
-        limit = 10000,
         transform = {encode(it)},
     )
 

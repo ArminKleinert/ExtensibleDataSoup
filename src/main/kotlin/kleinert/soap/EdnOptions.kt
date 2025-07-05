@@ -1,11 +1,14 @@
 package kleinert.soap
 
+import kleinert.soap.ExtendedEDNDecoders.arrayDecoders
+import kleinert.soap.ExtendedEDNDecoders.listDecoders
+import kleinert.soap.ExtendedEDNDecoders.prettyDecoders
+import kleinert.soap.data.PackedList
 import kleinert.soap.data.PersistentList
 import kleinert.soap.data.PersistentVector
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
-import kotlin.jvm.functions.FunctionN
 
 object ExtendedEDNDecoders {
     private fun ensureAllIntegral(iterable: Iterable<*>): Boolean {
@@ -84,37 +87,37 @@ object ExtendedEDNDecoders {
         }
     }
 
-    private fun vectorToByteArray(it: Any?): ByteArray = vectorToIntegralArray(it, 0) as ByteArray
-    private fun vectorToShortArray(it: Any?): ShortArray = vectorToIntegralArray(it, 1) as ShortArray
-    private fun vectorToIntArray(it: Any?): IntArray = vectorToIntegralArray(it, 2) as IntArray
-    private fun vectorToLongArray(it: Any?): LongArray = vectorToIntegralArray(it, 3) as LongArray
-    private fun vectorToBigIntArray(it: Any?): Array<BigInteger> {
+    private fun listToByteArray(it: Any?): ByteArray = vectorToIntegralArray(it, 0) as ByteArray
+    private fun listToShortArray(it: Any?): ShortArray = vectorToIntegralArray(it, 1) as ShortArray
+    private fun listToIntArray(it: Any?): IntArray = vectorToIntegralArray(it, 2) as IntArray
+    private fun listToLongArray(it: Any?): LongArray = vectorToIntegralArray(it, 3) as LongArray
+    private fun listToBigIntArray(it: Any?): Array<BigInteger> {
         val temp = vectorToIntegralArray(it, 4)
         require(temp is Array<*> && temp.isArrayOf<BigInteger>())
         return temp as Array<BigInteger>
     }
 
-    private fun vectorToFloatArray(it: Any?): FloatArray = vectorToFloatyArray(it, 0) as FloatArray
-    private fun vectorToDoubleArray(it: Any?): DoubleArray = vectorToFloatyArray(it, 1) as DoubleArray
-    private fun vectorToBigDecimalArray(it: Any?): Array<BigDecimal> {
+    private fun listToFloatArray(it: Any?): FloatArray = vectorToFloatyArray(it, 0) as FloatArray
+    private fun listToDoubleArray(it: Any?): DoubleArray = vectorToFloatyArray(it, 1) as DoubleArray
+    private fun listToBigDecimalArray(it: Any?): Array<BigDecimal> {
         val temp = vectorToFloatyArray(it, 2)
         require(temp is Array<*> && temp.isArrayOf<BigDecimal>())
         return temp as Array<BigDecimal>
     }
 
-    private fun vectorToStringArray(it: Any?): Array<String> {
+    private fun listToStringArray(it: Any?): Array<String> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
         return it.map { it.toString() }.toTypedArray()
     }
 
-    private  fun vectorToArray(it: Any?): Array<Any?> {
+    private  fun listToArray(it: Any?): Array<Any?> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
         return it.toTypedArray()
     }
 
-    private fun vectorTo2dArray(it: Any?): Array<Array<Any?>> {
+    private fun listTo2dArray(it: Any?): Array<Array<Any?>> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
         val arrays = it.map {
@@ -124,16 +127,13 @@ object ExtendedEDNDecoders {
         return arrays.toTypedArray()
     }
 
-    private fun listToMatrix(it: Any?): List<List<Any?>> {
+    private fun packed2dList(it: Any?): PackedList<Any?> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
-        var size = -1
         for (e in it) {
             require(e is List<*>)
-            if (size == -1) size = it.size
-            require(e.size == size)
         }
-        return it as List<List<Any?>>
+        return PackedList(it as List<List<Any?>>)
     }
 
     private fun setToBitSet(it: Any?): Any {
@@ -147,19 +147,23 @@ object ExtendedEDNDecoders {
 
     val arrayDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
-            "bytearray" to ::vectorToByteArray,
-            "shortarray" to ::vectorToShortArray,
-            "intarray" to ::vectorToIntArray,
-            "longarray" to ::vectorToLongArray,
-            "floatarray" to ::vectorToFloatArray,
-            "doublearray" to ::vectorToDoubleArray,
-            "bigintarray" to ::vectorToBigIntArray,
-            "bigdecimalarray" to ::vectorToBigDecimalArray,
-            "stringarray" to ::vectorToStringArray,
-            "array" to ::vectorToArray,
+            "bytearray" to ::listToByteArray,
+            "shortarray" to ::listToShortArray,
+            "intarray" to ::listToIntArray,
+            "longarray" to ::listToLongArray,
+            "floatarray" to ::listToFloatArray,
+            "doublearray" to ::listToDoubleArray,
+            "bigintarray" to ::listToBigIntArray,
+            "bigdecimalarray" to ::listToBigDecimalArray,
+            "stringarray" to ::listToStringArray,
+            "array" to ::listToArray,
+            "array2d" to ::listTo2dArray,
+        )
+
+    val listDecoders: Map<String, (Any?) -> Any?>
+        get() = mapOf(
             "bitset" to ::setToBitSet,
-            "array2d" to ::vectorTo2dArray,
-            "matrix" to ::listToMatrix,
+            "packed2D" to ::packed2dList,
         )
 
     val prettyDecoders: Map<String, (Any?) -> Any?>
@@ -185,6 +189,8 @@ data class EDNSoapOptions(
     companion object {
         val extendedOptions: EDNSoapOptions
             get() = extendedReaderOptions(mapOf())
+
+        val allDecoders = arrayDecoders + listDecoders + prettyDecoders
 
         val defaultOptions: EDNSoapOptions
             get() = EDNSoapOptions(

@@ -1,6 +1,5 @@
 package kleinert.soap
 
-import kleinert.soap.cons.PersistentList
 import kleinert.soap.data.Keyword
 import kleinert.soap.data.Ratio
 import kleinert.soap.data.Symbol
@@ -213,10 +212,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseList(cpi: CodePointIterator, level: Int): List<Any?> {
         val temp = parseVector(cpi, level, ')'.code)
-        return if (options.emptySequenceToUse is PersistentList<*>)
-            options.emptySequenceToUse.sameTypeFromList(temp)
-        else
-            options.emptySequenceToUse + temp
+        return options.listToPersistentListConverter(temp)
     }
 
     private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {
@@ -236,7 +232,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             if (elem != NOTHING) add(elem)
         } while (true)
     }.toList().let {
-        if (options.forceImmutableCollections) Collections.unmodifiableList(it) else it
+        options.listToPersistentVectorConverter(it)
     }
 
     private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Map<*, *> {

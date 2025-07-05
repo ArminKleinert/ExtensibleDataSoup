@@ -1,4 +1,5 @@
 import kleinert.soap.*
+import kleinert.soap.data.PackedList
 import java.math.BigInteger
 import kotlin.jvm.functions.FunctionN
 
@@ -224,23 +225,17 @@ fun main(args: Array<String>) {
 //        val seq = LazyList.distinct(LazyList.of(1,2,3,3,2,1,4))
 //        println(LazyList.distinct(seq))
 //    }
-
     run {
-        val text = "{}"
-        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
-        println(parsed?.javaClass ?: "null")
-        println(parsed)
+        val lst = PackedList(3, 2, listOf(1,2,3,4,5,6))
+        println(lst.unpack())
+        println(lst.unpack().indexOf(listOf(3,4)))
+        println(lst.indexOf(listOf(3,4)))
+        println(lst[1])
+        println(lst[1, 1])
     }
     run {
-        val text = "#{1 2 3 4}"
-        val parsed =
-            EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions.copy(forceImmutableCollections = false))
-        println(parsed?.javaClass ?: "null")
-        println(parsed)
-    }
-    run {
-        val text = "+2"
-        val parsed = EDNSoapReader.readString(text)
+        val text = "#array2d [[1 2] [3 4] [5 6]]"
+        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedReaderOptions(EDNSoapOptions.allDecoders))
         println(parsed?.javaClass ?: "null")
         println(parsed)
     }
