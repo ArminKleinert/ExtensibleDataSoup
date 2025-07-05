@@ -1,5 +1,6 @@
 import kleinert.soap.*
 import kleinert.soap.data.PackedList
+import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.jvm.functions.FunctionN
 
@@ -240,9 +241,6 @@ fun main(args: Array<String>) {
         println(parsed)
     }
     run{
-        val text = ("0xFF")
-        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
-        println(parsed?.javaClass ?: "null")
-        println(parsed)
+        println("5E-1".toDouble())
     }
 }

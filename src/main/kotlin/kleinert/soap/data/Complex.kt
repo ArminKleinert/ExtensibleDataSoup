@@ -3,15 +3,16 @@ package kleinert.soap.data
 import java.math.BigDecimal
 import java.math.BigInteger
 
-data class Complex(val real: Double, val imag: Double = 0.0) : Number() {
+data class Complex private constructor(val real: Double, val imag: Double = 0.0) : Number() {
 
     companion object {
         val I: Complex = Complex(0.0, 1.0)
         val ONE: Complex = Complex(1.0, 0.0)
         val ZERO: Complex = Complex(0.0, 0.0)
 
-        fun valueOf(v: Long) = Complex(v.toDouble(), 0.0)
         fun valueOf(v: Double) = Complex(v, 0.0)
+        fun valueOf(real: Double, imag: Double = 0.0) = Complex(real, imag)
+        fun valueOf(real: Long, imag: Long = 0) = Complex(real.toDouble(), imag.toDouble())
 
         fun valueOf(v: String): Complex =
             valueOfOrNull(v) ?: throw NumberFormatException("Illegal format for complex number $v.")
@@ -123,7 +124,7 @@ data class Complex(val real: Double, val imag: Double = 0.0) : Number() {
     override fun toString(): String {
         val sb = StringBuilder()
         sb.append(real)
-        if (imag < 0.0) sb.append('-')
+        if (imag >= 0.0) sb.append('+')
         sb.append(imag)
         sb.append('i')
         return sb.toString()

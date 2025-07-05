@@ -111,7 +111,7 @@ object ExtendedEDNDecoders {
         return it.map { it.toString() }.toTypedArray()
     }
 
-    private  fun listToArray(it: Any?): Array<Any?> {
+    private fun listToArray(it: Any?): Array<Any?> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
         return it.toTypedArray()
@@ -168,7 +168,7 @@ object ExtendedEDNDecoders {
 
     val prettyDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
-            "pretty" to {EDNSoapWriter.pprintS(it)},
+            "pretty" to { EDNSoapWriter.pprintS(it) },
         )
 }
 
@@ -185,6 +185,7 @@ data class EDNSoapOptions(
     val forceImmutableCollections: Boolean = true,
     val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList(it) },
     val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector(it) },
+    val allowComplexNumberLiterals: Boolean = false,
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions
@@ -193,18 +194,7 @@ data class EDNSoapOptions(
         val allDecoders = arrayDecoders + listDecoders + prettyDecoders
 
         val defaultOptions: EDNSoapOptions
-            get() = EDNSoapOptions(
-                allowSchemeUTF32Codes = false,
-                allowDispatchChars = false,
-                allowTimeDispatch = false,
-                allowNumericSuffixes = false,
-                allowMoreEncoderDecoderNames = false,
-                decodingSequenceSeparator = ", ",
-                forceImmutableCollections = true,
-                useFasterSetConstruction = false,
-                ednClassDecoders = mapOf(),
-                ednClassEncoders = mapOf(),
-            )
+            get() = EDNSoapOptions()
 
         fun extendedReaderOptions(ednClassDecoder: Map<String, (Any?) -> Any?>) =
             EDNSoapOptions(
@@ -216,6 +206,7 @@ data class EDNSoapOptions(
                 decodingSequenceSeparator = ", ",
                 forceImmutableCollections = true,
                 useFasterSetConstruction = true,
+                allowComplexNumberLiterals = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf(),
             )
@@ -230,6 +221,7 @@ data class EDNSoapOptions(
                 decodingSequenceSeparator = ", ",
                 forceImmutableCollections = true,
                 useFasterSetConstruction = false,
+                allowComplexNumberLiterals = true,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = ednClassEncoders,
             )
