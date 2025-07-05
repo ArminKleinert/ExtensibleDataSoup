@@ -1,7 +1,5 @@
 package kleinert.soap.data
 
-import java.math.BigDecimal
-
 class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T> {
     constructor(coll: Collection<T>) : this(if (coll is List<T>) coll.listIterator() else coll.toList().listIterator())
 
@@ -69,15 +67,9 @@ class PersistentMap<K, V>(
         }
 
         override fun equals(other: Any?): Boolean {
-            if (this === other) return true
+            if (other === this) return true
             if (other !is Map.Entry<*, *>) return false
-
-            other as Map.Entry<*, *>
-
-            if (key != other.key) return false
-            if (value != other.value) return false
-
-            return true
+            return key == other.key && value == other.value
         }
 
         override fun hashCode(): Int {
@@ -107,7 +99,18 @@ class PersistentMap<K, V>(
     override fun put(key: K, value: V): V? = throw UnsupportedOperationException("Not possible on persistent map.")
 
     override fun equals(other: Any?): Boolean {
-        return inner == other
+        if (this === other) return true
+        if (other !is Map<*, *>) return false
+
+        other as Map<*, *>
+
+        if (size != other.size) return false
+
+        for ((k,v) in entries)
+            if (other[k] != v)
+                return false
+
+        return true
     }
 
     override fun hashCode(): Int {
