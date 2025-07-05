@@ -31,7 +31,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     private fun ensureValidDecoderNames() {
         if (!options.allowMoreEncoderDecoderNames) {
             for (key in options.ednClassDecoders.keys) {
-                val name = Symbol.symbol(key)
+                val name = Symbol.parse(key)
                 if (name?.prefix == null) throw EdnReaderException("Invalid decoder name: \"$key\" (parsed as $name)")
             }
         }
@@ -402,7 +402,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
         if (token.length > 1)
             when (token[0]) {
-                ':' -> return Keyword.keyword(token)
+                ':' -> return Keyword.parse(token, options.allowUTFSymbols)
                     ?: throw EdnReaderException("Token starts with colon, but is not a valid keyword: $token")
             }
 
@@ -412,7 +412,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             "nil" -> null
             "true" -> true
             "false" -> false
-            else -> Symbol.symbol(token)
+            else -> Symbol.parse(token, options.allowUTFSymbols)
                 ?: throw EdnReaderException("Invalid symbol: $token")
         }
     }

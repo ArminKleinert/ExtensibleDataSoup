@@ -186,6 +186,7 @@ data class EDNSoapOptions(
     val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList(it) },
     val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector(it) },
     val allowComplexNumberLiterals: Boolean = false,
+    val allowUTFSymbols: Boolean = false,
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions
@@ -207,6 +208,7 @@ data class EDNSoapOptions(
                 forceImmutableCollections = true,
                 useFasterSetConstruction = true,
                 allowComplexNumberLiterals = true,
+                allowUTFSymbols = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = mapOf(),
             )
@@ -222,6 +224,7 @@ data class EDNSoapOptions(
                 forceImmutableCollections = true,
                 useFasterSetConstruction = false,
                 allowComplexNumberLiterals = true,
+                allowUTFSymbols = true,
                 ednClassDecoders = mapOf(),
                 ednClassEncoders = ednClassEncoders,
             )

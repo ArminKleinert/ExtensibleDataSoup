@@ -1,5 +1,6 @@
 import kleinert.soap.*
 import kleinert.soap.data.Complex
+import kleinert.soap.data.Keyword
 import kleinert.soap.data.PackedList
 import java.math.BigDecimal
 import java.math.BigInteger
