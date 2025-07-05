@@ -145,43 +145,6 @@ class PersistentVector<T>(private val inner: List<T>) : MutableList<T> {
     override fun contains(element: T): Boolean = inner.contains(element)
 }
 
-class PersistentMatrix : List<List<BigDecimal>> {
-
-    override val size: Int
-        get() {
-            return rows.size
-        }
-
-    private val rows: List<List<BigDecimal>>
-
-    constructor(rows: List<List<BigDecimal>>) {
-        var firstSize: Int = -1
-        for (row in rows) {
-            if (firstSize == -1) firstSize = row.size
-            require(row.size == firstSize)
-        }
-        this.rows = rows.map { it.toList() }
-    }
-
-    val dim: Pair<Int, Int>
-        get() =
-            if (rows.isEmpty()) 0 to 0
-            else rows.size to rows[0].size
-
-    override fun get(index: Int): List<BigDecimal> = rows[index]
-    override fun isEmpty(): Boolean = rows.isEmpty()
-    override fun iterator(): Iterator<List<BigDecimal>> = rows.toMutableList().iterator()
-    override fun listIterator(): ListIterator<List<BigDecimal>> = rows.toMutableList().listIterator()
-    override fun listIterator(index: Int): ListIterator<List<BigDecimal>> = rows.toMutableList().listIterator(index)
-    override fun subList(fromIndex: Int, toIndex: Int): List<List<BigDecimal>> =
-        rows.toMutableList().subList(fromIndex, toIndex)
-
-    override fun lastIndexOf(element: List<BigDecimal>): Int = rows.lastIndexOf(element)
-    override fun indexOf(element: List<BigDecimal>): Int = rows.indexOf(element)
-    override fun containsAll(elements: Collection<List<BigDecimal>>): Boolean = rows.containsAll(elements)
-    override fun contains(element: List<BigDecimal>): Boolean = rows.contains(element)
-}
-
 //    fun defaultAdd(a: Number, b: Number): Number {
 //        return when (a) {
 //            is Double -> {
