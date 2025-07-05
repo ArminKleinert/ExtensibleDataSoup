@@ -1,7 +1,7 @@
 package kleinert.soap
 
 import kleinert.soap.data.Symbol
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class EDNReaderSymbolTest {
@@ -20,21 +20,21 @@ class EDNReaderSymbolTest {
             val text = "ab"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
         run {
             val text = "a1"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
     }
 
@@ -44,11 +44,11 @@ class EDNReaderSymbolTest {
             val text = "a/b"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
     }
 
@@ -58,41 +58,41 @@ class EDNReaderSymbolTest {
             val text = "+"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
         run {
             val text = "+-"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
         run {
             val text = "->"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
         run {
             val text = "==="
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
     }
 
@@ -102,21 +102,21 @@ class EDNReaderSymbolTest {
             val text = "a+"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
         run {
             val text = "-a"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
     }
 
@@ -126,26 +126,26 @@ class EDNReaderSymbolTest {
             val text = "λ"
             val it = soap(text)
             val symbol = Symbol.parse(text)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             val text = "🎁"
             val it = soapE(text)
             val symbol = Symbol.parse(text, true)!!
-            assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
-            assertEquals(symbol, it)
-            assertEquals(symbol.prefix, it.prefix)
-            assertEquals(symbol.name, it.name)
+            Assertions.assertEquals(symbol, it)
+            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.name, it.name)
         }
     }
 
     @Test
     fun parseInvalidSymbolTest() {
-        assertThrows(EdnReaderException::class.java) { soap("\uD83C\uDF81") } // UTF-8 only valid with extension.
+        Assertions.assertThrows(EdnReaderException::class.java) { soap("\uD83C\uDF81") } // UTF-8 only valid with extension.
     }
 }

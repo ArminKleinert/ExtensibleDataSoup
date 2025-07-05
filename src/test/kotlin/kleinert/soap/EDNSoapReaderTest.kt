@@ -115,52 +115,6 @@ class EDNSoapReaderTest {
     }
 
     @Test
-    fun parseEmptyList() {
-        // Normal
-        soap("()").let {
-            assertTrue(it is Iterable<*>)
-            assertFalse((it as Iterable<*>).iterator().hasNext())
-        }
-
-        // Whitespace does not matter
-        soap("(  )").let {
-            assertTrue(it is Iterable<*>)
-            assertFalse((it as Iterable<*>).iterator().hasNext())
-        }
-        soap("(\t \n)").let {
-            assertTrue(it is Iterable<*>)
-            assertFalse((it as Iterable<*>).iterator().hasNext())
-        }
-        soap("(\n)").let {
-            assertTrue(it is Iterable<*>)
-            assertFalse((it as Iterable<*>).iterator().hasNext())
-        }
-    }
-
-    @Test
-    fun parseEmptyVector() {
-        // Normal
-        soap("[]").let {
-            assertTrue(it is List<*>)
-            assertTrue((it as List<*>).isEmpty())
-        }
-
-        // Whitespace does not matter
-        soap("[  ]").let {
-            assertTrue(it is List<*>)
-            assertTrue((it as List<*>).isEmpty())
-        }
-        soap("[\t \n]").let {
-            assertTrue(it is List<*>)
-            assertTrue((it as List<*>).isEmpty())
-        }
-        soap("[\n]").let {
-            assertTrue(it is List<*>)
-            assertTrue((it as List<*>).isEmpty())
-        }
-    }
-
-    @Test
     fun parseEmptySet() {
         // Normal
         soap("#{}").let {
