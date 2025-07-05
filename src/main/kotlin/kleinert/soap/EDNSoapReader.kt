@@ -1,8 +1,6 @@
 package kleinert.soap
 
-import kleinert.soap.data.Keyword
-import kleinert.soap.data.Ratio
-import kleinert.soap.data.Symbol
+import kleinert.soap.data.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -252,8 +250,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             result[key] = value
             i++
         } while (true)
-        if (options.forceImmutableCollections) return Collections.unmodifiableMap(result)
-        return result
+        return PersistentMap(result)
     }
 
     private fun parseSet(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Set<*> {
@@ -269,8 +266,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             result.add(key)
             i++
         }while (true)
-        if (options.forceImmutableCollections) return Collections.unmodifiableSet(result)
-        return result
+        return PersistentSet(result)
     }
 
     private fun parseChar(cpi: CodePointIterator): Char {
