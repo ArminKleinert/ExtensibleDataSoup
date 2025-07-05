@@ -60,26 +60,9 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         return data.first()
     }
 
-    private fun parseNumber(cpi: CodePointIterator, negate: Boolean = false): Number {
-        fun negateIfNegative(number: BigDecimal) = if (negate) number.negate() else number
-        fun negateIfNegative(number: BigInteger) = if (negate) number.negate() else number
-        fun negateIfNegative(number: Long) = if (negate) -number else number
-        fun negateIfNegative(number: Double) = if (negate) -number else number
-        fun negateIfNegative(number: Ratio) = if (negate) number.negate() else number
-        fun negateIfNegative(number: Complex) = if (negate) number.negate() else number
+    private fun parseNumber(cpi: CodePointIterator): Number {
         try {
-            return when (val n = parseNumberHelper(cpi, negate)) {
-                is BigDecimal -> negateIfNegative(n)
-                is BigInteger -> negateIfNegative(n)
-                is Byte -> negateIfNegative(n.toLong()).toByte()
-                is Short -> negateIfNegative(n.toLong()).toShort()
-                is Int -> negateIfNegative(n.toLong()).toInt()
-                is Long -> negateIfNegative(n)
-                is Double -> negateIfNegative(n)
-                is Ratio -> negateIfNegative(n)
-                is Complex -> negateIfNegative(n)
-                else -> throw EdnReaderException("Could not negate number $n of type ${n.javaClass.name}")
-            }
+            return parseNumberHelper(cpi)
         } catch (ex: NumberFormatException) {
             // For UUID.fromString
             throw EdnReaderException(ex.toString(), ex)
@@ -87,24 +70,40 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseNumberHelper(cpi: CodePointIterator, negate: Boolean = false): Number {
+        fun negateIfNegative(number: BigDecimal) = if (negate) number.negate() else number
+        fun negateIfNegative(number: BigInteger) = if (negate) number.negate() else number
+        fun negateIfNegative(number: Long) = if (negate) -number else number
+        fun negateIfNegative(number: Double) = if (negate) -number else number
+        fun negateIfNegative(number: Ratio) = if (negate) number.negate() else number
+        fun negateIfNegative(number: Complex) = if (negate) number.negate() else number
+
         val token = readToken(cpi, ::isNotBreakingSymbol)
 
-        val floatyRegex = Regex("[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?")
-        val intRegex = Regex("(0[obx])?[0-9a-fA-F]+N?")
-        val ratioRegex = Regex("[0-9]+/[0-9]+?")
+        val floatyRegex = Regex("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?")
+        val intRegex = Regex("[+\\-]?(0[obx])?[0-9a-fA-F]+N?")
+        val ratioRegex = Regex("[+\\-]?[0-9]+/[0-9]+?")
 
-        val expandedIntRegex = Regex("(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64)?")
-        val complexRegex = Regex("([0-9]*\\.?[0-9]+[+\\-]?)?([0-9]*\\.?[0-9]+)?i")
+        val expandedIntRegex = Regex("[+\\-]?(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64)?")
+        val complexRegex = Regex("[+\\-]?([0-9]*\\.?[0-9]+[+\\-]?)?([0-9]*\\.?[0-9]+)?i")
 
         val tokenLen = token.length
         var base = 10
         var startIndex = 0
+        var sign: Long = 1
 
         if ((options.allowNumericSuffixes && expandedIntRegex.matches(token)) || intRegex.matches(token)) {
-            val first = token[0]
-            if (first == '0' && token.length > 1) {
+            if (token[0] == '+') {
+                startIndex++
+                sign = 1
+            } else if (token[0] == '-') {
+                startIndex++
+                sign = -1
+            }
+
+            val first = token[startIndex]
+            if (first == '0' && token.length-startIndex > 1) {
                 startIndex += 2
-                base = when (token[1]) {
+                base = when (token[startIndex - 1]) {
                     'x' -> 16
                     'o' -> 8
                     'b' -> 2
@@ -117,25 +116,29 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         } else if (floatyRegex.matches(token)) {
             startIndex = 0
             if (token.endsWith('M')) return token.substring(startIndex, tokenLen - 1).toBigDecimal()
-            return token.toDouble()
+            return sign * (token.toDouble())
         } else if (ratioRegex.matches(token)) {
-            return Ratio.valueOfOrNull(token) ?: throw EdnReaderException("Invalid number format: $token")
-        } else if (complexRegex.matches(token)) {
-            return Complex.valueOfOrNull(token) ?: throw EdnReaderException("Invalid number format: $token")
+            return Ratio.valueOf(token)
+        } else if (options.allowComplexNumberLiterals && complexRegex.matches(token)) {
+            return Complex.valueOf(token)
         } else {
             throw EdnReaderException("Invalid number format: $token")
         }
 
         return when {
-            token.endsWith('M') -> token.substring(startIndex, tokenLen - 1).toBigDecimal()
-            token.endsWith("N") -> token.substring(startIndex, tokenLen - 1).toBigInteger(base)
-            !options.allowNumericSuffixes -> token.substring(startIndex, tokenLen - 0).toLong(base)
-            token.endsWith("_i8") -> token.substring(startIndex, tokenLen - 3).toByte(base)
-            token.endsWith("_i16") -> token.substring(startIndex, tokenLen - 4).toShort(base)
-            token.endsWith("_i32") -> token.substring(startIndex, tokenLen - 4).toInt(base)
-            token.endsWith("_i64") -> token.substring(startIndex, tokenLen - 4).toLong(base)
-            token.endsWith("L") -> token.substring(startIndex, tokenLen - 1).toLong(base)
-            else -> token.substring(startIndex, tokenLen - 0).toLong(base)
+            token.endsWith('M') -> sign.toBigDecimal()
+                .multiply(token.substring(startIndex, tokenLen - 1).toBigDecimal())
+
+            token.endsWith("N") -> sign.toBigInteger()
+                .multiply(token.substring(startIndex, tokenLen - 1).toBigInteger(base))
+
+            !options.allowNumericSuffixes -> sign * (token.substring(startIndex, tokenLen - 0).toLong(base))
+            token.endsWith("_i8") -> (sign * token.substring(startIndex, tokenLen - 3).toLong(base)).toByte()
+            token.endsWith("_i16") -> (sign * token.substring(startIndex, tokenLen - 4).toLong(base)).toShort()
+            token.endsWith("_i32") -> (sign * token.substring(startIndex, tokenLen - 4).toLong(base)).toInt()
+            token.endsWith("_i64") -> (sign * token.substring(startIndex, tokenLen - 4).toLong(base))
+            token.endsWith("L") -> (sign * token.substring(startIndex, tokenLen - 1).toLong(base))
+            else -> sign * (token.substring(startIndex, tokenLen - 0).toLong(base))
         }
     }
 
@@ -454,17 +457,19 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 ')'.code, ']'.code, '}'.code ->
                     throw EdnReaderException("Unexpected character ${Char(codePoint)}.")
 
-                '+'.code ->
+                '+'.code -> {
                     res.add(
-                        if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi)
+                        if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi.unread(codePoint))
                         else parseOther(cpi.unread(codePoint), level + 1)
                     )
+                }
 
-                '-'.code ->
+                '-'.code -> {
                     res.add(
-                        if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi, true)
+                        if (cpi.hasNext() && cpi.peek() in '0'.code..'9'.code) parseNumber(cpi.unread(codePoint))
                         else parseOther(cpi.unread(codePoint), level + 1)
                     )
+                }
 
                 else -> res.add(parseOther(cpi.unread(codePoint), level + 1))
             }

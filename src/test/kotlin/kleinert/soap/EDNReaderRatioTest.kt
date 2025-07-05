@@ -65,93 +65,93 @@ class EDNReaderRatioTest {
 
     @Test
     fun parseComplex() {
-        soap("0i").let {
+        soapE("0i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(0, 0), it)
         }
-        soap("+0i").let {
+        soapE("+0i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(0, 0), it)
         }
-        soap("-0i").let {
+        soapE("-0i").let {
             assertInstanceOf(Complex::class.java, it)
-            assertEquals(Complex.valueOf(0, -0), it)
+            assertEquals(Complex.valueOf(0.0, -0.0), it)
         }
 
-        soap("1i").let {
+        soapE("1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(0, 1), it)
         }
-        soap("+1i").let {
+        soapE("+1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(0, 1), it)
         }
-        soap("-1i").let {
+        soapE("-1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(0, -1), it)
         }
 
-        soap("1+0i").let {
+        soapE("1+0i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1), it)
         }
-        soap("+1+0i").let {
+        soapE("+1+0i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1), it)
         }
-        soap("-1+0i").let {
+        soapE("-1+0i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(-1), it)
         }
 
-        soap("1+1i").let {
+        soapE("1+1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1, 1), it)
         }
-        soap("+1+1i").let {
+        soapE("+1+1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1, 1), it)
         }
-        soap("-1+1i").let {
+        soapE("-1+1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(-1, 1), it)
         }
 
-        soap("1-1i").let {
+        soapE("1-1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1, -1), it)
         }
-        soap("+1-1i").let {
+        soapE("+1-1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1, -1), it)
         }
-        soap("-1-1i").let {
+        soapE("-1-1i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(-1, -1), it)
         }
 
-        soap("1.5+0i").let {
+        soapE("1.5+0i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1.5), it)
         }
-        soap("+1.5+0i").let {
+        soapE("+1.5+0i").let {
             assertInstanceOf(Complex::class.java, it)
-            assertEquals(Complex.valueOf(1, 0), it)
+            assertEquals(Complex.valueOf(1.5, 0.0), it)
         }
-        soap("-1.5+0i").let {
+        soapE("-1.5+0i").let {
             assertInstanceOf(Complex::class.java, it)
-            assertEquals(Complex.valueOf(-1, 0), it)
+            assertEquals(Complex.valueOf(-1.5, 0.0), it)
         }
 
-        soap("1.5+0.5i").let {
+        soapE("1.5+0.5i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1.5, 0.5), it)
         }
-        soap("+1.5+0.5i").let {
+        soapE("+1.5+0.5i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(1.5, 0.5), it)
         }
-        soap("-1.5+0.5i").let {
+        soapE("-1.5+0.5i").let {
             assertInstanceOf(Complex::class.java, it)
             assertEquals(Complex.valueOf(-1.5, 0.5), it)
         }

@@ -2,6 +2,7 @@ package kleinert.soap.data
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.math.sign
 
 data class Complex private constructor(val real: Double, val imag: Double = 0.0) : Number() {
 
@@ -10,9 +11,9 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
         val ONE: Complex = Complex(1.0, 0.0)
         val ZERO: Complex = Complex(0.0, 0.0)
 
-        fun valueOf(v: Double) = Complex(v, 0.0)
         fun valueOf(real: Double, imag: Double = 0.0) = Complex(real, imag)
         fun valueOf(real: Long, imag: Long = 0) = Complex(real.toDouble(), imag.toDouble())
+        fun valueOf(real: Int, imag: Int = 0) = Complex(real.toDouble(), imag.toDouble())
 
         fun valueOf(v: String): Complex =
             valueOfOrNull(v) ?: throw NumberFormatException("Illegal format for complex number $v.")
@@ -33,6 +34,7 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
                 if (parts[0].endsWith('i')) {
                     realPart = "0"
                     imagSign = sign
+                    sign = 1
                     imagPart = parts[0].substring(0, parts[0].lastIndex)
                 } else {
                     realPart = parts[0]
@@ -41,7 +43,7 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
                 }
             } else {
                 realPart = parts[0]
-                imagSign = if (subs[parts.size] == '-') -1 else 1
+                imagSign = if (subs[parts[0].length] == '-') -1 else 1
                 imagPart = parts[1]
                 imagPart = imagPart.substring(0, imagPart.lastIndex)
             }
@@ -123,10 +125,12 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
 
     override fun toString(): String {
         val sb = StringBuilder()
-        sb.append(real)
-        if (imag >= 0.0) sb.append('+')
-        sb.append(imag)
+
+        sb.append("%+f".format(real).trimEnd('0').removeSuffix("."))
+
+        sb.append("%+f".format(imag).trimEnd('0').removeSuffix("."))
         sb.append('i')
+
         return sb.toString()
     }
 

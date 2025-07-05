@@ -1,4 +1,5 @@
 import kleinert.soap.*
+import kleinert.soap.data.Complex
 import kleinert.soap.data.PackedList
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -238,9 +239,11 @@ fun main(args: Array<String>) {
         val text = "#array2d [[1 2] [3 4] [5 6]]"
         val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedReaderOptions(EDNSoapOptions.allDecoders))
         println(parsed?.javaClass ?: "null")
-        println(parsed)
+        println((parsed as Array<Array<*>>).contentDeepToString())
     }
-    run{
-        println("5E-1".toDouble())
+    run {
+        val text = "123+456"
+        val parts = text.split('+')
+        println(text[parts[0].length])
     }
 }
