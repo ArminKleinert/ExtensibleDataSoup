@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.collections.LinkedHashMap
-import kotlin.jvm.functions.FunctionN
 
 class EDNSoapReader private constructor(private val options: EDNSoapOptions = EDNSoapOptions.extendedOptions) {
     companion object {
@@ -67,6 +66,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         fun negateIfNegative(number: Long) = if (negate) -number else number
         fun negateIfNegative(number: Double) = if (negate) -number else number
         fun negateIfNegative(number: Ratio) = if (negate) number.negate() else number
+        fun negateIfNegative(number: Complex) = if (negate) number.negate() else number
         try {
             return when (val n = parseNumberHelper(cpi, negate)) {
                 is BigDecimal -> negateIfNegative(n)
@@ -77,6 +77,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 is Long -> negateIfNegative(n)
                 is Double -> negateIfNegative(n)
                 is Ratio -> negateIfNegative(n)
+                is Complex -> negateIfNegative(n)
                 else -> throw EdnReaderException("Could not negate number $n of type ${n.javaClass.name}")
             }
         } catch (ex: NumberFormatException) {
@@ -88,48 +89,53 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     private fun parseNumberHelper(cpi: CodePointIterator, negate: Boolean = false): Number {
         val token = readToken(cpi, ::isNotBreakingSymbol)
 
+        val floatyRegex: Regex = Regex("[0-9]*\\.?[0-9]+M?")
+        val intRegex: Regex = Regex("(0[obx])?[0-9a-fA-F]+N?")
+        val ratioRegex: Regex = Regex("[0-9]+/[0-9]+?")
+
+        val expandedIntRegex: Regex = Regex("(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64)?")
+        val complexRegex: Regex = Regex("([0-9]*\\.?[0-9]+[+\\-]?)?([0-9]*\\.?[0-9]+)?i")
+
         val tokenLen = token.length
-        var dotIndex = -1
-        var divIndex = -1
-
-        for ((index, c) in token.withIndex()) {
-            if (c == '/') {
-                if (divIndex != -1 || dotIndex != -1) throw EdnReaderException("Invalid number format: $token")
-                divIndex = index
-            } else if (c == '.') {
-                if (dotIndex != -1 || divIndex != -1) throw EdnReaderException("Invalid number format: $token")
-                dotIndex = index
-            }
-        }
-
-        if (dotIndex != -1) {
-            return (
-                    if (token.endsWith('M')) token.substring(0, tokenLen - 1).toBigDecimal()
-                    else token.toDouble())
-        }
-
-        if (divIndex != -1) {
-            if (divIndex == 0 || divIndex == token.length - 1) throw EdnReaderException("Invalid number format: $token")
-            val part1 = token.substring(0, divIndex).toBigInteger()
-            val part2 = token.substring(divIndex + 1).toBigInteger()
-            return Ratio.of(part1, part2)
-        }
-
         var base = 10
         var startIndex = 0
 
-        val first = token[0]
-        if (first == '0' && token.length > 1) {
-            startIndex += 2
-            base = when (token[1]) {
-                'x' -> 16
-                'o' -> 8
-                'b' -> 2
-                else -> {
-                    startIndex -= 2 // Reset start index
-                    8
+        println(listOf(
+            "Token: $token",
+            intRegex.matches(token),
+            expandedIntRegex.matches(token),
+            floatyRegex.matches(token),
+            ratioRegex.matches(token),
+            complexRegex.matches(token)
+        ))
+
+        if ((options.allowNumericSuffixes && expandedIntRegex.matches(token)) || intRegex.matches(token)) {
+            val first = token[0]
+            if (first == '0' && token.length > 1) {
+                startIndex += 2
+                base = when (token[1]) {
+                    'x' -> 16
+                    'o' -> 8
+                    'b' -> 2
+                    else -> {
+                        startIndex -= 2 // Reset start index
+                        8
+                    }
                 }
             }
+            println("First $first, Base $base")
+        } else if (floatyRegex.matches(token)) {
+            base = 10
+            startIndex = 0
+        } else if (ratioRegex.matches(token)) {
+            val divIndex = token.indexOf('/')
+            val part1 = token.substring(0, divIndex).toBigInteger()
+            val part2 = token.substring(divIndex + 1).toBigInteger()
+            return Ratio.of(part1, part2)
+        } else if (complexRegex.matches(token)) {
+            return Complex.valueOfOrNull(token) ?: throw EdnReaderException("Invalid number format: $token")
+        } else {
+            throw EdnReaderException("Invalid number format: $token")
         }
 
         return when {
@@ -143,6 +149,60 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             token.endsWith("L") -> token.substring(startIndex, tokenLen - 1).toLong(base)
             else -> token.substring(startIndex, tokenLen - 0).toLong(base)
         }
+//        var dotIndex = -1
+//        var divIndex = -1
+//
+//        for ((index, c) in token.withIndex()) {
+//            if (c == '/') {
+//                if (divIndex != -1 || dotIndex != -1) throw EdnReaderException("Invalid number format: $token")
+//                divIndex = index
+//            } else if (c == '.') {
+//                if (dotIndex != -1 || divIndex != -1) throw EdnReaderException("Invalid number format: $token")
+//                dotIndex = index
+//            }
+//        }
+//
+//        if (dotIndex != -1) {
+//            return (
+//                    if (token.endsWith('M')) token.substring(0, tokenLen - 1).toBigDecimal()
+//                    else token.toDouble())
+//        }
+//
+//        if (divIndex != -1) {
+//            if (divIndex == 0 || divIndex == token.length - 1) throw EdnReaderException("Invalid number format: $token")
+//            val part1 = token.substring(0, divIndex).toBigInteger()
+//            val part2 = token.substring(divIndex + 1).toBigInteger()
+//            return Ratio.of(part1, part2)
+//        }
+//
+//        var base = 10
+//        var startIndex = 0
+//
+//        val first = token[0]
+//        if (first == '0' && token.length > 1) {
+//            startIndex += 2
+//            base = when (token[1]) {
+//                'x' -> 16
+//                'o' -> 8
+//                'b' -> 2
+//                else -> {
+//                    startIndex -= 2 // Reset start index
+//                    8
+//                }
+//            }
+//        }
+//
+//        return when {
+//            token.endsWith('M') -> token.substring(startIndex, tokenLen - 1).toBigDecimal()
+//            token.endsWith("N") -> token.substring(startIndex, tokenLen - 1).toBigInteger(base)
+//            !options.allowNumericSuffixes -> token.substring(startIndex, tokenLen - 0).toLong(base)
+//            token.endsWith("_i8") -> token.substring(startIndex, tokenLen - 3).toByte(base)
+//            token.endsWith("_i16") -> token.substring(startIndex, tokenLen - 4).toShort(base)
+//            token.endsWith("_i32") -> token.substring(startIndex, tokenLen - 4).toInt(base)
+//            token.endsWith("_i64") -> token.substring(startIndex, tokenLen - 4).toLong(base)
+//            token.endsWith("L") -> token.substring(startIndex, tokenLen - 1).toLong(base)
+//            else -> token.substring(startIndex, tokenLen - 0).toLong(base)
+//        }
     }
 
     private fun parseComment(cpi: CodePointIterator, errorIfEof: Boolean = false) {
@@ -265,7 +325,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                 throw EdnReaderException("Illegal set. Duplicate value $key.")
             result.add(key)
             i++
-        }while (true)
+        } while (true)
         return PersistentSet(result)
     }
 

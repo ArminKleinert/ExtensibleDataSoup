@@ -239,4 +239,10 @@ fun main(args: Array<String>) {
         println(parsed?.javaClass ?: "null")
         println(parsed)
     }
+    run{
+        val text = ("0xFF")
+        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
+        println(parsed?.javaClass ?: "null")
+        println(parsed)
+    }
 }

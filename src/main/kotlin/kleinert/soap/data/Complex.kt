@@ -9,6 +9,47 @@ data class Complex(val real: Double, val imag: Double = 0.0) : Number() {
         val I: Complex = Complex(0.0, 1.0)
         val ONE: Complex = Complex(1.0, 0.0)
         val ZERO: Complex = Complex(0.0, 0.0)
+
+        fun valueOf(v: Long) = Complex(v.toDouble(), 0.0)
+        fun valueOf(v: Double) = Complex(v, 0.0)
+
+        fun valueOf(v: String): Complex =
+            valueOfOrNull(v) ?: throw NumberFormatException("Illegal format for complex number $v.")
+
+        fun valueOfOrNull(v: String): Complex? {
+            var sign: Int = 1
+            var index = 0
+            while (v[index] == '+' || v[index] == '-') {
+                if (v[index] == '-') sign = -sign
+                index++
+            }
+            val subs = v.substring(index)
+            val parts = subs.split('+', '-', limit = 2)
+            val imagSign: Int
+            val realPart: String
+            var imagPart: String
+            if (parts.size == 1) {
+                if (parts[0].endsWith('i')) {
+                    realPart = "0"
+                    imagSign = sign
+                    imagPart = parts[0].substring(0, parts[0].lastIndex)
+                } else {
+                    realPart = parts[0]
+                    imagSign = 1
+                    imagPart = "0"
+                }
+            } else {
+                realPart = parts[0]
+                imagSign = if (subs[parts.size] == '-') -1 else 1
+                imagPart = parts[1]
+                imagPart = imagPart.substring(0, imagPart.lastIndex)
+            }
+
+            val real = realPart.toDoubleOrNull() ?: return null
+            val imag = imagPart.toDoubleOrNull() ?: return null
+
+            return Complex(sign * real, imagSign * imag)
+        }
     }
 
     fun polar() = abs() to arg()
@@ -18,6 +59,9 @@ data class Complex(val real: Double, val imag: Double = 0.0) : Number() {
 
     operator fun minus(other: Complex) =
         Complex(this.real - other.real, this.imag - other.imag)
+
+    operator fun unaryPlus(): Complex = this
+    operator fun unaryMinus(): Complex = Complex(-real, imag)
 
     operator fun times(other: Complex) =
         Complex(
@@ -37,7 +81,8 @@ data class Complex(val real: Double, val imag: Double = 0.0) : Number() {
     fun exp(): Complex {
         return Complex(
             Math.exp(this.real) * Math.cos(this.imag),
-            Math.exp(this.real) * Math.sin(this.imag))
+            Math.exp(this.real) * Math.sin(this.imag)
+        )
     }
 
     fun log(): Complex {
@@ -83,6 +128,8 @@ data class Complex(val real: Double, val imag: Double = 0.0) : Number() {
         sb.append('i')
         return sb.toString()
     }
+
+    fun negate(): Complex = Complex(-real, imag)
 
     override fun toDouble(): Double {
         require(this.imag == 0.0)

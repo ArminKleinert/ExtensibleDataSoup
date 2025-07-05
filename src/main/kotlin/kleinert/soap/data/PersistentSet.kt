@@ -39,6 +39,18 @@ class PersistentSet<T>(private val inner: Set<T>, val sorted: Boolean = false, v
         throw UnsupportedOperationException("Not possible on persistent sets.")
 
     override fun remove(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent sets.")
+
+    override fun equals(other: Any?): Boolean {
+        return inner == other
+    }
+
+    override fun hashCode(): Int {
+        return inner.hashCode()
+    }
+
+    override fun toString(): String {
+        return inner.toString()
+    }
 }
 
 
@@ -51,6 +63,28 @@ class PersistentMap<K, V>(
     class Entry<K, V>(override val key: K, override val value: V) : MutableMap.MutableEntry<K, V> {
         override fun setValue(newValue: V): V =
             throw UnsupportedOperationException("Not possible on persistent map entry.")
+
+        override fun toString(): String {
+            return "[$key=$value]"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Map.Entry<*, *>) return false
+
+            other as Map.Entry<*, *>
+
+            if (key != other.key) return false
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = key?.hashCode() ?: 0
+            result = 31 * result + (value?.hashCode() ?: 0)
+            return result
+        }
     }
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
@@ -71,6 +105,18 @@ class PersistentMap<K, V>(
     override fun remove(key: K): V? = throw UnsupportedOperationException("Not possible on persistent map.")
     override fun putAll(from: Map<out K, V>) = throw UnsupportedOperationException("Not possible on persistent map.")
     override fun put(key: K, value: V): V? = throw UnsupportedOperationException("Not possible on persistent map.")
+
+    override fun equals(other: Any?): Boolean {
+        return inner == other
+    }
+
+    override fun hashCode(): Int {
+        return inner.hashCode()
+    }
+
+    override fun toString(): String {
+        return inner.toString()
+    }
 }
 
 class PersistentList<T>(private val inner: List<T>) : MutableList<T> {
@@ -107,6 +153,18 @@ class PersistentList<T>(private val inner: List<T>) : MutableList<T> {
     override fun indexOf(element: T): Int = inner.indexOf(element)
     override fun containsAll(elements: Collection<T>): Boolean = inner.containsAll(elements)
     override fun contains(element: T): Boolean = inner.contains(element)
+
+    override fun equals(other: Any?): Boolean {
+        return inner == other
+    }
+
+    override fun hashCode(): Int {
+        return inner.hashCode()
+    }
+
+    override fun toString(): String {
+        return inner.toString()
+    }
 }
 
 class PersistentVector<T>(private val inner: List<T>) : MutableList<T> {
@@ -143,6 +201,18 @@ class PersistentVector<T>(private val inner: List<T>) : MutableList<T> {
     override fun indexOf(element: T): Int = inner.indexOf(element)
     override fun containsAll(elements: Collection<T>): Boolean = inner.containsAll(elements)
     override fun contains(element: T): Boolean = inner.contains(element)
+
+    override fun equals(other: Any?): Boolean {
+        return inner == other
+    }
+
+    override fun hashCode(): Int {
+        return inner.hashCode()
+    }
+
+    override fun toString(): String {
+        return inner.toString()
+    }
 }
 
 //    fun defaultAdd(a: Number, b: Number): Number {
