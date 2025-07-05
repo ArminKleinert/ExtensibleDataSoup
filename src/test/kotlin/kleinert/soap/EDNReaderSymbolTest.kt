@@ -146,6 +146,6 @@ class EDNReaderSymbolTest {
 
     @Test
     fun parseInvalidSymbolTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("\uD83C\uDF81") } // UTF-8 only valid with extension.
+        Assertions.assertThrows(EdnReaderException::class.java) { soap("\uD83C\uDF81") } // UTF-16 only valid with extension.
     }
 }

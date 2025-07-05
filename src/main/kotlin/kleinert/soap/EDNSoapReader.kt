@@ -342,16 +342,13 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
         when (token[0]) {
             '\\' ->
-                if (options.allowDispatchChars)
+                if (options.allowDispatchChars) {
+                    val subToken = token.subSequence(1, token.length)
+                    val uniChar = parseDispatchUnicodeChar(cpi, subToken, true)
                     return StringBuilder()
-                        .appendCodePoint(
-                            parseDispatchUnicodeChar(
-                                cpi,
-                                token.subSequence(1, token.length),
-                                true
-                            )
-                        )
+                        .appendCodePoint(uniChar)
                         .toString()
+                }
 
             '{' -> return parseSet(cpi, level + 1)
 

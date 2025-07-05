@@ -19,6 +19,14 @@ object ExtendedEDNDecoders {
             }
         return true
     }
+    private fun ensureAllFloaty(iterable: Iterable<*>): Boolean {
+        for (elem in iterable)
+            when (elem) {
+                is Number -> null
+                else -> throw EdnReaderException.EdnClassConversionError("Requires number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
+            }
+        return true
+    }
 
     private inline fun <reified T> requireType(elem: Any?, s: String) {
         if (elem !is T)
@@ -26,7 +34,7 @@ object ExtendedEDNDecoders {
     }
 
     private inline fun <reified T> requireAllType(elem: Iterable<Any?>, s: String) {
-        for (e in elem) requireType<Number>(elem, s)
+        for (e in elem) requireType<T>(elem, s)
     }
 
     private fun vectorToIntegralArray(it: Any?, typeId: Int): Any {
@@ -66,7 +74,7 @@ object ExtendedEDNDecoders {
     private fun vectorToFloatyArray(it: Any?, typeId: Int): Any {
         requireType<List<*>>(it, "Vector or List")
         it as List<*>
-        requireAllType<Number>(it, "Number")
+        ensureAllFloaty(it)
         return when (typeId) {
             0 -> FloatArray(it.size).apply {
                 for ((index, num) in it.withIndex())
@@ -120,9 +128,10 @@ object ExtendedEDNDecoders {
     private fun listTo2dArray(it: Any?): Array<Array<Any?>> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
-        val arrays = it.map {
-            require(it is List<*>)
-            it.toTypedArray()
+        val arrays = it.map { e->
+            requireType<List<*>>(e, "List")
+            require(e is List<*>)
+            e.toTypedArray()
         }
         return arrays.toTypedArray()
     }
@@ -131,9 +140,13 @@ object ExtendedEDNDecoders {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
         for (e in it) {
-            require(e is List<*>)
+            requireType<List<*>>(e, "List")
         }
-        return PackedList(it as List<List<Any?>>)
+        return try {
+            PackedList(it as List<List<Any?>>)
+        }catch(iae: IllegalArgumentException) {
+            throw EdnReaderException.EdnClassConversionError(iae)
+        }
     }
 
     private fun setToBitSet(it: Any?): Any {

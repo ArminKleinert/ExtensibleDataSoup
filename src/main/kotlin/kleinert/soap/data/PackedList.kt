@@ -277,9 +277,7 @@ class PackedList<T> : List<List<T>> {
         if (this === other) return true
         if (other !is List<*>) return false
 
-        println("this=$this other=$other withIndex=${withIndex().toList()}")
         for ((index, value) in withIndex()) {
-            println("index=$index value=$value other[index]=${other[index]} check=${value != other[index]}")
             if (value != other[index])
                 return false
         }
