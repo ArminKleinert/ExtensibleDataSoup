@@ -101,7 +101,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             }
 
             val first = token[startIndex]
-            if (first == '0' && token.length-startIndex > 1) {
+            if (first == '0' && token.length - startIndex > 1) {
                 startIndex += 2
                 base = when (token[startIndex - 1]) {
                     'x' -> 16
@@ -263,10 +263,19 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseChar(cpi: CodePointIterator): Char {
         val token = readToken(cpi, ::isNotBreakingSymbol)
-        return Char(parseDispatchUnicodeChar(token, false))
+        return Char(parseDispatchUnicodeChar(cpi, token, false))
     }
 
-    private fun parseDispatchUnicodeChar(token: CharSequence, isDispatch: Boolean = false): Int {
+    private fun parseDispatchUnicodeChar(
+        cpi: CodePointIterator,
+        token: CharSequence,
+        isDispatch: Boolean = false
+    ): Int {
+        val token = if (token.isEmpty() && cpi.hasNext())
+            cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle)
+        else
+            token
+
         if (token.length == 1)
             return token[0].code
 
@@ -280,6 +289,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
 
         val reducedToken = token.subSequence(1, token.length)
+
         val errorTokenText = if (isDispatch) "#\\$token" else "\\$token"
         when (token[0]) {
             'o' -> {
@@ -288,7 +298,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                         "Invalid length of unicode sequence ${reducedToken.length} in sequence $errorTokenText (should be 4)"
                     throw EdnReaderException(msg)
                 }
-                return parseUnicodeChar(reducedToken, 16, 'o')
+                return parseUnicodeChar(reducedToken, 8, 'o')
             }
 
             'u' -> { // UTF-16 or UTF-32 code
@@ -330,15 +340,14 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             }
         }
 
-        val tokenAsString = token.toString()
-
         when (token[0]) {
             '\\' ->
                 if (options.allowDispatchChars)
                     return StringBuilder()
                         .appendCodePoint(
                             parseDispatchUnicodeChar(
-                                tokenAsString.subSequence(1, tokenAsString.length),
+                                cpi,
+                                token.subSequence(1, token.length),
                                 true
                             )
                         )
@@ -346,18 +355,26 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
             '{' -> return parseSet(cpi, level + 1)
 
-            '#' ->
-                return when (tokenAsString.toString()) {
+            '#' -> {
+                cpi.takeCodePoints(token, ::isNotBreakingSymbolOrDispatch)
+
+                val tokenAsString = "#$token"
+
+                return when (tokenAsString) {
                     "##NaN" -> Double.NaN
+                    "##-NaN" -> -Double.NaN
                     "##INF" -> Double.POSITIVE_INFINITY
                     "##-INF" -> Double.NEGATIVE_INFINITY
                     "##time" ->
                         if (options.allowTimeDispatch) LocalDateTime.now()
-                        else EdnReaderException("Unknown symbolic value $tokenAsString")
+                        else throw EdnReaderException("Unknown symbolic value $tokenAsString")
 
-                    else -> EdnReaderException("Unknown symbolic value $tokenAsString")
+                    else -> throw EdnReaderException("Unknown symbolic value $tokenAsString")
                 }
+            }
         }
+
+        val tokenAsString = token.toString()
 
         if (tokenAsString == "uuid" || tokenAsString == "inst")
             return parseDecode(cpi, level + 1, tokenAsString, null)
@@ -503,6 +520,10 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     private fun isWhitespace(code: Int): Boolean =
         if (code < Char.MIN_VALUE.code || code > Char.MAX_VALUE.code) false
         else Char(code).isWhitespace() || code == ','.code
+
+    private fun isValidCharSingle(code: Int): Boolean =
+        if (code < Char.MIN_VALUE.code || code > Char.MAX_VALUE.code) false
+        else !Char(code).isWhitespace()
 
     private fun isValidSymbolChar(code: Int): Boolean = when (code.toChar()) {
         ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', '"' -> false

@@ -1,5 +1,105 @@
 package kleinert.soap.data
 
+import java.util.*
+
+class PackedSubList<T>(val startIndex: Int, val endIndex: Int, val list: MutableList<T>) : MutableList<T> {
+    override val size: Int
+        get() = endIndex - startIndex
+
+
+    override fun get(index: Int): T {
+        if (index < 0 || index >= size)
+            throw IndexOutOfBoundsException("Index $index out of bounds 0 to $size (exclusive).")
+        return list[index + startIndex]
+    }
+
+    override fun isEmpty(): Boolean = startIndex <= endIndex
+
+    override fun iterator(): MutableIterator<T> {
+        TODO("Not yet implemented")
+    }
+
+    override fun listIterator(): MutableListIterator<T> {
+        TODO("Not yet implemented")
+    }
+
+    override fun listIterator(index: Int): MutableListIterator<T> = object : MutableListIterator<T> {
+        val cursor = index
+
+        override fun add(element: T) = throw UnsupportedOperationException()
+
+        override fun hasNext(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun hasPrevious(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun next(): T {
+            TODO("Not yet implemented")
+        }
+
+        override fun nextIndex(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun previous(): T {
+            TODO("Not yet implemented")
+        }
+
+        override fun previousIndex(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun remove() = throw UnsupportedOperationException()
+
+        override fun set(element: T) {
+            TODO("Not yet implemented")
+        }
+
+    }
+
+
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
+
+        TODO("Not yet implemented")
+    }
+
+    override fun set(index: Int, element: T): T {
+        if (index < 0 || index >= size)
+            throw IndexOutOfBoundsException("Index $index out of bounds 0 to $size (exclusive).")
+        list[startIndex + index] = element
+        TODO("Not yet implemented")
+    }
+
+    override fun lastIndexOf(element: T): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun indexOf(element: T): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun containsAll(elements: Collection<T>): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun contains(element: T): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun clear() = throw UnsupportedOperationException()
+    override fun addAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
+    override fun addAll(index: Int, elements: Collection<T>): Boolean = throw UnsupportedOperationException()
+    override fun add(index: Int, element: T) = throw UnsupportedOperationException()
+    override fun add(element: T): Boolean = throw UnsupportedOperationException()
+    override fun removeAt(index: Int): T = throw UnsupportedOperationException()
+    override fun retainAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
+    override fun removeAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
+    override fun remove(element: T): Boolean = throw UnsupportedOperationException()
+}
+
 class PackedList<T> : List<List<T>> {
     private var packed: List<T>
 
@@ -9,7 +109,7 @@ class PackedList<T> : List<List<T>> {
         get() = packed.size
 
     val subListSize: Int
-        get() = packedSize / size
+        get() = if (size == 0) 0 else packedSize / size
 
     constructor(m: Int, n: Int, packed: List<T>, copy: Boolean = true) {
         if (m < 0) throw IllegalArgumentException("Index $m is negative.")
@@ -29,7 +129,7 @@ class PackedList<T> : List<List<T>> {
             packed.addAll(l)
         }
 
-        size = unpacked.size
+        size = if (packed.isEmpty()) 0 else unpacked.size
         this.packed = packed
     }
 
@@ -51,10 +151,11 @@ class PackedList<T> : List<List<T>> {
         private var index: Int = startIndex
 
         init {
-            packedList.checkBounds(startIndex)
+            if (index != 0 || packedList.size != 0)
+                packedList.checkBounds(startIndex)
         }
 
-        override fun hasNext(): Boolean = index < packedList.size - 1
+        override fun hasNext(): Boolean = index < packedList.size
         override fun hasPrevious(): Boolean = index > 0
         override fun nextIndex(): Int = index
         override fun previousIndex(): Int = index - 1
@@ -125,7 +226,7 @@ class PackedList<T> : List<List<T>> {
 
     override fun containsAll(elements: Collection<List<T>>): Boolean {
         for (it in elements.toSet()) {
-            if (it.size != subListSize) continue
+            if (it.size != subListSize) return false
             if (!contains(it)) return false
         }
         return true
@@ -171,12 +272,17 @@ class PackedList<T> : List<List<T>> {
     }
 
     override fun toString(): String = unpack().toString()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is List<*>) return false
 
-        for ((index, value) in withIndex().withIndex())
-            if (value != other[index]) return false
+        println("this=$this other=$other withIndex=${withIndex().toList()}")
+        for ((index, value) in withIndex()) {
+            println("index=$index value=$value other[index]=${other[index]} check=${value != other[index]}")
+            if (value != other[index])
+                return false
+        }
 
         return true
     }
