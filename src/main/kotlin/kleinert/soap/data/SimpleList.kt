@@ -27,21 +27,24 @@ interface SimpleList<T> : MutableList<T> {
     override fun lastIndexOf(element: T): Int {
         var lastIndex = -1
         for ((index, e) in withIndex()) {
-            if (e == element) lastIndex = index
+            if (e == element)
+                lastIndex = index
         }
         return lastIndex
     }
 
     override fun indexOf(element: T): Int {
         for ((index, e) in withIndex()) {
-            if (e == element) return index
+            if (e == element)
+                return index
         }
         return -1
     }
 
     override fun containsAll(elements: Collection<T>): Boolean {
         for (it in elements.toSet()) {
-            if (!contains(it)) return false
+            if (!contains(it))
+                return false
         }
         return true
     }
@@ -84,7 +87,7 @@ interface SimpleList<T> : MutableList<T> {
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-        checkBoundsRange(fromIndex, toIndex)
+        checkBoundsExclusiveRange(fromIndex, toIndex)
         if (fromIndex == 0 && toIndex == size) return this
         return MutableListView(fromIndex, toIndex, this)
     }
@@ -99,19 +102,31 @@ interface SimpleList<T> : MutableList<T> {
     override fun removeAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
     override fun remove(element: T): Boolean = throw UnsupportedOperationException()
 
-    private fun checkBounds(index: Int) {
+    fun checkBounds(index: Int) {
         if (isEmpty())
             throw IndexOutOfBoundsException("Index $index is not in empty list.")
         if (index < 0 || index >= size)
             throw IndexOutOfBoundsException("Index $index out of bounds 0 to $size (exclusive).")
     }
 
-    private fun checkBoundsRange(index: Int, toIndex: Int) {
+    fun checkBoundsExclusiveRange(index: Int, toIndex: Int) {
         if (toIndex < index)
             throw IllegalArgumentException("Index range $index to $toIndex (exclusive) is invalid.")
         if (isEmpty() && index != 0 && toIndex != 0)
             throw IndexOutOfBoundsException("Index range $index to $toIndex (exclusive) out of bounds on empty list.")
-        if (index < 0 || /*toIndex < 0 ||*/ index >= size || toIndex >= size)
+        if (index < 0 || /*toIndex < 0 ||*/ index >= size || toIndex > size)
             throw IndexOutOfBoundsException("Index range $index to $toIndex (exclusive) out of bounds 0 to $size (exclusive).")
+    }
+
+     fun commonEquals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is List<*>) return false
+
+        for ((index, e) in this.withIndex()) {
+            if (e != other[index])
+                return false
+        }
+
+        return true
     }
 }

@@ -3,12 +3,13 @@ package kleinert.soap.data
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import kotlin.math.absoluteValue
 
-data class Ratio private constructor(var num: Long, val den: Long) : Number() {
+class Ratio private constructor(var num: Long, val den: Long) : Number(), Comparable<Ratio> {
     companion object {
         val ZERO: Ratio = Ratio(0, 1)
 
-        fun valueOf(numerator1: Long, denominator1: Long=1L): Ratio {
+        fun valueOf(numerator1: Long, denominator1: Long = 1L): Ratio {
             var numerator = numerator1
             var denominator = denominator1
 
@@ -22,18 +23,21 @@ data class Ratio private constructor(var num: Long, val den: Long) : Number() {
             }
 
             // reduce fraction
-            val g = gcd(numerator, denominator)
-            numerator /= g
-            denominator /= g
+            if (denominator != 1L) {
+                require(denominator > 1)
+                val g = gcd(numerator.absoluteValue, denominator)
+                numerator /= g
+                denominator /= g
+            }
 
             return Ratio(numerator, denominator)
         }
 
         fun valueOf(numerator: Int, denominator: Int): Ratio =
-            Ratio(numerator.toLong(), denominator.toLong())
+            valueOf(numerator.toLong(), denominator.toLong())
 
-        fun valueOf(n: BigInteger): Ratio = Ratio(n.toLong(), 1)
-        fun valueOf(n: Int): Ratio = Ratio(n.toLong(), 1)
+        fun valueOf(n: BigInteger): Ratio = valueOf(n.toLong(), 1)
+        fun valueOf(n: Int): Ratio = valueOf(n.toLong(), 1)
 
         fun valueOf(s: String): Ratio {
             val divIndex = s.indexOf('/')
@@ -51,11 +55,9 @@ data class Ratio private constructor(var num: Long, val den: Long) : Number() {
             return valueOf(part1, part2)
         }
 
-        private fun gcd(m1: Long, n1: Long): Long {
-            val m = if (m1 < 0) -m1 else m1
-            val n = if (n1 < 0) -n1 else n1
-            return if ( n==0L) m else gcd(n, m % n)
-        }
+        private fun gcd(m: Long, n: Long): Long =
+            if (n == 0L) m else gcd(n, m % n)
+
 
         private fun lcm(m1: Long, n1: Long): Long {
             val m = if (m1 < 0) -m1 else m1
@@ -65,36 +67,26 @@ data class Ratio private constructor(var num: Long, val den: Long) : Number() {
     }
 
     init {
-        if (den == 0L) throw NumberFormatException("kleinert.soap.Ratio with 0 denominator.")
+        if (den == 0L) throw IllegalArgumentException("Ratio with 0 denominator.")
     }
 
-    override fun toByte(): Byte = toInt().toByte()
+    operator fun component1() = num
+    operator fun component2() = den
+
 
     override fun toString(): String = "$num/$den"
 
-    override fun toInt(): Int = this.toDouble().toInt()
-
-    override fun toLong(): Long = toBigInteger().toLong()
-
-    override fun toShort(): Short = toInt().toShort()
-
-    override fun toFloat(): Float = this.toDouble().toFloat()
-
-    override fun toDouble(): Double = toBigDecimal(MathContext.DECIMAL64).toDouble()
+    override fun toByte(): Byte = toLong().toByte()
+    override fun toShort(): Short = toLong().toShort()
+    override fun toInt(): Int = toLong().toInt()
+    override fun toLong(): Long = num / den
+    override fun toFloat(): Float = toDouble().toFloat()
+    override fun toDouble(): Double = num.toDouble() / den.toDouble()
 
     fun toBigDecimal(mc: MathContext? = MathContext.UNLIMITED): BigDecimal =
-        BigDecimal(num, mc) / BigDecimal(den, mc)
+        BigDecimal(num, mc) .divide( BigDecimal(den, mc))
 
     fun toBigInteger(): BigInteger = BigInteger.valueOf(num).divide(BigInteger.valueOf(den))
-
-    operator fun compareTo(b: Ratio): Int {
-        val a: Ratio = this
-        val lhs = a.num * b.den
-        val rhs = a.den * b.num
-        if (lhs < rhs) return -1
-        return if (lhs > rhs) +1 else 0
-    }
-
     // return |a|
     fun abs(): Ratio = if (num >= 0) this else negate()
 
@@ -113,14 +105,11 @@ data class Ratio private constructor(var num: Long, val den: Long) : Number() {
         if (b.compareTo(ZERO) == 0) return a
 
         // Find gcd of numerators and denominators
-        val f = gcd(a.num, b.num)
-        val g = gcd(a.den, b.den)
+        val f = gcd(a.num.absoluteValue, b.num)
+        val g = gcd(a.den.absoluteValue, b.den)
 
         // add cross-product terms for numerator
-        val s = Ratio(
-            a.num / f * (b.den / g) + b.num / f * (a.den / g),
-            lcm(a.den, b.den)
-        )
+        val s = Ratio(a.num / f * (b.den / g) + b.num / f * (a.den / g), lcm(a.den, b.den))
 
         // multiply back in
         s.num *= f
@@ -138,4 +127,35 @@ data class Ratio private constructor(var num: Long, val den: Long) : Number() {
 
     operator fun div(b: Ratio): Ratio =
         this.times(b.reciprocal())
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Number) return false
+
+        return when (other) {
+            is Ratio -> num == other.num && den == other.den
+
+            is Byte, is Short, is Int, is Long -> den == 1L && num == other.toLong()
+            is BigInteger -> den == 1L && num.toBigInteger() == other
+            is Float, is Double -> toDouble() == other.toDouble()
+            is BigDecimal -> toBigDecimal() == other
+            is Complex -> other.imag == 0.0 && equals(other.real)
+
+            else -> false
+        }
+    }
+
+    override operator fun compareTo(other: Ratio): Int {
+        val a: Ratio = this
+        val lhs = a.num * other.den
+        val rhs = a.den * other.num
+        if (lhs < rhs) return -1
+        return if (lhs > rhs) +1 else 0
+    }
+
+    override fun hashCode(): Int {
+        var result = num.hashCode()
+        result = 31 * result + den.hashCode()
+        return result
+    }
 }

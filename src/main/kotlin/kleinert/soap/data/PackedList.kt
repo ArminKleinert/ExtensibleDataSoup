@@ -1,7 +1,7 @@
 package kleinert.soap.data
 
 class PackedList<T> : SimpleList<List<T>> {
-    private var packed: List<T>
+    private var packed: MutableList<T>
 
     override val size: Int
 
@@ -11,15 +11,18 @@ class PackedList<T> : SimpleList<List<T>> {
     val subListSize: Int
         get() = if (size == 0) 0 else packedSize / size
 
-    constructor(m: Int, n: Int, packed: List<T>, copy: Boolean = true) {
+    val frozen: Boolean
+
+    constructor(m: Int, n: Int, packed: List<T>, frozen: Boolean = true) {
         if (m < 0) throw IllegalArgumentException("Index $m is negative.")
         if (n < 0) throw IllegalArgumentException("Inner index $n is negative.")
         if (packed.size != m * n) throw IllegalArgumentException("Invalid size of packed list. Must be ${m * n} ($m*$n) but is ${packed.size}.")
         size = m
-        this.packed = if (copy) packed.toList() else packed
+        this.packed = packed.toMutableList()
+        this.frozen = frozen
     }
 
-    constructor(unpacked: List<List<T>>) {
+    constructor(unpacked: List<List<T>>, frozen: Boolean = true) {
         val packed = mutableListOf<T>()
         var firstSize: Int = -1
         for (l in unpacked) {
@@ -31,6 +34,16 @@ class PackedList<T> : SimpleList<List<T>> {
 
         size = if (packed.isEmpty()) 0 else unpacked.size
         this.packed = packed
+        this.frozen = frozen
+    }
+
+    constructor(m: Int, n: Int, packed: MutableList<T>, frozen: Boolean = true, unsafe: Boolean = false) {
+        if (m < 0) throw IllegalArgumentException("Index $m is negative.")
+        if (n < 0) throw IllegalArgumentException("Inner index $n is negative.")
+        if (packed.size != m * n) throw IllegalArgumentException("Invalid size of packed list. Must be ${m * n} ($m*$n) but is ${packed.size}.")
+        size = m
+        this.packed = if (!unsafe || frozen) packed.toMutableList() else packed
+        this.frozen = frozen
     }
 
     fun unpack(): List<List<T>> =
@@ -39,7 +52,21 @@ class PackedList<T> : SimpleList<List<T>> {
     override fun getUnchecked(index: Int): List<T> =
         packed.subList(index * subListSize, index * subListSize + subListSize)
 
-    override fun setUnchecked(index: Int, element: List<T>): List<T> = throw UnsupportedOperationException()
+    override fun setUnchecked(index: Int, element: List<T>): List<T> {
+        if (frozen)
+            throw UnsupportedOperationException()
+        if (element.size != subListSize)
+            throw IllegalArgumentException()
+
+        val offset = index * subListSize
+        val old = get(index)
+
+        for ((i, item) in element.withIndex()) {
+            packed[offset + i] = item
+        }
+
+        return old
+    }
 
 //    class PackedListIterator<T>(private val packedList: PackedList<T>, startIndex: Int = 0) : ListIterator<List<T>> {
 //        private var index: Int = startIndex
@@ -66,15 +93,16 @@ class PackedList<T> : SimpleList<List<T>> {
 //        }
 //    }
 
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<List<T>> {
-        checkBoundsRange(fromIndex, toIndex)
-        val subListSize = this.subListSize
-        return PackedList(
-            toIndex - fromIndex,
-            subListSize,
-            packed.subList(subListSize * fromIndex, subListSize * toIndex)
-        )
-    }
+//    override fun subList(fromIndex: Int, toIndex: Int): MutableList<List<T>> {
+//        checkBoundsRange(fromIndex, toIndex)
+//        val subListSize = this.subListSize
+//        return PackedList(
+//            toIndex - fromIndex,
+//            subListSize,
+//            packed.subList(subListSize * fromIndex, subListSize * toIndex),
+//            unsafe = true, frozen = false
+//        )
+//    }
 
     override fun lastIndexOf(element: List<T>): Int {
         if (element.size != subListSize)
@@ -117,35 +145,22 @@ class PackedList<T> : SimpleList<List<T>> {
         return packed[i * subListSize + j]
     }
 
+    operator fun set(i: Int, j: Int, element: T): T {
+        checkBounds(i, j)
+        val old = get(i, j)
+        packed[i * subListSize + j] = element
+        return old
+    }
+
     private fun checkBounds(index: Int, innerIndex: Int) {
         if (isEmpty())
             throw IndexOutOfBoundsException("Index [$index, $innerIndex] is not in empty list.")
         if (index < 0 || innerIndex < 0 || index >= size || innerIndex >= subListSize)
             throw IndexOutOfBoundsException("Index [$index, $innerIndex] out of bounds [0, 0] to [$size, $subListSize] (both exclusive).")
     }
+    override fun toString(): String = joinToString(", ", prefix="[", postfix = "]")
 
-    private fun checkBoundsRange(index: Int, toIndex: Int) {
-        if (toIndex < index)
-            throw IllegalArgumentException("Index range $index to $toIndex (exclusive) is invalid.")
-        if (isEmpty() && index != 0 && toIndex != 0)
-            throw IndexOutOfBoundsException("Index range $index to $toIndex (exclusive) out of bounds on empty list.")
-        if (index < 0 || /*toIndex < 0 ||*/ index >= size || toIndex >= size)
-            throw IndexOutOfBoundsException("Index range $index to $toIndex (exclusive) out of bounds 0 to $size (exclusive).")
-    }
-
-    override fun toString(): String = unpack().toString()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is List<*>) return false
-
-        for ((index, value) in withIndex()) {
-            if (value != other[index])
-                return false
-        }
-
-        return true
-    }
+    override fun equals(other: Any?): Boolean = commonEquals(other)
 
     override fun hashCode(): Int {
         var result = packed.hashCode()
