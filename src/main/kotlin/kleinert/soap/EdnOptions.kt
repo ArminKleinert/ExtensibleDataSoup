@@ -3,9 +3,7 @@ package kleinert.soap
 import kleinert.soap.ExtendedEDNDecoders.arrayDecoders
 import kleinert.soap.ExtendedEDNDecoders.listDecoders
 import kleinert.soap.ExtendedEDNDecoders.prettyDecoders
-import kleinert.soap.data.PackedList
-import kleinert.soap.data.PersistentList
-import kleinert.soap.data.PersistentVector
+import kleinert.soap.data.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -19,6 +17,7 @@ object ExtendedEDNDecoders {
             }
         return true
     }
+
     private fun ensureAllFloaty(iterable: Iterable<*>): Boolean {
         for (elem in iterable)
             when (elem) {
@@ -128,7 +127,7 @@ object ExtendedEDNDecoders {
     private fun listTo2dArray(it: Any?): Array<Array<Any?>> {
         requireType<List<*>>(it, "List")
         require(it is List<*>)
-        val arrays = it.map { e->
+        val arrays = it.map { e ->
             requireType<List<*>>(e, "List")
             require(e is List<*>)
             e.toTypedArray()
@@ -144,7 +143,7 @@ object ExtendedEDNDecoders {
         }
         return try {
             PackedList(it as List<List<Any?>>)
-        }catch(iae: IllegalArgumentException) {
+        } catch (iae: IllegalArgumentException) {
             throw EdnReaderException.EdnClassConversionError(iae)
         }
     }
@@ -195,9 +194,10 @@ data class EDNSoapOptions(
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
     val useFasterSetConstruction: Boolean = false,
-    val forceImmutableCollections: Boolean = true,
     val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList(it) },
     val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector(it) },
+    val setToPersistentSetConverter: (LinkedHashSet<*>) -> Set<*> = { PersistentSet(it, ordered = true) },
+    val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap(it, ordered = true) },
     val allowComplexNumberLiterals: Boolean = false,
     val allowUTFSymbols: Boolean = false,
 ) {
@@ -218,7 +218,6 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
-                forceImmutableCollections = true,
                 useFasterSetConstruction = true,
                 allowComplexNumberLiterals = true,
                 allowUTFSymbols = true,
@@ -234,7 +233,6 @@ data class EDNSoapOptions(
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
-                forceImmutableCollections = true,
                 useFasterSetConstruction = false,
                 allowComplexNumberLiterals = true,
                 allowUTFSymbols = true,

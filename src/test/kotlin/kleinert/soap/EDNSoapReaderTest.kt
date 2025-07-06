@@ -2,37 +2,32 @@ package kleinert.soap
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.math.BigInteger
 
 class EDNSoapReaderTest {
     private fun soap(s: String): Any? {
         return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
     }
 
-    private fun soapE(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-    }
-
     @Test
     fun parseStringBasicTest() {
-        soap("\"\"").let { assertInstanceOf(String::class.java, it) }
-        soap("\"\"").let { assertEquals("", it) }
-        soap("\"abc\"").let { assertEquals("abc", it) }
+        assertInstanceOf(String::class.java, soap("\"\""))
+        assertEquals("", soap("\"\""))
+        assertEquals("abc", soap("\"abc\""))
     }
 
     @Test
     fun parseStringEscapeSequenceTest() {
-        soap("\"\\n\"").let { assertEquals("\n", it) }
-        soap("\"\\n\"").let { assertEquals(listOf("", ""), (it as String).lines()) }
-        soap("\"\\t\"").let { assertEquals("\t", it) }
+        assertEquals("\n", soap("\"\\n\""))
+        assertEquals(listOf("", ""), (soap("\"\\n\"") as String).lines())
+        assertEquals("\t", soap("\"\\t\""))
 
-        soap("\"\\t\"").let { assertEquals("\t", it) }
-        soap("\"\\b\"").let { assertEquals("\b", it) }
-        soap("\"\\r\"").let { assertEquals("\r", it) }
-        soap("\"\\\"\"").let { assertEquals("\"", it) }
+        assertEquals("\t", soap("\"\\t\""))
+        assertEquals("\b", soap("\"\\b\""))
+        assertEquals("\r", soap("\"\\r\""))
+        assertEquals("\"", soap("\"\\\"\""))
 
-        soap("\"\\\\\"").let { assertEquals("\\", it) }
-        soap("\"\\\\\\\\\"").let { assertEquals("\\\\", it) }
+        assertEquals("\\", soap("\"\\\\\""))
+        assertEquals("\\\\", soap("\"\\\\\\\\\""))
         soap(
             """
             "\\"
@@ -45,15 +40,15 @@ class EDNSoapReaderTest {
         """.trimMargin()
         ).let { assertEquals("\\\\", it) }
 
-        soap("\"\\t\\t\"").let { assertEquals("\t\t", it) }
+        assertEquals("\t\t", soap("\"\\t\\t\""))
     }
 
     @Test
     fun parseStringUnicodeSequenceTest() {
-        soap("\"🎁\"").let { assertEquals("🎁", it) }
-        soap("\"\\uD83C\\uDF81\"").let { assertEquals("🎁", it) }
-        soap("\"\\uD83C\\uDF81\"").let { assertEquals("🎁", it) }
-        soap("\"\\x0001F381\"").let { assertEquals("🎁", it) }
+        assertEquals("🎁", soap("\"🎁\""))
+        assertEquals("🎁", soap("\"\\uD83C\\uDF81\""))
+        assertEquals("🎁", soap("\"\\uD83C\\uDF81\""))
+        assertEquals("🎁", soap("\"\\x0001F381\""))
     }
 
     @Test
@@ -65,32 +60,32 @@ class EDNSoapReaderTest {
 
     @Test
     fun parseDiscardSimpleTest() {
-        soap("#_1 2").let { assertEquals(2L, it) }
+        assertEquals(2L, soap("#_1 2"))
     }
 
     @Test
     fun parseDiscardTest() {
-        soap("#_1 2").let { assertEquals(2L, it) }
+        assertEquals(2L, soap("#_1 2"))
 
         // Discard tags ignore spaces.
-        soap("#_ 1 2").let { assertEquals(2L, it) }
-        soap("#_      1 2").let { assertEquals(2L, it) }
+        assertEquals(2L, soap("#_ 1 2"))
+        assertEquals(2L, soap("#_      1 2"))
 
         // Discard ignores newlines
-        soap("#_\n1 2").let { assertEquals(2L, it) }
+        assertEquals(2L, soap("#_\n1 2"))
 
         // Discard ignores comments
-        soap("#_ ; abc\n 1 2").let { assertEquals(2L, it) }
+        assertEquals(2L, soap("#_ ; abc\n 1 2"))
 
         // Discard in strings does nothing
-        soap("\"#_\"").let { assertEquals("#_", it) }
-        soap("\"#_1\"").let { assertEquals("#_1", it) }
+        assertEquals("#_", soap("\"#_\""))
+        assertEquals("#_1", soap("\"#_1\""))
     }
 
     @Test
     fun parseDiscardAssociativityTest() {
         // Discard is right-associative
-        soap("#_ #_ 1 2 3").let { assertEquals(3L, it) }
+        assertEquals(3L, soap("#_ #_ 1 2 3"))
     }
 
     @Test

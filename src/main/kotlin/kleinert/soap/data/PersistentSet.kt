@@ -53,7 +53,7 @@ class PersistentSet<T>(private val inner: Set<T>, val sorted: Boolean = false, v
 
 
 class PersistentMap<K, V>(
-    private val inner: MutableMap<K, V>,
+    private val inner: Map<K, V>,
     val sorted: Boolean = false,
     val ordered: Boolean = false
 ) :

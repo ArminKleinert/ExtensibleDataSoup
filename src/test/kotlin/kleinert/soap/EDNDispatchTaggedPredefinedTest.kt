@@ -7,7 +7,7 @@ import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class EDNDispatchTaggedPredefTest {
+class EDNDispatchTaggedPredefinedTest {
     private fun parse(s: String) =
         EDNSoapReader.readString(
             s,
@@ -18,31 +18,9 @@ class EDNDispatchTaggedPredefTest {
         )
 
     /*
-        val arrayDecoders: Map<String, (Any?) -> Any?>
-        get() = mapOf(
-            "bytearray" to ::listToByteArray,
-            "shortarray" to ::listToShortArray,
-            "intarray" to ::listToIntArray,
-            "longarray" to ::listToLongArray,
-            "floatarray" to ::listToFloatArray,
-            "doublearray" to ::listToDoubleArray,
-            "bigintarray" to ::listToBigIntArray,
-            "bigdecimalarray" to ::listToBigDecimalArray,
-            "stringarray" to ::listToStringArray,
-            "array" to ::listToArray,
-            "array2d" to ::listTo2dArray,
-        )
-
-    val listDecoders: Map<String, (Any?) -> Any?>
-        get() = mapOf(
             "bitset" to ::setToBitSet,
-            "packed2D" to ::packed2dList,
-        )
-
-    val prettyDecoders: Map<String, (Any?) -> Any?>
-        get() = mapOf(
+            "packed2D" to ::packed2dList
             "pretty" to { EDNSoapWriter.pprintS(it) },
-        )
      */
 
     @Test

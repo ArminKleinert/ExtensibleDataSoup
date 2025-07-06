@@ -1,106 +1,6 @@
 package kleinert.soap.data
 
-import java.util.*
-
-class PackedSubList<T>(val startIndex: Int, val endIndex: Int, val list: MutableList<T>) : MutableList<T> {
-    override val size: Int
-        get() = endIndex - startIndex
-
-
-    override fun get(index: Int): T {
-        if (index < 0 || index >= size)
-            throw IndexOutOfBoundsException("Index $index out of bounds 0 to $size (exclusive).")
-        return list[index + startIndex]
-    }
-
-    override fun isEmpty(): Boolean = startIndex <= endIndex
-
-    override fun iterator(): MutableIterator<T> {
-        TODO("Not yet implemented")
-    }
-
-    override fun listIterator(): MutableListIterator<T> {
-        TODO("Not yet implemented")
-    }
-
-    override fun listIterator(index: Int): MutableListIterator<T> = object : MutableListIterator<T> {
-        val cursor = index
-
-        override fun add(element: T) = throw UnsupportedOperationException()
-
-        override fun hasNext(): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun hasPrevious(): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun next(): T {
-            TODO("Not yet implemented")
-        }
-
-        override fun nextIndex(): Int {
-            TODO("Not yet implemented")
-        }
-
-        override fun previous(): T {
-            TODO("Not yet implemented")
-        }
-
-        override fun previousIndex(): Int {
-            TODO("Not yet implemented")
-        }
-
-        override fun remove() = throw UnsupportedOperationException()
-
-        override fun set(element: T) {
-            TODO("Not yet implemented")
-        }
-
-    }
-
-
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-
-        TODO("Not yet implemented")
-    }
-
-    override fun set(index: Int, element: T): T {
-        if (index < 0 || index >= size)
-            throw IndexOutOfBoundsException("Index $index out of bounds 0 to $size (exclusive).")
-        list[startIndex + index] = element
-        TODO("Not yet implemented")
-    }
-
-    override fun lastIndexOf(element: T): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun indexOf(element: T): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun containsAll(elements: Collection<T>): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun contains(element: T): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun clear() = throw UnsupportedOperationException()
-    override fun addAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
-    override fun addAll(index: Int, elements: Collection<T>): Boolean = throw UnsupportedOperationException()
-    override fun add(index: Int, element: T) = throw UnsupportedOperationException()
-    override fun add(element: T): Boolean = throw UnsupportedOperationException()
-    override fun removeAt(index: Int): T = throw UnsupportedOperationException()
-    override fun retainAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
-    override fun removeAll(elements: Collection<T>): Boolean = throw UnsupportedOperationException()
-    override fun remove(element: T): Boolean = throw UnsupportedOperationException()
-}
-
-class PackedList<T> : List<List<T>> {
+class PackedList<T> : SimpleList<List<T>> {
     private var packed: List<T>
 
     override val size: Int
@@ -136,52 +36,37 @@ class PackedList<T> : List<List<T>> {
     fun unpack(): List<List<T>> =
         (0..<size).map { getUnchecked(it) }
 
-    override fun get(index: Int): List<T> {
-        checkBounds(index)
-        return packed.subList(index * subListSize, index * subListSize + subListSize)
-    }
-
-    private fun getUnchecked(index: Int): List<T> =
+    override fun getUnchecked(index: Int): List<T> =
         packed.subList(index * subListSize, index * subListSize + subListSize)
 
-    override fun isEmpty(): Boolean =
-        size == 0
+    override fun setUnchecked(index: Int, element: List<T>): List<T> = throw UnsupportedOperationException()
 
-    class PackedListIterator<T>(private val packedList: PackedList<T>, startIndex: Int = 0) : ListIterator<List<T>> {
-        private var index: Int = startIndex
+//    class PackedListIterator<T>(private val packedList: PackedList<T>, startIndex: Int = 0) : ListIterator<List<T>> {
+//        private var index: Int = startIndex
+//
+//        init {
+//            if (index != 0 || packedList.size != 0)
+//                packedList.checkBounds(startIndex)
+//        }
+//
+//        override fun hasNext(): Boolean = index < packedList.size
+//        override fun hasPrevious(): Boolean = index > 0
+//        override fun nextIndex(): Int = index
+//        override fun previousIndex(): Int = index - 1
+//
+//        override fun next(): List<T> {
+//            val temp = packedList[index]
+//            index++
+//            return temp
+//        }
+//
+//        override fun previous(): List<T> {
+//            index--
+//            return packedList[index]
+//        }
+//    }
 
-        init {
-            if (index != 0 || packedList.size != 0)
-                packedList.checkBounds(startIndex)
-        }
-
-        override fun hasNext(): Boolean = index < packedList.size
-        override fun hasPrevious(): Boolean = index > 0
-        override fun nextIndex(): Int = index
-        override fun previousIndex(): Int = index - 1
-
-        override fun next(): List<T> {
-            val temp = packedList[index]
-            index++
-            return temp
-        }
-
-        override fun previous(): List<T> {
-            index--
-            return packedList[index]
-        }
-    }
-
-    override fun iterator(): Iterator<List<T>> =
-        PackedListIterator(this)
-
-    override fun listIterator(): ListIterator<List<T>> =
-        PackedListIterator(this)
-
-    override fun listIterator(index: Int): ListIterator<List<T>> =
-        PackedListIterator(this, index)
-
-    override fun subList(fromIndex: Int, toIndex: Int): List<List<T>> {
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<List<T>> {
         checkBoundsRange(fromIndex, toIndex)
         val subListSize = this.subListSize
         return PackedList(
@@ -224,35 +109,12 @@ class PackedList<T> : List<List<T>> {
         return -1
     }
 
-    override fun containsAll(elements: Collection<List<T>>): Boolean {
-        for (it in elements.toSet()) {
-            if (it.size != subListSize) return false
-            if (!contains(it)) return false
-        }
-        return true
-    }
-
-    override fun contains(element: List<T>): Boolean {
-        if (element.size != subListSize) return false
-        return indexOf(element) >= 0
-    }
-
     fun flatten(): List<T> =
         packed.toList()
 
     operator fun get(i: Int, j: Int): T {
         checkBounds(i, j)
         return packed[i * subListSize + j]
-    }
-
-    fun getUnchecked(i: Int, j: Int): T =
-        packed[i * subListSize + j]
-
-    private fun checkBounds(index: Int) {
-        if (isEmpty())
-            throw IndexOutOfBoundsException("Index $index is not in empty list.")
-        if (index < 0 || index >= size)
-            throw IndexOutOfBoundsException("Index $index out of bounds 0 to $size (exclusive).")
     }
 
     private fun checkBounds(index: Int, innerIndex: Int) {

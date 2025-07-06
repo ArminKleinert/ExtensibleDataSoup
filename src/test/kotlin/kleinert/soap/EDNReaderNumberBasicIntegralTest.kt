@@ -9,10 +9,6 @@ class EDNReaderNumberBasicIntegralTest {
         return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
     }
 
-    private fun soapE(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-    }
-
     @Test
     fun parseIntegerDecimal() {
         soap("0").let {

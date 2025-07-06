@@ -242,7 +242,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             result[key] = value
             i++
         } while (true)
-        return PersistentMap(result)
+        return options.mapToPersistentMapConverter(result)
     }
 
     private fun parseSet(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Set<*> {
@@ -258,7 +258,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             result.add(key)
             i++
         } while (true)
-        return PersistentSet(result)
+        return options.setToPersistentSetConverter(result)
     }
 
     private fun parseChar(cpi: CodePointIterator): Char {

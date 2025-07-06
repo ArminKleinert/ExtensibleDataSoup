@@ -9,10 +9,6 @@ class EDNReaderSymbolTest {
         return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
     }
 
-    private fun soapE(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-    }
-
 
     @Test
     fun parseSymbolBasicTest() {
@@ -134,7 +130,7 @@ class EDNReaderSymbolTest {
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             val text = "🎁"
-            val it = soapE(text)
+            val it = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
             val symbol = Symbol.parse(text, true)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol

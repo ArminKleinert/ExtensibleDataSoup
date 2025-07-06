@@ -8,10 +8,6 @@ class EDNReaderStringTest {
         return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
     }
 
-    private fun soapE(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-    }
-
     @Test
     fun parseStringBasicTest() {
         soap("\"\"").let { Assertions.assertInstanceOf(String::class.java, it) }

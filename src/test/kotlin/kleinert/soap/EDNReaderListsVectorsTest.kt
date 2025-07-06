@@ -3,6 +3,7 @@ package kleinert.soap
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.util.LinkedList
 
 class EDNReaderListsVectorsTest {
     private fun soap(s: String): Any? {
@@ -100,6 +101,22 @@ class EDNReaderListsVectorsTest {
         soap("[1 (2 3)]").let {
             Assertions.assertInstanceOf(List::class.java, it)
             Assertions.assertEquals(listOf(1L, listOf(2L, 3L)), (it as List<*>))
+        }
+    }
+
+    @Test
+    fun parseWithConverter() {
+        run {
+            val options = EDNSoapOptions.defaultOptions.copy(listToPersistentListConverter = {LinkedList (it)})
+            val parsed = EDNSoapReader.readString("(1 2)", options)
+            Assertions.assertInstanceOf(LinkedList::class.java, parsed)
+            Assertions.assertEquals(listOf(1L, 2L), parsed)
+        }
+        run {
+            val options = EDNSoapOptions.defaultOptions.copy(listToPersistentVectorConverter = {LinkedList (it)})
+            val parsed = EDNSoapReader.readString("[1 2]", options)
+            Assertions.assertInstanceOf(LinkedList::class.java, parsed)
+            Assertions.assertEquals(listOf(1L, 2L), parsed)
         }
     }
 

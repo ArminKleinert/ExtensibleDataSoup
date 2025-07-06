@@ -1,9 +1,5 @@
 package kleinert.soap
 
-import kleinert.soap.EdnReaderException.EdnClassConversionError
-import kleinert.soap.data.Keyword
-import kleinert.soap.data.PackedList
-import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

@@ -4,6 +4,7 @@ package kleinert.soap
 import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class EDNReaderSetsMapsTest {
     private fun soap(s: String): Any? {
@@ -39,6 +40,22 @@ class EDNReaderSetsMapsTest {
         soap("#{1 2 3 4}").let {
             Assertions.assertInstanceOf(Set::class.java, it)
             Assertions.assertEquals(setOf(1L, 2L, 3L, 4L), (it as Set<*>))
+        }
+    }
+
+    @Test
+    fun parseWithConverter() {
+        run {
+            val options = EDNSoapOptions.defaultOptions.copy(mapToPersistentMapConverter = { IdentityHashMap (it) })
+            val parsed = EDNSoapReader.readString("{1 2}", options)
+            Assertions.assertInstanceOf(IdentityHashMap::class.java, parsed)
+            Assertions.assertEquals(mapOf(1L to 2L), parsed)
+        }
+        run {
+            val options = EDNSoapOptions.defaultOptions.copy(setToPersistentSetConverter = { TreeSet<Long>() })
+            val parsed = EDNSoapReader.readString("#{1 2}", options)
+            Assertions.assertInstanceOf(TreeSet::class.java, parsed)
+            Assertions.assertEquals(setOf<Long>(), parsed)
         }
     }
 

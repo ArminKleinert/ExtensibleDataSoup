@@ -2,7 +2,6 @@ package kleinert.soap
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.time.Instant
 
 class EDNReaderCharTest {
     private fun soap(s: String): Any? {
@@ -53,5 +52,10 @@ class EDNReaderCharTest {
         Assertions.assertEquals('λ', soap("\\u03bb"))
         Assertions.assertEquals('ῷ', soap("\\u1ff7"))
         Assertions.assertEquals('\u8183', soap("\\u8183"))
+
+        Assertions.assertEquals('\u2626', soap("\\u2626")) // Orthodox cross
+        Assertions.assertEquals('\u271D', soap("\\u271D")) // Latin cross
+        Assertions.assertEquals("\uD83D\uDD46", soapE("#\\u0001F546")) // White latin cross
+        Assertions.assertEquals("\uD83D\uDD47", soapE("#\\u0001F547")) // Heavy latin cross
     }
 }

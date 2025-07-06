@@ -9,10 +9,6 @@ class EDNReaderKeywordTest {
         return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
     }
 
-    private fun soapE(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-    }
-
     @Test
     fun parseKeywordBasicTest() {
         run {
@@ -141,7 +137,7 @@ class EDNReaderKeywordTest {
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             val text = ":🎁"
-            val it = soapE(text)
+            val it = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
             val keyword = Keyword.parse(text, true)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword

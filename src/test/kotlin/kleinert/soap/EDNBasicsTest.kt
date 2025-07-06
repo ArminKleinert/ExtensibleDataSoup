@@ -8,10 +8,6 @@ class EDNBasicsTest {
         return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
     }
 
-    private fun soapE(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
-    }
-
     @Test
     fun parseCommentTest() {
         // Empty output
@@ -40,5 +36,12 @@ class EDNBasicsTest {
 
         Assertions.assertEquals(listOf(1L), soap("[,1 ,]"))
         Assertions.assertEquals(listOf(1L, 1L), soap("[1,1]"))
+    }
+
+    @Test
+    fun parseDirectConstantsTest() {
+        Assertions.assertEquals(false, soap("false"))
+        Assertions.assertEquals(true, soap("true"))
+        Assertions.assertEquals(null, soap("nil"))
     }
 }
