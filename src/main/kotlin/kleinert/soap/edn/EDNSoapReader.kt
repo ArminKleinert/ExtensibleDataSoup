@@ -11,30 +11,11 @@ import kotlin.collections.LinkedHashMap
 
 class EDNSoapReader private constructor(private val options: EDNSoapOptions = EDNSoapOptions.extendedOptions) {
     companion object {
-        private const val NULL_CHAR = '\u0000'
-
         private val NOTHING = object {}
 
         @Throws(EdnReaderException::class)
-        fun readString(input: String, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
-            return CodePointIterator(input.codePoints()).use {
-                EDNSoapReader(options).readString(it)
-            }
-        }
-
-        @Throws(EdnReaderException::class)
-        fun readFile(input: File, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
-            return CodePointIterator(input.reader(Charsets.UTF_8)).use {
-                EDNSoapReader(options).readString(it)
-            }
-        }
-
-        @Throws(EdnReaderException::class)
-        fun readReader(input: Reader, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
-            return CodePointIterator(input).use {
-                EDNSoapReader(options).readString(it)
-            }
-        }
+        internal fun read(cpi: CodePointIterator, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? =
+            EDNSoapReader(options).readString(cpi)
     }
 
     init {

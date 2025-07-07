@@ -180,7 +180,7 @@ object ExtendedEDNDecoders {
 
     val prettyDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
-            "pretty" to { EDNSoapWriter.pprintS(it) },
+            "pretty" to { EDNSoapWriter.pprintToString(it) },
         )
 }
 
@@ -200,6 +200,7 @@ data class EDNSoapOptions(
     val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap(it, ordered = true) },
     val allowComplexNumberLiterals: Boolean = false,
     val allowUTFSymbols: Boolean = false,
+    val sequenceElementLimit: Int = 10000,
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions

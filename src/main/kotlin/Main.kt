@@ -1,15 +1,17 @@
 import kleinert.soap.data.PackedList
+import kleinert.soap.edn.EDN
 import kleinert.soap.edn.EDNSoapOptions
 import kleinert.soap.edn.EDNSoapReader
+import kleinert.soap.edn.EDNSoapWriter
 
 fun examples1() {
     fun testFunDefault(s: String) {
-        val data = EDNSoapReader.readString(s)
+        val data = EDN.read(s)
         println("\"" + data + "\" " + (data?.javaClass ?: "null"))
     }
 
     fun testFunExtend(s: String) {
-        val data = EDNSoapReader.readString(s, EDNSoapOptions.extendedOptions)
+        val data = EDN.read(s, EDN.extendedOptions)
         println("\"" + data + "\" " + (data?.javaClass ?: "null"))
     }
     testFunDefault("\\a") // "a Class Char"
@@ -50,9 +52,9 @@ fun examples2() {
     run {
         val decoders = mapOf("my/pair" to ::mapOrListToPair)
         println(
-            EDNSoapReader.readString(
+            EDN.read(
                 "[ #my/pair {\"first\" 4 \"second\" 5} #my/pair [4 5] ] ",
-                EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
+                EDN.defaultOptions.copy(ednClassDecoders = decoders)
             )
         )
     } // Output: [(4, 5), (4, 5)]
@@ -61,9 +63,9 @@ fun examples2() {
         // Allowing more freedom in naming here.
         val decoders = mapOf("pair" to ::mapOrListToPair)
         println(
-            EDNSoapReader.readString(
+            EDN.read(
                 "[ #pair {\"first\" 4 \"second\" 5} #pair [4 5] ] ",
-                EDNSoapOptions.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = decoders)
+                EDN.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = decoders)
             )
         )
     } // Output: [(4, 5), (4, 5)]
@@ -224,23 +226,33 @@ fun main(args: Array<String>) {
 //        val seq = LazyList.distinct(LazyList.of(1,2,3,3,2,1,4))
 //        println(LazyList.distinct(seq))
 //    }
+//    run {
+//        val lst = PackedList(3, 2, listOf(1, 2, 3, 4, 5, 6))
+//        println(lst.unpack())
+//        println(lst.unpack().indexOf(listOf(3, 4)))
+//        println(lst.indexOf(listOf(3, 4)))
+//        println(lst[1])
+//        println(lst[1, 1])
+//    }
+//    run {
+//        val text = "#array2d [[1 2] [3 4] [5 6]]"
+//        val parsed = EDN.read(text, EDNSoapOptions.extendedReaderOptions(EDNSoapOptions.allDecoders))
+//        println(parsed?.javaClass ?: "null")
+//        println((parsed as Array<Array<*>>).contentDeepToString())
+//    }
+//    run {
+//        val text = "##INF"
+//        val parsed = EDN.read(text)
+//        println(parsed)
+//    }
+
     run {
-        val lst = PackedList(3, 2, listOf(1,2,3,4,5,6))
-        println(lst.unpack())
-        println(lst.unpack().indexOf(listOf(3,4)))
-        println(lst.indexOf(listOf(3,4)))
-        println(lst[1])
-        println(lst[1, 1])
+        val parsed = EDN.read(readln())
+        println(parsed)
     }
+
     run {
-        val text = "#array2d [[1 2] [3 4] [5 6]]"
-        val parsed = EDNSoapReader.readString(text, EDNSoapOptions.extendedReaderOptions(EDNSoapOptions.allDecoders))
-        println(parsed?.javaClass ?: "null")
-        println((parsed as Array<Array<*>>).contentDeepToString())
-    }
-    run {
-        val text = "##INF"
-        val parsed = EDNSoapReader.readString(text)
+        val parsed = EDN.read(readln())
         println(parsed)
     }
 }

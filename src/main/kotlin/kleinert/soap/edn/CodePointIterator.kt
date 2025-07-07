@@ -1,12 +1,13 @@
 package kleinert.soap.edn
 
+import java.io.BufferedReader
 import java.io.Closeable
+import java.io.InputStream
 import java.io.Reader
 import java.util.*
 import java.util.function.IntConsumer
 import java.util.stream.IntStream
 import kotlin.math.min
-
 
 internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     private var index = -1
@@ -18,10 +19,14 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
         iterator = codepointStream.iterator()
     }
 
-    constructor(reader: Reader, memorySize: Int = 32) {
-        iterator = IntermediateReader(reader)
+    constructor(reader: InputStream, memorySize: Int = 32) {
+        iterator = IntermediateInputStream(reader)
         memory = IntArray(memorySize)
+    }
 
+    constructor(reader: Reader, memorySize: Int = 32) {
+        iterator = IntermediateReader(reader.buffered())
+        memory = IntArray(memorySize)
     }
 
     override fun remove() {
@@ -30,9 +35,6 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
 
     override fun hasNext(): Boolean =
         index >= 0 || iterator.hasNext()
-
-    fun isFinished(): Boolean =
-        index == -1 && !iterator.hasNext()
 
     fun peek(): Int {
         if (index >= 0)
@@ -116,21 +118,33 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     }
 
     override fun close() {
-        if (iterator is Closeable)
+        if (iterator is Closeable) {
             iterator.close()
+        }
     }
 }
 
-internal class IntermediateReader(private var reader: Reader) : PrimitiveIterator.OfInt, Closeable {
+internal class IntermediateReader(private var reader: BufferedReader) : PrimitiveIterator.OfInt, Closeable {
+    private var memory: Int = -1
+
     override fun hasNext(): Boolean {
-        return reader.ready()
+        if (memory != -1) return true
+        val temp = reader.read()
+        if (temp == -1) return false
+        memory = temp
+        return true
     }
 
     override fun next(): Int {
-        return reader.read()
+        return nextInt()
     }
 
     override fun nextInt(): Int {
+        if (memory != -1) {
+            val temp = memory
+            memory = -1
+            return temp
+        }
         return reader.read()
     }
 
@@ -140,5 +154,34 @@ internal class IntermediateReader(private var reader: Reader) : PrimitiveIterato
 
     override fun close() {
         reader.close()
+    }
+}
+
+internal class IntermediateInputStream(private var input: InputStream) : PrimitiveIterator.OfInt {
+    private var memory: Int = -1
+
+    override fun hasNext(): Boolean {
+        if (memory != -1) return true
+        val temp = input.read()
+        if (temp == -1) return false
+        memory = temp
+        return true
+    }
+
+    override fun next(): Int {
+        return nextInt()
+    }
+
+    override fun nextInt(): Int {
+        if (memory != -1) {
+            val temp = memory
+            memory = -1
+            return temp
+        }
+        return input.read()
+    }
+
+    override fun remove() {
+        throw java.lang.UnsupportedOperationException("Remove not supported!")
     }
 }

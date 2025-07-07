@@ -5,7 +5,7 @@ import java.math.BigInteger
 import java.math.MathContext
 import kotlin.math.absoluteValue
 
-class Ratio private constructor(var num: Long, val den: Long) : Number(), Comparable<Ratio> {
+class Ratio private constructor(var num: Long, val den: Long) : Number(), Comparable<Number> {
     companion object {
         val ZERO: Ratio = Ratio(0, 1)
 
@@ -145,12 +145,29 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
         }
     }
 
-    override operator fun compareTo(other: Ratio): Int {
-        val a: Ratio = this
-        val lhs = a.num * other.den
-        val rhs = a.den * other.num
-        if (lhs < rhs) return -1
-        return if (lhs > rhs) +1 else 0
+    override operator fun compareTo(other: Number): Int = when (other) {
+        is Byte, is Short, is Int, is Long, is Float, is Double ->
+            (num.toDouble()/den.toDouble()).compareTo(other.toDouble())
+
+        is BigInteger-> toBigDecimal().compareTo(BigDecimal(other))
+        is BigDecimal ->toBigDecimal().compareTo(other)
+
+        is Ratio -> {
+            val a: Ratio = this
+            val lhs = a.num * other.den
+            val rhs = a.den * other.num
+
+            if (lhs < rhs) -1
+            else if (lhs > rhs) +1
+            else 0
+        }
+
+        is Complex -> {
+            if (other.imag != 0.0) throw IllegalArgumentException()
+            toDouble().compareTo(other.real)
+        }
+
+        else -> throw IllegalArgumentException()
     }
 
     override fun hashCode(): Int {

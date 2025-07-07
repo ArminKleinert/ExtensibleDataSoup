@@ -2,7 +2,6 @@ package kleinert.soap.edn
 
 import kleinert.soap.data.PersistentList
 import kleinert.soap.data.Ratio
-import java.io.Writer
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -11,22 +10,14 @@ import java.util.*
 class EDNSoapWriter private constructor(private val options: EDNSoapOptions = EDNSoapOptions.extendedOptions) {
 
     companion object {
-        fun pprintS(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions) =
+        fun pprintToString(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions,) =
             EDNSoapWriter(options).encode(obj)
 
-        fun pprint(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions) =
-            print(EDNSoapWriter(options).encode(obj))
+        fun pprint(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions, writer: Appendable = StringBuilder()) =
+            writer.append(EDNSoapWriter(options).encode(obj))
 
-        fun pprintln(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions) =
-            println(EDNSoapWriter(options).encode(obj))
-
-        fun pprintSE(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.extendedOptions) = pprintS(obj, options)
-        fun pprintE(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.extendedOptions) = pprint(obj, options)
-        fun pprintlnE(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.extendedOptions) = pprintln(obj, options)
-
-        fun encode(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.extendedOptions) = pprintS(obj, options)
-
-        fun write(obj:Any?, writer:Writer, options: EDNSoapOptions): Unit = TODO()
+        fun pprintln(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions, writer: Appendable = StringBuilder()) =
+            writer.append(EDNSoapWriter(options).encode(obj)).append('\n')
 
     }
 
@@ -89,7 +80,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
 
     private fun encodeSequence(obj: Sequence<*>) = obj.joinToString(
         separator = options.decodingSequenceSeparator,
-        limit = 10000,
+        limit = options.sequenceElementLimit,
         prefix = "(",
         postfix = ")",
         transform = {encode(it)},
