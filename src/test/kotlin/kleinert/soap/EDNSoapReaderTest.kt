@@ -1,109 +1,107 @@
 package kleinert.soap
 
+import kleinert.soap.edn.EDN
+import kleinert.soap.edn.EdnReaderException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class EDNSoapReaderTest {
-    private fun soap(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
-    }
-
     @Test
     fun parseStringBasicTest() {
-        assertInstanceOf(String::class.java, soap("\"\""))
-        assertEquals("", soap("\"\""))
-        assertEquals("abc", soap("\"abc\""))
+        assertInstanceOf(String::class.java, EDN.read("\"\""))
+        assertEquals("", EDN.read("\"\""))
+        assertEquals("abc", EDN.read("\"abc\""))
     }
 
     @Test
     fun parseStringEscapeSequenceTest() {
-        assertEquals("\n", soap("\"\\n\""))
-        assertEquals(listOf("", ""), (soap("\"\\n\"") as String).lines())
-        assertEquals("\t", soap("\"\\t\""))
+        assertEquals("\n", EDN.read("\"\\n\""))
+        assertEquals(listOf("", ""), (EDN.read("\"\\n\"") as String).lines())
+        assertEquals("\t", EDN.read("\"\\t\""))
 
-        assertEquals("\t", soap("\"\\t\""))
-        assertEquals("\b", soap("\"\\b\""))
-        assertEquals("\r", soap("\"\\r\""))
-        assertEquals("\"", soap("\"\\\"\""))
+        assertEquals("\t", EDN.read("\"\\t\""))
+        assertEquals("\b", EDN.read("\"\\b\""))
+        assertEquals("\r", EDN.read("\"\\r\""))
+        assertEquals("\"", EDN.read("\"\\\"\""))
 
-        assertEquals("\\", soap("\"\\\\\""))
-        assertEquals("\\\\", soap("\"\\\\\\\\\""))
-        soap(
+        assertEquals("\\", EDN.read("\"\\\\\""))
+        assertEquals("\\\\", EDN.read("\"\\\\\\\\\""))
+        EDN.read(
             """
             "\\"
         """.trimMargin()
         ).let { assertEquals("\\", it) }
 
-        soap(
+        EDN.read(
             """
             "\\\\"
         """.trimMargin()
         ).let { assertEquals("\\\\", it) }
 
-        assertEquals("\t\t", soap("\"\\t\\t\""))
+        assertEquals("\t\t", EDN.read("\"\\t\\t\""))
     }
 
     @Test
     fun parseStringUnicodeSequenceTest() {
-        assertEquals("🎁", soap("\"🎁\""))
-        assertEquals("🎁", soap("\"\\uD83C\\uDF81\""))
-        assertEquals("🎁", soap("\"\\uD83C\\uDF81\""))
-        assertEquals("🎁", soap("\"\\x0001F381\""))
+        assertEquals("🎁", EDN.read("\"🎁\""))
+        assertEquals("🎁", EDN.read("\"\\uD83C\\uDF81\""))
+        assertEquals("🎁", EDN.read("\"\\uD83C\\uDF81\""))
+        assertEquals("🎁", EDN.read("\"\\x0001F381\""))
     }
 
     @Test
     fun parseStringUnclosedTest() {
-        assertThrows(EdnReaderException::class.java) { soap("\"") }
-        assertThrows(EdnReaderException::class.java) { soap("\"abc") }
-        assertThrows(EdnReaderException::class.java) { soap("\"\"\"") }
+        assertThrows(EdnReaderException::class.java) { EDN.read("\"") }
+        assertThrows(EdnReaderException::class.java) { EDN.read("\"abc") }
+        assertThrows(EdnReaderException::class.java) { EDN.read("\"\"\"") }
     }
 
     @Test
     fun parseDiscardSimpleTest() {
-        assertEquals(2L, soap("#_1 2"))
+        assertEquals(2L, EDN.read("#_1 2"))
     }
 
     @Test
     fun parseDiscardTest() {
-        assertEquals(2L, soap("#_1 2"))
+        assertEquals(2L, EDN.read("#_1 2"))
 
         // Discard tags ignore spaces.
-        assertEquals(2L, soap("#_ 1 2"))
-        assertEquals(2L, soap("#_      1 2"))
+        assertEquals(2L, EDN.read("#_ 1 2"))
+        assertEquals(2L, EDN.read("#_      1 2"))
 
         // Discard ignores newlines
-        assertEquals(2L, soap("#_\n1 2"))
+        assertEquals(2L, EDN.read("#_\n1 2"))
 
         // Discard ignores comments
-        assertEquals(2L, soap("#_ ; abc\n 1 2"))
+        assertEquals(2L, EDN.read("#_ ; abc\n 1 2"))
 
         // Discard in strings does nothing
-        assertEquals("#_", soap("\"#_\""))
-        assertEquals("#_1", soap("\"#_1\""))
+        assertEquals("#_", EDN.read("\"#_\""))
+        assertEquals("#_1", EDN.read("\"#_1\""))
     }
 
     @Test
     fun parseDiscardAssociativityTest() {
         // Discard is right-associative
-        assertEquals(3L, soap("#_ #_ 1 2 3"))
+        assertEquals(3L, EDN.read("#_ #_ 1 2 3"))
     }
 
     @Test
     fun parseDiscardInCollectionTest() {
         // Discard is nothing. When discard appears in a list, vector, set, or map, it does nothing
-        soap("( #_ 1 #_ 2 #_ 3 )").let {
+        EDN.read("( #_ 1 #_ 2 #_ 3 )").let {
             assertTrue(it is Iterable<*>)
             assertTrue((it as Iterable<*>).toList().isEmpty())
         }
-        soap("[#_1 #_2 #_3]").let {
+        EDN.read("[#_1 #_2 #_3]").let {
             assertTrue(it is List<*>)
             assertTrue((it as List<*>).isEmpty())
         }
-        soap("#{#_1 #_1 #_1}").let {
+        EDN.read("#{#_1 #_1 #_1}").let {
             assertTrue(it is Set<*>)
             assertTrue((it as Set<*>).isEmpty())
         }
-        soap("{#_1 #_1 #_1}").let {
+        EDN.read("{#_1 #_1 #_1}").let {
             assertTrue(it is Map<*, *>)
             assertTrue((it as Map<*, *>).isEmpty())
         }
@@ -112,21 +110,21 @@ class EDNSoapReaderTest {
     @Test
     fun parseEmptySet() {
         // Normal
-        soap("#{}").let {
+        EDN.read("#{}").let {
             assertTrue(it is Set<*>)
             assertTrue((it as Set<*>).isEmpty())
         }
 
         // Whitespace does not matter
-        soap("#{  }").let {
+        EDN.read("#{  }").let {
             assertTrue(it is Set<*>)
             assertTrue((it as Set<*>).isEmpty())
         }
-        soap("#{\t \n}").let {
+        EDN.read("#{\t \n}").let {
             assertTrue(it is Set<*>)
             assertTrue((it as Set<*>).isEmpty())
         }
-        soap("#{\n}").let {
+        EDN.read("#{\n}").let {
             assertTrue(it is Set<*>)
             assertTrue((it as Set<*>).isEmpty())
         }
@@ -135,21 +133,21 @@ class EDNSoapReaderTest {
     @Test
     fun parseEmptyMap() {
         // Normal
-        soap("{}").let {
+        EDN.read("{}").let {
             assertTrue(it is Map<*, *>)
             assertTrue((it as Map<*, *>).isEmpty())
         }
 
         // Whitespace does not matter
-        soap("{  }").let {
+        EDN.read("{  }").let {
             assertTrue(it is Map<*, *>)
             assertTrue((it as Map<*, *>).isEmpty())
         }
-        soap("{\t \n}").let {
+        EDN.read("{\t \n}").let {
             assertTrue(it is Map<*, *>)
             assertTrue((it as Map<*, *>).isEmpty())
         }
-        soap("{\n}").let {
+        EDN.read("{\n}").let {
             assertTrue(it is Map<*, *>)
             assertTrue((it as Map<*, *>).isEmpty())
         }
@@ -157,15 +155,15 @@ class EDNSoapReaderTest {
 
     @Test
     fun parseListSimple() {
-        soap("(\\a)").let {
+        EDN.read("(\\a)").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf<Any?>('a'), (it as Iterable<*>).toList())
         }
-        soap("(\\a \\b)").let {
+        EDN.read("(\\a \\b)").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf('a', 'b'), (it as Iterable<*>).toList())
         }
-        soap("(())").let {
+        EDN.read("(())").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf(listOf<Any?>()), (it as Iterable<*>).toList())
         }
@@ -173,15 +171,15 @@ class EDNSoapReaderTest {
 
     @Test
     fun parseVectorSimple() {
-        soap("[\\a]").let {
+        EDN.read("[\\a]").let {
             assertTrue(it is List<*>)
             assertEquals(listOf('a'), (it as List<*>))
         }
-        soap("[\\a \\b]").let {
+        EDN.read("[\\a \\b]").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf('a', 'b'), (it as List<*>))
         }
-        soap("[[]]").let {
+        EDN.read("[[]]").let {
             assertTrue(it is Iterable<*>)
             assertEquals(listOf(listOf<Any?>()), (it as List<*>))
         }
@@ -189,15 +187,15 @@ class EDNSoapReaderTest {
 
     @Test
     fun parseSetSimple() {
-        soap("#{\\a \\b}").let {
+        EDN.read("#{\\a \\b}").let {
             assertTrue(it is Set<*>)
             assertEquals(setOf('a', 'b'), (it as Set<*>))
         }
-        soap("#{ \\a }").let {
+        EDN.read("#{ \\a }").let {
             assertTrue(it is Set<*>)
             assertEquals(setOf('a'), (it as Set<*>))
         }
-        soap("#{\\a #{}}").let {
+        EDN.read("#{\\a #{}}").let {
             assertTrue(it is Set<*>)
             assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
         }
@@ -205,17 +203,17 @@ class EDNSoapReaderTest {
 
     @Test
     fun parseSetFastSimple() {
-        EDNSoapReader.readString("#{\\a \\b}", EDNSoapOptions.extendedOptions.copy(useFasterSetConstruction = true))
+        EDN.read("#{\\a \\b}", EDN.extendedOptions.copy(useFasterSetConstruction = true))
             .let {
                 assertTrue(it is Set<*>)
                 assertEquals(setOf('a', 'b'), (it as Set<*>))
             }
-        EDNSoapReader.readString("#{ \\a }", EDNSoapOptions.extendedOptions.copy(useFasterSetConstruction = true))
+        EDN.read("#{ \\a }", EDN.extendedOptions.copy(useFasterSetConstruction = true))
             .let {
                 assertTrue(it is Set<*>)
                 assertEquals(setOf('a'), (it as Set<*>))
             }
-        EDNSoapReader.readString("#{\\a #{}}", EDNSoapOptions.extendedOptions.copy(useFasterSetConstruction = true))
+        EDN.read("#{\\a #{}}", EDN.extendedOptions.copy(useFasterSetConstruction = true))
             .let {
                 assertTrue(it is Set<*>)
                 assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
@@ -224,15 +222,15 @@ class EDNSoapReaderTest {
 
     @Test
     fun parseMapSimple() {
-        soap("{\\a \\b}").let {
+        EDN.read("{\\a \\b}").let {
             assertTrue(it is Map<*, *>)
             assertEquals(mapOf('a' to 'b').entries, (it as Map<*, *>).entries)
         }
-        soap("{\\a {}}").let {
+        EDN.read("{\\a {}}").let {
             assertTrue(it is Map<*, *>)
             assertEquals(mapOf('a' to mapOf<Any?, Any?>()).entries, (it as Map<*, *>).entries)
         }
-        soap("{{} {}}").let {
+        EDN.read("{{} {}}").let {
             assertTrue(it is Map<*, *>)
             assertEquals(mapOf<Any?, Any?>(mapOf<Any?, Any?>() to mapOf<Any?, Any?>()), (it as Map<*, *>))
         }

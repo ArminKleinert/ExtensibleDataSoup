@@ -1,8 +1,8 @@
-package kleinert.soap
+package kleinert.soap.edn
 
-import kleinert.soap.ExtendedEDNDecoders.arrayDecoders
-import kleinert.soap.ExtendedEDNDecoders.listDecoders
-import kleinert.soap.ExtendedEDNDecoders.prettyDecoders
+import kleinert.soap.edn.ExtendedEDNDecoders.arrayDecoders
+import kleinert.soap.edn.ExtendedEDNDecoders.listDecoders
+import kleinert.soap.edn.ExtendedEDNDecoders.prettyDecoders
 import kleinert.soap.data.*
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -159,23 +159,23 @@ object ExtendedEDNDecoders {
 
     val arrayDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
-            "bytearray" to ::listToByteArray,
-            "shortarray" to ::listToShortArray,
-            "intarray" to ::listToIntArray,
-            "longarray" to ::listToLongArray,
-            "floatarray" to ::listToFloatArray,
-            "doublearray" to ::listToDoubleArray,
-            "bigintarray" to ::listToBigIntArray,
-            "bigdecimalarray" to ::listToBigDecimalArray,
-            "stringarray" to ::listToStringArray,
-            "array" to ::listToArray,
-            "array2d" to ::listTo2dArray,
+            "bytearray" to ExtendedEDNDecoders::listToByteArray,
+            "shortarray" to ExtendedEDNDecoders::listToShortArray,
+            "intarray" to ExtendedEDNDecoders::listToIntArray,
+            "longarray" to ExtendedEDNDecoders::listToLongArray,
+            "floatarray" to ExtendedEDNDecoders::listToFloatArray,
+            "doublearray" to ExtendedEDNDecoders::listToDoubleArray,
+            "bigintarray" to ExtendedEDNDecoders::listToBigIntArray,
+            "bigdecimalarray" to ExtendedEDNDecoders::listToBigDecimalArray,
+            "stringarray" to ExtendedEDNDecoders::listToStringArray,
+            "array" to ExtendedEDNDecoders::listToArray,
+            "array2d" to ExtendedEDNDecoders::listTo2dArray,
         )
 
     val listDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
-            "bitset" to ::setToBitSet,
-            "packed2D" to ::packed2dList,
+            "bitset" to ExtendedEDNDecoders::setToBitSet,
+            "packed2D" to ExtendedEDNDecoders::packed2dList,
         )
 
     val prettyDecoders: Map<String, (Any?) -> Any?>

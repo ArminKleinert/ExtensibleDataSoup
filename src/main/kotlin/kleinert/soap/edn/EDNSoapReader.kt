@@ -1,8 +1,8 @@
-package kleinert.soap
+package kleinert.soap.edn
 
 import kleinert.soap.data.*
-import java.math.BigDecimal
-import java.math.BigInteger
+import java.io.File
+import java.io.Reader
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
@@ -17,7 +17,23 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
         @Throws(EdnReaderException::class)
         fun readString(input: String, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
-            return EDNSoapReader(options).readString(input)
+            return CodePointIterator(input.codePoints()).use {
+                EDNSoapReader(options).readString(it)
+            }
+        }
+
+        @Throws(EdnReaderException::class)
+        fun readFile(input: File, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
+            return CodePointIterator(input.reader(Charsets.UTF_8)).use {
+                EDNSoapReader(options).readString(it)
+            }
+        }
+
+        @Throws(EdnReaderException::class)
+        fun readReader(input: Reader, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? {
+            return CodePointIterator(input).use {
+                EDNSoapReader(options).readString(it)
+            }
         }
     }
 
@@ -50,10 +66,10 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 //            throw EdnReaderException("Unclosed String $currentToken")
 //        }
 
-    fun readString(s: String): Any? {
-        val codePointIterator = CodePointIterator(s.codePoints())
+    private fun readString(codePointIterator: CodePointIterator): Any? {
         if (!codePointIterator.hasNext())
             throw EdnReaderException("Empty input string.")
+
         val data = readForm(codePointIterator, 0)
         if ((data as Collection<*>).size != 1)
             throw EdnReaderException("The string should only contain one expression, but there are multiple.")
@@ -70,20 +86,13 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseNumberHelper(cpi: CodePointIterator, negate: Boolean = false): Number {
-        fun negateIfNegative(number: BigDecimal) = if (negate) number.negate() else number
-        fun negateIfNegative(number: BigInteger) = if (negate) number.negate() else number
-        fun negateIfNegative(number: Long) = if (negate) -number else number
-        fun negateIfNegative(number: Double) = if (negate) -number else number
-        fun negateIfNegative(number: Ratio) = if (negate) number.negate() else number
-        fun negateIfNegative(number: Complex) = if (negate) number.negate() else number
-
         val token = readToken(cpi, ::isNotBreakingSymbol)
 
         val floatyRegex = Regex("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?")
         val intRegex = Regex("[+\\-]?(0[obx])?[0-9a-fA-F]+N?")
         val ratioRegex = Regex("[+\\-]?[0-9]+/[0-9]+?")
 
-        val expandedIntRegex = Regex("[+\\-]?(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64)?")
+        val expandedIntRegex = Regex("[+\\-]?(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64|L)?")
         val complexRegex = Regex("[+\\-]?([0-9]*\\.?[0-9]+[+\\-]?)?([0-9]*\\.?[0-9]+)?i")
 
         val tokenLen = token.length
@@ -142,7 +151,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         }
     }
 
-    private fun parseComment(cpi: CodePointIterator, errorIfEof: Boolean = false) {
+    private fun parseComment(cpi: CodePointIterator) {
         cpi.skipLine()
     }
 
@@ -268,13 +277,12 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
 
     private fun parseDispatchUnicodeChar(
         cpi: CodePointIterator,
-        token: CharSequence,
+        initialToken: CharSequence,
         isDispatch: Boolean = false
     ): Int {
-        val token = if (token.isEmpty() && cpi.hasNext())
-            cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle)
-        else
-            token
+        val token =
+            if (initialToken.isEmpty() && cpi.hasNext()) cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle)
+            else initialToken
 
         if (token.length == 1)
             return token[0].code
@@ -355,9 +363,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
             '#' -> {
                 cpi.takeCodePoints(token, ::isNotBreakingSymbolOrDispatch)
 
-                val tokenAsString = "#$token"
-
-                return when (tokenAsString) {
+                return when (val tokenAsString = "#$token") {
                     "##NaN" -> Double.NaN
                     "##-NaN" -> -Double.NaN
                     "##INF" -> Double.POSITIVE_INFINITY

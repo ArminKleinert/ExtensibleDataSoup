@@ -1,19 +1,17 @@
 package kleinert.soap
 
 import kleinert.soap.data.Keyword
+import kleinert.soap.edn.EDN
+import kleinert.soap.edn.EdnReaderException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class EDNReaderKeywordTest {
-    private fun soap(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
-    }
-
     @Test
     fun parseKeywordBasicTest() {
         run {
             val text = ":ab"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -23,7 +21,7 @@ class EDNReaderKeywordTest {
         }
         run {
             val text = ":a1"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -37,7 +35,7 @@ class EDNReaderKeywordTest {
     fun parseKeywordWithNamespaceTest() {
         run {
             val text = ":a/b"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -51,7 +49,7 @@ class EDNReaderKeywordTest {
     fun parseKeywordSymbolsTest() {
         run {
             val text = ":+"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -61,7 +59,7 @@ class EDNReaderKeywordTest {
         }
         run {
             val text = ":+-"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -71,7 +69,7 @@ class EDNReaderKeywordTest {
         }
         run {
             val text = ":->"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -81,7 +79,7 @@ class EDNReaderKeywordTest {
         }
         run {
             val text = ":==="
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -93,17 +91,17 @@ class EDNReaderKeywordTest {
 
     @Test
     fun parseKeywordSymbolsMixTest() {
-        soap(":a+").let {
+        EDN.read(":a+").let {
             Assertions.assertInstanceOf(Keyword::class.java, it)
             Assertions.assertEquals(Keyword.parse(":a+"), it)
         }
-        soap(":-a").let {
+        EDN.read(":-a").let {
             Assertions.assertInstanceOf(Keyword::class.java, it)
             Assertions.assertEquals(Keyword.parse(":-a"), it)
         }
         run {
             val text = ":a+"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -113,7 +111,7 @@ class EDNReaderKeywordTest {
         }
         run {
             val text = ":-a"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -127,7 +125,7 @@ class EDNReaderKeywordTest {
     fun parseKeywordUTFTest() {
         run { // 'λ' fits into simple chars.
             val text = ":λ"
-            val it = soap(text)
+            val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -137,7 +135,7 @@ class EDNReaderKeywordTest {
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             val text = ":🎁"
-            val it = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
+            val it = EDN.read(text, EDN.extendedOptions)
             val keyword = Keyword.parse(text, true)!!
             Assertions.assertInstanceOf(Keyword::class.java, it)
             it as Keyword
@@ -149,12 +147,12 @@ class EDNReaderKeywordTest {
 
     @Test
     fun parseInvalidKeywordTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { soap(":") } // Only colon is invalid.
-        Assertions.assertThrows(EdnReaderException::class.java) { soap(":/") } // Colon+slash is invalid.
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read(":") } // Only colon is invalid.
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read(":/") } // Colon+slash is invalid.
 
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("::") } // Double colon is invalid.
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("::abc") } // Double colon is invalid.
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("::") } // Double colon is invalid.
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("::abc") } // Double colon is invalid.
 
-        Assertions.assertThrows(EdnReaderException::class.java) { soap(":\uD83C\uDF81") } // UTF-8 only valid with extension.
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read(":\uD83C\uDF81") } // UTF-8 only valid with extension.
     }
 }

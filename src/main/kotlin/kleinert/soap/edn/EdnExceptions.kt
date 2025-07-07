@@ -1,4 +1,4 @@
-package kleinert.soap
+package kleinert.soap.edn
 
 
 open class EdnReaderException(text: String, cause: Throwable? = null) : Exception(text, cause) {

@@ -1,10 +1,6 @@
-import kleinert.soap.*
-import kleinert.soap.data.Complex
-import kleinert.soap.data.Keyword
 import kleinert.soap.data.PackedList
-import java.math.BigDecimal
-import java.math.BigInteger
-import kotlin.jvm.functions.FunctionN
+import kleinert.soap.edn.EDNSoapOptions
+import kleinert.soap.edn.EDNSoapReader
 
 fun examples1() {
     fun testFunDefault(s: String) {

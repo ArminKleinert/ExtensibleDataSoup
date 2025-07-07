@@ -1,20 +1,17 @@
 package kleinert.soap
 
 import kleinert.soap.data.Symbol
+import kleinert.soap.edn.EDN
+import kleinert.soap.edn.EdnReaderException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class EDNReaderSymbolTest {
-    private fun soap(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
-    }
-
-
     @Test
     fun parseSymbolBasicTest() {
         run {
             val text = "ab"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -24,7 +21,7 @@ class EDNReaderSymbolTest {
         }
         run {
             val text = "a1"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -38,7 +35,7 @@ class EDNReaderSymbolTest {
     fun parseSymbolWithNamespaceTest() {
         run {
             val text = "a/b"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -52,7 +49,7 @@ class EDNReaderSymbolTest {
     fun parseSymbolSymbolsTest() {
         run {
             val text = "+"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -62,7 +59,7 @@ class EDNReaderSymbolTest {
         }
         run {
             val text = "+-"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -72,7 +69,7 @@ class EDNReaderSymbolTest {
         }
         run {
             val text = "->"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -82,7 +79,7 @@ class EDNReaderSymbolTest {
         }
         run {
             val text = "==="
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -96,7 +93,7 @@ class EDNReaderSymbolTest {
     fun parseSymbolSymbolsMixTest() {
         run {
             val text = "a+"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -106,7 +103,7 @@ class EDNReaderSymbolTest {
         }
         run {
             val text = "-a"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -120,7 +117,7 @@ class EDNReaderSymbolTest {
     fun parseSymbolUTFTest() {
         run { // 'λ' fits into simple chars.
             val text = "λ"
-            val it = soap(text)
+            val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -130,7 +127,7 @@ class EDNReaderSymbolTest {
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             val text = "🎁"
-            val it = EDNSoapReader.readString(text, EDNSoapOptions.extendedOptions)
+            val it = EDN.read(text, EDN.extendedOptions)
             val symbol = Symbol.parse(text, true)!!
             Assertions.assertInstanceOf(Symbol::class.java, it)
             it as Symbol
@@ -142,6 +139,6 @@ class EDNReaderSymbolTest {
 
     @Test
     fun parseInvalidSymbolTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("\uD83C\uDF81") } // UTF-16 only valid with extension.
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\uD83C\uDF81") } // UTF-16 only valid with extension.
     }
 }

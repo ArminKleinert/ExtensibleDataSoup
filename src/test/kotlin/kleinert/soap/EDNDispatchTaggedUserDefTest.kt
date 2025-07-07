@@ -1,5 +1,7 @@
 package kleinert.soap
 
+import kleinert.soap.edn.EDN
+import kleinert.soap.edn.EdnReaderException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -9,16 +11,16 @@ class EDNDispatchTaggedUserDefTest {
         // invalid name
         run {
             val decoders = mapOf("pair" to { e: Any? -> e })
-            val options = EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
-            Assertions.assertThrows(EdnReaderException::class.java) { EDNSoapReader.readString("1", options) }
+            val options = EDN.defaultOptions.copy(ednClassDecoders = decoders)
+            Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("1", options) }
         }
 
         // Valid name with option
         run {
             val decoders = mapOf("pair" to { e: Any? -> e })
             val options =
-                EDNSoapOptions.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = decoders)
-            EDNSoapReader.readString("1", options)
+                EDN.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = decoders)
+            EDN.read("1", options)
         }
     }
 
@@ -34,16 +36,16 @@ class EDNDispatchTaggedUserDefTest {
 
         Assertions.assertEquals(
             4L to 5L,
-            EDNSoapReader.readString(
+            EDN.read(
                 "#my/pair {\"first\" 4 \"second\" 5}",
-                EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
+                EDN.defaultOptions.copy(ednClassDecoders = decoders)
             )
         )
         Assertions.assertEquals(
             4L to 5L,
-            EDNSoapReader.readString(
+            EDN.read(
                 "#my/pair [4 5]",
-                EDNSoapOptions.defaultOptions.copy(ednClassDecoders = decoders)
+                EDN.defaultOptions.copy(ednClassDecoders = decoders)
             )
         )
     }

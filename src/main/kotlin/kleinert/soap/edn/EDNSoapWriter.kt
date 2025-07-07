@@ -1,7 +1,8 @@
-package kleinert.soap
+package kleinert.soap.edn
 
 import kleinert.soap.data.PersistentList
 import kleinert.soap.data.Ratio
+import java.io.Writer
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -24,12 +25,14 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions = ED
         fun pprintlnE(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.extendedOptions) = pprintln(obj, options)
 
         fun encode(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.extendedOptions) = pprintS(obj, options)
+
+        fun write(obj:Any?, writer:Writer, options: EDNSoapOptions): Unit = TODO()
+
     }
 
     private fun tryEncoder(obj: Any): String? {
         val encoder = options.ednClassEncoders[obj.javaClass] ?: return null
         val (prefix, output) = encoder(obj as Any?) ?: return null
-        println("Prefix: $prefix Output: $output")
         return "#$prefix ${encode(output)}"
     }
 

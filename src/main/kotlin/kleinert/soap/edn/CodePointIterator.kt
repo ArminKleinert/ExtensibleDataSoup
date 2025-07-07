@@ -1,14 +1,28 @@
-package kleinert.soap
+package kleinert.soap.edn
 
-import java.util.PrimitiveIterator
+import java.io.Closeable
+import java.io.Reader
+import java.util.*
 import java.util.function.IntConsumer
 import java.util.stream.IntStream
 import kotlin.math.min
 
-class CodePointIterator(codepointStream: IntStream, memorySize: Int = 32) : PrimitiveIterator.OfInt {
+
+internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     private var index = -1
-    private var memory = IntArray(memorySize)
-    private val iterator: PrimitiveIterator.OfInt = codepointStream.iterator()
+    private var memory: IntArray
+    private val iterator: PrimitiveIterator.OfInt
+
+    constructor(codepointStream: IntStream, memorySize: Int = 32) {
+        memory = IntArray(memorySize)
+        iterator = codepointStream.iterator()
+    }
+
+    constructor(reader: Reader, memorySize: Int = 32) {
+        iterator = IntermediateReader(reader)
+        memory = IntArray(memorySize)
+
+    }
 
     override fun remove() {
         throw UnsupportedOperationException("remove")
@@ -99,5 +113,32 @@ class CodePointIterator(codepointStream: IntStream, memorySize: Int = 32) : Prim
                 break
             }
         }
+    }
+
+    override fun close() {
+        if (iterator is Closeable)
+            iterator.close()
+    }
+}
+
+internal class IntermediateReader(private var reader: Reader) : PrimitiveIterator.OfInt, Closeable {
+    override fun hasNext(): Boolean {
+        return reader.ready()
+    }
+
+    override fun next(): Int {
+        return reader.read()
+    }
+
+    override fun nextInt(): Int {
+        return reader.read()
+    }
+
+    override fun remove() {
+        throw java.lang.UnsupportedOperationException("Remove not supported!")
+    }
+
+    override fun close() {
+        reader.close()
     }
 }

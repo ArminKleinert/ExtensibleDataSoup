@@ -1,55 +1,57 @@
 package kleinert.soap
 
-import org.junit.jupiter.api.Test
+import kleinert.soap.edn.EDN
+import kleinert.soap.edn.EdnReaderException
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class EDNReaderStringTest {
-    private fun soap(s: String): Any? {
-        return EDNSoapReader.readString(s, EDNSoapOptions.defaultOptions)
-    }
-
     @Test
     fun parseStringBasicTest() {
-        soap("\"\"").let { Assertions.assertInstanceOf(String::class.java, it) }
-        soap("\"\"").let { Assertions.assertEquals("", it) }
-        soap("\"abc\"").let { Assertions.assertEquals("abc", it) }
+        EDN.read("\"\"").let { Assertions.assertInstanceOf(String::class.java, it) }
+        EDN.read("\"\"").let { Assertions.assertEquals("", it) }
+        EDN.read("\"abc\"").let { Assertions.assertEquals("abc", it) }
     }
 
     @Test
     fun parseStringEscapeSequenceTest() {
-        soap("\"\\n\"").let { Assertions.assertEquals("\n", it) }
-        soap("\"\\n\"").let { Assertions.assertEquals(listOf("", ""), (it as String).lines()) }
-        soap("\"\\t\"").let { Assertions.assertEquals("\t", it) }
+        EDN.read("\"\\n\"").let { Assertions.assertEquals("\n", it) }
+        EDN.read("\"\\n\"").let { Assertions.assertEquals(listOf("", ""), (it as String).lines()) }
+        EDN.read("\"\\t\"").let { Assertions.assertEquals("\t", it) }
 
-        soap("\"\\t\"").let { Assertions.assertEquals("\t", it) }
-        soap("\"\\b\"").let { Assertions.assertEquals("\b", it) }
-        soap("\"\\r\"").let { Assertions.assertEquals("\r", it) }
-        soap("\"\\\"\"").let { Assertions.assertEquals("\"", it) }
+        EDN.read("\"\\t\"").let { Assertions.assertEquals("\t", it) }
+        EDN.read("\"\\b\"").let { Assertions.assertEquals("\b", it) }
+        EDN.read("\"\\r\"").let { Assertions.assertEquals("\r", it) }
+        EDN.read("\"\\\"\"").let { Assertions.assertEquals("\"", it) }
 
-        soap("\"\\\\\"").let { Assertions.assertEquals("\\", it) }
-        soap("\"\\\\\\\\\"").let { Assertions.assertEquals("\\\\", it) }
-        soap("""
+        EDN.read("\"\\\\\"").let { Assertions.assertEquals("\\", it) }
+        EDN.read("\"\\\\\\\\\"").let { Assertions.assertEquals("\\\\", it) }
+        EDN.read(
+            """
             "\\"
-        """.trimIndent()).let { Assertions.assertEquals("\\", it) }
-        soap("""
+        """.trimIndent()
+        ).let { Assertions.assertEquals("\\", it) }
+        EDN.read(
+            """
             "\\\\"
-        """.trimIndent()).let { Assertions.assertEquals("\\\\", it) }
+        """.trimIndent()
+        ).let { Assertions.assertEquals("\\\\", it) }
 
-        soap("\"\\t\\t\"").let { Assertions.assertEquals("\t\t", it) }
+        EDN.read("\"\\t\\t\"").let { Assertions.assertEquals("\t\t", it) }
     }
 
     @Test
     fun parseStringUnicodeSequenceTest() {
-        soap("\"🎁\"").let { Assertions.assertEquals("🎁", it) }
-        soap("\"\\uD83C\\uDF81\"").let { Assertions.assertEquals("🎁", it) }
-        soap("\"\\uD83C\\uDF81\"").let { Assertions.assertEquals("🎁", it) }
-        soap("\"\\x0001F381\"").let { Assertions.assertEquals("🎁", it) }
+        EDN.read("\"🎁\"").let { Assertions.assertEquals("🎁", it) }
+        EDN.read("\"\\uD83C\\uDF81\"").let { Assertions.assertEquals("🎁", it) }
+        EDN.read("\"\\uD83C\\uDF81\"").let { Assertions.assertEquals("🎁", it) }
+        EDN.read("\"\\x0001F381\"").let { Assertions.assertEquals("🎁", it) }
     }
 
     @Test
     fun parseStringUnclosedTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("\"") }
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("\"abc") }
-        Assertions.assertThrows(EdnReaderException::class.java) { soap("\"\"\"") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\"") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\"abc") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\"\"\"") }
     }
 }
