@@ -3,7 +3,6 @@ package kleinert.soap.edn
 import java.io.File
 import java.io.InputStream
 import java.io.Reader
-import java.io.Writer
 
 class EDN {
     companion object {
@@ -30,6 +29,18 @@ class EDN {
             return cpi1.use { cpi -> EDNSoapReader.read(cpi, options) }
         }
 
-        fun write(string: String, writer: Writer, options: EDNSoapOptions = defaultOptions) {}
+        fun pprint(string: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
+            if (writer == null) EDNSoapWriter.pprint(string, options, System.out.writer())
+            else EDNSoapWriter.pprint(string, options, writer)
+        }
+
+        fun pprintln(string: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
+            if (writer == null) EDNSoapWriter.pprintln(string, options, System.out.writer())
+            else EDNSoapWriter.pprintln(string, options, writer)
+        }
+
+        fun pprintToString(string: Any?, options: EDNSoapOptions = defaultOptions): String {
+            return EDNSoapWriter.pprintToString(string, options)
+        }
     }
 }

@@ -1,8 +1,5 @@
-import kleinert.soap.data.PackedList
 import kleinert.soap.edn.EDN
-import kleinert.soap.edn.EDNSoapOptions
-import kleinert.soap.edn.EDNSoapReader
-import kleinert.soap.edn.EDNSoapWriter
+import java.lang.StringBuilder
 
 fun examples1() {
     fun testFunDefault(s: String) {
@@ -247,12 +244,7 @@ fun main(args: Array<String>) {
 //    }
 
     run {
-        val parsed = EDN.read(readln())
-        println(parsed)
-    }
-
-    run {
-        val parsed = EDN.read(readln())
-        println(parsed)
+        EDN.pprint(listOf(123,456), System.out.bufferedWriter())
+        EDN.pprintln(listOf(123,456), System.out.bufferedWriter())
     }
 }
