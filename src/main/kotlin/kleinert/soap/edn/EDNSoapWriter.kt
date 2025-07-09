@@ -1,9 +1,10 @@
 package kleinert.soap.edn
 
+import kleinert.soap.data.Keyword
 import kleinert.soap.data.PersistentList
 import kleinert.soap.data.Ratio
+import kleinert.soap.data.Symbol
 import java.io.Flushable
-import java.io.Writer
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -22,13 +23,15 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             obj: Any?,
             options: EDNSoapOptions = EDNSoapOptions.defaultOptions,
             writer: Appendable
-        ) { EDNSoapWriter(options, writer).encode(obj)
-        if (writer is Flushable) writer.flush()}
+        ) {
+            EDNSoapWriter(options, writer).encode(obj)
+            if (writer is Flushable) writer.flush()
+        }
 
         fun pprintln(
             obj: Any?,
             options: EDNSoapOptions = EDNSoapOptions.defaultOptions,
-            writer: Appendable = StringBuilder()
+            writer: Appendable
         ) {
             EDNSoapWriter(options, writer).encode(obj)
             writer.append('\n')
@@ -50,14 +53,16 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             null -> writer.append("nil")
             true -> writer.append("true")
             false -> writer.append("false")
-            is String -> writer.append(encodeString(obj))
-            is Char -> writer.append(encodeChar(obj))
-            is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> writer.append(
-                encodePredefinedNumberType(obj as Number)
-            )
-
-            is BigInteger, is BigDecimal -> writer.append(encodePredefinedNumberType(obj as Number))
-            is Map.Entry<*, *> -> writer.append("${encode(obj.key)} ${encode(obj.value)}")
+            is String -> encodeString(obj)
+            is Char -> encodeChar(obj)
+            is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> encodePredefinedNumberType(obj as Number)
+            is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
+            is Map.Entry<*, *> -> {
+                println("entry: $obj")
+                encode(obj.key)
+                writer.append(' ')
+                encode (obj.value)
+            }
             is PersistentList<*> -> if (!tryEncoder(obj)) encodePersistentList(obj)
             is ByteArray -> if (!tryEncoder(obj)) encode(obj.toList())
             is ShortArray -> if (!tryEncoder(obj)) encode(obj.toList())
@@ -73,31 +78,31 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             is Sequence<*> -> if (!tryEncoder(obj)) encodeSequence(obj)
             is UUID -> writer.append("#uuid ").append(obj.toString())
             is Instant -> writer.append("#inst").append(obj.toString())
-            else -> if (!tryEncoder(obj)) obj.toString()
+            is Keyword -> if (!tryEncoder(obj)) writer.append(obj.toString())
+            is Symbol -> if (!tryEncoder(obj)) writer.append(obj.toString())
+            else -> if (!tryEncoder(obj)) writer.append(obj.toString())
         }
     }
 
-    private fun encodePredefinedNumberType(obj: Number): String {
-        val temp = StringBuilder()
+    private fun encodePredefinedNumberType(obj: Number) {
         when (obj) {
-            is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> temp.append(obj)
-            is BigInteger -> temp.append(obj).append('N')
-            is BigDecimal -> temp.append(obj).append('M')
-            else -> temp.append(obj)
+            is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> writer.append(obj.toString())
+            is BigInteger -> writer.append(obj.toString()).append('N')
+            is BigDecimal -> writer.append(obj.toString()).append('M')
+            else -> writer.append(obj.toString())
         }
         if (options.allowNumericSuffixes) {
             when (obj) {
-                is Byte -> temp.append("_i8")
-                is Short -> temp.append("_i16")
-                is Int -> temp.append("_i32")
+                is Byte -> writer.append("_i8")
+                is Short -> writer.append("_i16")
+                is Int -> writer.append("_i32")
             }
         }
-        return temp.toString()
     }
 
-    private fun encodeString(obj: String) = StringBuilder().append('"').append(obj).append('"').toString()
+    private fun encodeString(obj: String) = writer.append('"').append(obj).append('"')
 
-    private fun encodeChar(obj: Char) = StringBuilder().append('\\').append(obj).toString()
+    private fun encodeChar(obj: Char) = writer.append('\\').append(obj)
 
     private fun encodeSequence(obj: Sequence<*>) = obj.joinTo(
         writer,

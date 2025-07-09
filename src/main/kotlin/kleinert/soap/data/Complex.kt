@@ -15,11 +15,15 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
         fun valueOf(real: Long, imag: Long = 0) = Complex(real.toDouble(), imag.toDouble())
         fun valueOf(real: Int, imag: Int = 0) = Complex(real.toDouble(), imag.toDouble())
 
-        fun valueOf(v: String): Complex =
-            valueOfOrNull(v) ?: throw NumberFormatException("Illegal format for complex number $v.")
+        fun valueOfOrNull(v: String): Complex? =
+            try {
+                valueOf(v)
+            } catch (nfe: NumberFormatException) {
+                null
+            }
 
-        fun valueOfOrNull(v: String): Complex? {
-            var sign: Int = 1
+        fun valueOf(v: String): Complex {
+            var sign = 1
             var index = 0
             while (v[index] == '+' || v[index] == '-') {
                 if (v[index] == '-') sign = -sign
@@ -28,16 +32,18 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
             val subs = v.substring(index)
             val parts = subs.split('+', '-', limit = 2)
             val imagSign: Int
-            val realPart: String
+            var realPart: String
             var imagPart: String
             if (parts.size == 1) {
-                if (parts[0].endsWith('i')) {
+                if (parts[0].endsWith('i')) { // Number only has an imaginary part
                     realPart = "0"
                     imagSign = sign
                     sign = 1
-                    imagPart = parts[0].substring(0, parts[0].lastIndex)
-                } else {
+                    imagPart = parts[0].substring(0, parts[0].lastIndex) // Cut away the 'i'
+                    if (imagPart.isEmpty()) imagPart = "0"
+                } else { // Number only has a real part
                     realPart = parts[0]
+                    if (realPart.isEmpty()) realPart = "0"
                     imagSign = 1
                     imagPart = "0"
                 }
@@ -45,11 +51,13 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
                 realPart = parts[0]
                 imagSign = if (subs[parts[0].length] == '-') -1 else 1
                 imagPart = parts[1]
-                imagPart = imagPart.substring(0, imagPart.lastIndex)
+                if (!imagPart.endsWith('i')) throw NumberFormatException("No 'i' postfix for complex number $v.")
+                imagPart = imagPart.substring(0, imagPart.lastIndex) // Cut away the 'i'
+                if (imagPart.isEmpty()) imagPart = "0"
             }
 
-            val real = realPart.toDoubleOrNull() ?: return null
-            val imag = imagPart.toDoubleOrNull() ?: return null
+            val real = realPart.toDoubleOrNull() ?: throw NumberFormatException("Illegal format for complex number $v.")
+            val imag = imagPart.toDoubleOrNull() ?: throw NumberFormatException("Illegal format for complex number $v.")
 
             return Complex(sign * real, imagSign * imag)
         }

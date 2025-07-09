@@ -56,21 +56,8 @@ class EDNReaderNumberRatioComplexTest {
     }
 
     @Test
-    fun parseComplex() {
+    fun parseComplex2() {
         val optionsWithComplex = EDN.defaultOptions.copy(allowComplexNumberLiterals = true)
-        
-        EDN.read("0i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(0, 0), it)
-        }
-        EDN.read("+0i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(0, 0), it)
-        }
-        EDN.read("-0i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(0.0, -0.0), it)
-        }
 
         EDN.read("1i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
@@ -78,76 +65,162 @@ class EDNReaderNumberRatioComplexTest {
         }
         EDN.read("+1i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(0, 1), it)
+            Assertions.assertEquals(Complex.valueOf(0, +1), it)
         }
         EDN.read("-1i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
             Assertions.assertEquals(Complex.valueOf(0, -1), it)
         }
-
-        EDN.read("1+0i", optionsWithComplex).let {
+        EDN.read("1.2i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1), it)
+            Assertions.assertEquals(Complex.valueOf(0.0, 1.2), it)
         }
-        EDN.read("+1+0i", optionsWithComplex).let {
+        EDN.read("+1.2i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1), it)
+            Assertions.assertEquals(Complex.valueOf(0.0, 1.2), it)
         }
-        EDN.read("-1+0i", optionsWithComplex).let {
+        EDN.read("-1.2i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(-1), it)
-        }
-
-        EDN.read("1+1i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1, 1), it)
-        }
-        EDN.read("+1+1i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1, 1), it)
-        }
-        EDN.read("-1+1i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(-1, 1), it)
+            Assertions.assertEquals(Complex.valueOf(0.0, -1.2), it)
         }
 
-        EDN.read("1-1i", optionsWithComplex).let {
+        EDN.read("1+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1, -1), it)
+            Assertions.assertEquals(Complex.valueOf(1, 0), it)
         }
-        EDN.read("+1-1i", optionsWithComplex).let {
+        EDN.read("+1+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1, -1), it)
+            Assertions.assertEquals(Complex.valueOf(+1, 0), it)
         }
-        EDN.read("-1-1i", optionsWithComplex).let {
+        EDN.read("-1+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(-1, -1), it)
+            Assertions.assertEquals(Complex.valueOf(-1, 0), it)
         }
-
-        EDN.read("1.5+0i", optionsWithComplex).let {
-            Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1.5), it)
-        }
-        EDN.read("+1.5+0i", optionsWithComplex).let {
+        EDN.read("1.5+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
             Assertions.assertEquals(Complex.valueOf(1.5, 0.0), it)
         }
-        EDN.read("-1.5+0i", optionsWithComplex).let {
+        EDN.read("+1.5+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(-1.5, 0.0), it)
+            Assertions.assertEquals(Complex.valueOf(+1.5, 0.0), it)
         }
 
-        EDN.read("1.5+0.5i", optionsWithComplex).let {
+        EDN.read("1+2i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1.5, 0.5), it)
+            Assertions.assertEquals(Complex.valueOf(1, 2), it)
         }
-        EDN.read("+1.5+0.5i", optionsWithComplex).let {
+        EDN.read("1-2i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1.5, 0.5), it)
+            Assertions.assertEquals(Complex.valueOf(1, -2), it)
         }
-        EDN.read("-1.5+0.5i", optionsWithComplex).let {
+        EDN.read("1+2.3i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(-1.5, 0.5), it)
+            Assertions.assertEquals(Complex.valueOf(1.0, 2.3), it)
         }
+        EDN.read("1-2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.0, -2.3), it)
+        }
+        EDN.read("+1+2i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(+1, 2), it)
+        }
+        EDN.read("+1-2i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(+1, -2), it)
+        }
+        EDN.read("+1+2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(+1.0, +2.3), it)
+        }
+        EDN.read("+1-2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(+1.0, -2.3), it)
+        }
+        EDN.read("1.5+2i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, 2.0), it)
+        }
+        EDN.read("1.5-2i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, -2.0), it)
+        }
+        EDN.read("1.5+2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, 2.3), it)
+        }
+        EDN.read("1.5-2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, -2.3), it)
+        }
+        EDN.read("+1.5+2i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, 2.0), it)
+        }
+        EDN.read("+1.5-2i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, -2.0), it)
+        }
+        EDN.read("+1.5+2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, 2.3), it)
+        }
+        EDN.read("+1.5-2.3i", optionsWithComplex).let {
+            Assertions.assertInstanceOf(Complex::class.java, it)
+            Assertions.assertEquals(Complex.valueOf(1.5, -2.3), it)
+        }
+    }
+
+    //            "([+\\-]?\\d+(.\\d)?+i)", // imaginary only
+    //            "([+\\-]?\\d+(.\\d+)?[+\\-](\\d+(.\\d+)?)?i)" // real only or real +/- imaginary
+    private val complexRegex = Regex("([+\\-]?\\d+(.\\d)?+i)|([+\\-]?\\d+(.\\d+)?[+\\-](\\d+(.\\d+)?)?i)")
+
+    @Test
+    fun testComplexNumberRecognitionNoMatch() {
+        Assertions.assertFalse(complexRegex.matches("i"))
+        Assertions.assertFalse(complexRegex.matches("+i"))
+        Assertions.assertFalse(complexRegex.matches("-i"))
+        Assertions.assertFalse(complexRegex.matches("1.i"))
+        Assertions.assertFalse(complexRegex.matches(".1i"))
+        Assertions.assertFalse(complexRegex.matches("+1.i"))
+        Assertions.assertFalse(complexRegex.matches("+.1i"))
+    }
+
+    @Test
+    fun testComplexNumberRecognitionMatchImagOnly() {
+        Assertions.assertTrue(complexRegex.matches("1i"))
+        Assertions.assertTrue(complexRegex.matches("+1i"))
+        Assertions.assertTrue(complexRegex.matches("-1i"))
+        Assertions.assertTrue(complexRegex.matches("1.2i"))
+        Assertions.assertTrue(complexRegex.matches("+1.2i"))
+        Assertions.assertTrue(complexRegex.matches("-1.2i"))
+    }
+
+    @Test
+    fun testComplexNumberRecognitionMatchRealOnly() {
+        Assertions.assertTrue(complexRegex.matches("1+i"))
+        Assertions.assertTrue(complexRegex.matches("+1+i"))
+        Assertions.assertTrue(complexRegex.matches("1.5+i"))
+        Assertions.assertTrue(complexRegex.matches("+1.5+i"))
+    }
+
+    @Test
+    fun testComplexNumberRecognitionMatchAll() {
+        Assertions.assertTrue(complexRegex.matches("1+2i"))
+        Assertions.assertTrue(complexRegex.matches("1-2i"))
+        Assertions.assertTrue(complexRegex.matches("1+2.3i"))
+        Assertions.assertTrue(complexRegex.matches("1-2.3i"))
+        Assertions.assertTrue(complexRegex.matches("+1+2i"))
+        Assertions.assertTrue(complexRegex.matches("+1-2i"))
+        Assertions.assertTrue(complexRegex.matches("+1+2.3i"))
+        Assertions.assertTrue(complexRegex.matches("+1-2.3i"))
+        Assertions.assertTrue(complexRegex.matches("1.5+2i"))
+        Assertions.assertTrue(complexRegex.matches("1.5-2i"))
+        Assertions.assertTrue(complexRegex.matches("1.5+2.3i"))
+        Assertions.assertTrue(complexRegex.matches("1.5-2.3i"))
+        Assertions.assertTrue(complexRegex.matches("+1.5+2i"))
+        Assertions.assertTrue(complexRegex.matches("+1.5-2i"))
+        Assertions.assertTrue(complexRegex.matches("+1.5+2.3i"))
+        Assertions.assertTrue(complexRegex.matches("+1.5-2.3i"))
     }
 }

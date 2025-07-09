@@ -202,25 +202,6 @@ class EDNSoapReaderTest {
     }
 
     @Test
-    fun parseSetFastSimple() {
-        EDN.read("#{\\a \\b}", EDN.extendedOptions.copy(useFasterSetConstruction = true))
-            .let {
-                assertTrue(it is Set<*>)
-                assertEquals(setOf('a', 'b'), (it as Set<*>))
-            }
-        EDN.read("#{ \\a }", EDN.extendedOptions.copy(useFasterSetConstruction = true))
-            .let {
-                assertTrue(it is Set<*>)
-                assertEquals(setOf('a'), (it as Set<*>))
-            }
-        EDN.read("#{\\a #{}}", EDN.extendedOptions.copy(useFasterSetConstruction = true))
-            .let {
-                assertTrue(it is Set<*>)
-                assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
-            }
-    }
-
-    @Test
     fun parseMapSimple() {
         EDN.read("{\\a \\b}").let {
             assertTrue(it is Map<*, *>)

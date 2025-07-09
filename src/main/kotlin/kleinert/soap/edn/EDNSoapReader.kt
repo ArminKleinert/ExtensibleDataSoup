@@ -74,7 +74,7 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         val ratioRegex = Regex("[+\\-]?[0-9]+/[0-9]+?")
 
         val expandedIntRegex = Regex("[+\\-]?(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64|L)?")
-        val complexRegex = Regex("[+\\-]?([0-9]*\\.?[0-9]+[+\\-]?)?([0-9]*\\.?[0-9]+)?i")
+        val complexRegex = Regex("([+\\-]?\\d+(.\\d)?+i)|([+\\-]?\\d+(.\\d+)?[+\\-](\\d+(.\\d+)?)?i)")
 
         val tokenLen = token.length
         var base = 10
@@ -110,7 +110,11 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
         } else if (ratioRegex.matches(token)) {
             return Ratio.valueOf(token)
         } else if (options.allowComplexNumberLiterals && complexRegex.matches(token)) {
-            return Complex.valueOf(token)
+            return try {
+                Complex.valueOf(token)
+            } catch (nfe: NumberFormatException) {
+                throw EdnReaderException(nfe.toString(), nfe)
+            }
         } else {
             throw EdnReaderException("Invalid number format: $token")
         }
@@ -191,29 +195,30 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
     }
 
     private fun parseList(cpi: CodePointIterator, level: Int): List<Any?> {
-        val temp = parseVector(cpi, level, ')'.code)
+        val temp = parseVector(cpi, level, ')'.code, false)
         return options.listToPersistentListConverter(temp)
     }
 
-    private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int): List<*> = buildList {
-        do {
-            cpi.skipWhile(::isWhitespace)
+    private fun parseVector(cpi: CodePointIterator, level: Int, separator: Int, doConvert: Boolean = true): List<*> =
+        buildList {
+            do {
+                cpi.skipWhile(::isWhitespace)
 
-            if (!cpi.hasNext())
-                throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
+                if (!cpi.hasNext())
+                    throw EdnReaderException("Unclosed list. Expected '${Char(separator)}', got EOF.")
 
-            if (cpi.peek() == separator) {
-                cpi.nextInt()
-                break
-            }
+                if (cpi.peek() == separator) {
+                    cpi.nextInt()
+                    break
+                }
 
-            val elem = readForm(cpi, level + 1, true)
+                val elem = readForm(cpi, level + 1, true)
 
-            if (elem != NOTHING) add(elem)
-        } while (true)
-    }.toList().let {
-        options.listToPersistentVectorConverter(it)
-    }
+                if (elem != NOTHING) add(elem)
+            } while (true)
+        }.toList().let {
+            if (doConvert) options.listToPersistentVectorConverter(it) else it
+        }
 
     private fun parseMap(cpi: CodePointIterator, level: Int, separator: Int = '}'.code): Map<*, *> {
         val result = LinkedHashMap<Any?, Any?>()

@@ -1,3 +1,5 @@
+import kleinert.soap.data.Complex
+import kleinert.soap.data.Keyword
 import kleinert.soap.edn.EDN
 import java.lang.StringBuilder
 
@@ -243,8 +245,25 @@ fun main(args: Array<String>) {
 //        println(parsed)
 //    }
 
-    run {
-        EDN.pprint(listOf(123,456), System.out.bufferedWriter())
-        EDN.pprintln(listOf(123,456), System.out.bufferedWriter())
-    }
+
+    data class DoubleWrap(val d: Double)
+
+    val encoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(DoubleWrap::class.java to { it: Any? ->
+        it as DoubleWrap
+        "soap/doublewrap" to mapOf(Keyword["d"] to it.d)
+    })
+
+    val string = EDN.pprintToString(DoubleWrap(1.2345), EDN.defaultOptions.copy(ednClassEncoders = encoders))
+
+    println(string)
+
+    val decoders: Map<String, (Any?) -> Any?> = mapOf("soap/doublewrap" to {it as Map<*, *>
+    DoubleWrap((it[Keyword["d"]] as Number).toDouble())})
+
+    val parsed = EDN.read(string, EDN.defaultOptions.copy(ednClassDecoders = decoders))
+
+    println(parsed)
+
+    println(Complex.valueOf("1+i"))
+
 }
