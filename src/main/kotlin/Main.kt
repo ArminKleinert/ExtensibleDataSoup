@@ -1,6 +1,8 @@
 import kleinert.soap.data.Complex
 import kleinert.soap.data.Keyword
 import kleinert.soap.edn.EDN
+import kleinert.soap.edn.EDNSoapOptions
+import java.io.File
 import java.lang.StringBuilder
 
 fun examples1() {
@@ -246,24 +248,68 @@ fun main(args: Array<String>) {
 //    }
 
 
-    data class DoubleWrap(val d: Double)
+//    data class DoubleWrap(val d: Double)
+//
+//    val encoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(DoubleWrap::class.java to { it: Any? ->
+//        it as DoubleWrap
+//        "soap/doublewrap" to mapOf(Keyword["d"] to it.d)
+//    })
+//
+//    val string = EDN.pprintToString(DoubleWrap(1.2345), EDN.defaultOptions.copy(ednClassEncoders = encoders))
+//
+//    println(string)
+//
+//    val decoders: Map<String, (Any?) -> Any?> = mapOf("soap/doublewrap" to {it as Map<*, *>
+//    DoubleWrap((it[Keyword["d"]] as Number).toDouble())})
+//
+//    val parsed = EDN.read(string, EDN.defaultOptions.copy(ednClassDecoders = decoders))
+//
+//    println(parsed)
 
-    val encoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(DoubleWrap::class.java to { it: Any? ->
-        it as DoubleWrap
-        "soap/doublewrap" to mapOf(Keyword["d"] to it.d)
-    })
+    println(EDN.read("symbol")) // Symbol without namespace
+    println(EDN.read("namespace/symbol")) // Symbol
+    println(EDN.read(":keyword")) // Keyword without namespace
+    println(EDN.read(":namespace/symbol")) // Keyword
+    println(EDN.read("\"string\"")) // String
+    println(EDN.read("\\c")) // Character
 
-    val string = EDN.pprintToString(DoubleWrap(1.2345), EDN.defaultOptions.copy(ednClassEncoders = encoders))
+    println(EDN.read("(list elements)")) // List
+    println(EDN.read("[vector elements]")) // Vector
+    println(EDN.read("#{set elements}")) // Set
+    println(EDN.read("{map-key map-value }")) // Map
 
-    println(string)
+    println(EDN.read("0xC0FFEE")) // Long
+    println(EDN.read("12648430")) // The same Long
+    println(EDN.read("12648430N")) // The same as BigInt
+    println(EDN.read("5.0")) // Double
+    println(EDN.read("5")) // BigDecimal
+    println(EDN.read("5.0M")) // BigDecimal
+    println(EDN.read("5/6")) // Ratio
+    println(EDN.read("5+7i", EDNSoapOptions(allowComplexNumberLiterals = true))) // Complex
 
-    val decoders: Map<String, (Any?) -> Any?> = mapOf("soap/doublewrap" to {it as Map<*, *>
-    DoubleWrap((it[Keyword["d"]] as Number).toDouble())})
+    println(EDN.read("nil")) // Null
+    println(EDN.read("false")) // False
+    println(EDN.read("true")) // True
 
-    val parsed = EDN.read(string, EDN.defaultOptions.copy(ednClassDecoders = decoders))
+    println(EDN.read("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"")) // UUID
+    println(EDN.read("#inst \"1985-04-12T23:20:50.52Z\"")) // Instant
 
-    println(parsed)
+    println(EDN.read("##INF")) // Infinity
+    println(EDN.read("##-INF")) // Negative infinity
+    println(EDN.read("##NaN")) // NaN
+    println(EDN.read("##-NaN")) // The cooler NaN
 
-    println(Complex.valueOf("1+i"))
 
+    data class Dice(val sides: Int)
+
+    val anyToDice = { it: Any? ->
+        if (it is List<*> && it.size == 1 && it[0] is Number) Dice((it[0] as Number).toInt())
+        else null
+    }
+
+    println(EDN.read("#my/dice [6]", EDN.defaultOptions.copy(ednClassDecoders = mapOf("my/dice" to anyToDice))))
+
+    val opts =
+        EDN.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = mapOf("dice" to anyToDice))
+    println(EDN.read("#dice [6]", opts))
 }

@@ -4,6 +4,9 @@ An EDN library for Kotlin.
 
 ## Standard things implemented
 
+☑ Can read from strings or from input streams.  
+☑ Can write to strings or writers.
+
 ☑ Use `UTF-8`  
 ☑ String literals  
 ☑ Symbol  
@@ -23,23 +26,19 @@ An EDN library for Kotlin.
 ☑ Symbolic values `##NaN`, `##INF` and `##-INF`  
 ☑ Built-in tagged elements `#uuid` and `#inst`  
 ☑ Discard with `#_`  
-☑ Tags
+☑ Tagged elements.
 
 ☑ Lists and vectors  
 ☑ Sets  
 ☑ Maps
 
-## Known bugs
-
-- If an input contains more than one expression, the reader just returns the first expression. For
-  example, `EDNSoapReader.readString("1 2")` should fail, but does not. It just returns `1`.
-
-## Not implemented
+## TODOs
 
 ☐ Metadata
 
-- Why not? I don't see a use for this yet.
-- Ideas: May return a `data class` which can be split with `componentN` methods.
+- Returns an `IObj` object which can be split into its `meta` and `object` parts.
+
+## Not implemented
 
 ☐ `@`, `'`, `~` and backtick prefixes, `#` prefix for lists.
 
@@ -48,6 +47,24 @@ An EDN library for Kotlin.
 ## Non-standard
 
 I included some non-standard features. All of these can be turned off (see examples).
+
+| Option                            | Description                                                                  | Default                  |
+|:----------------------------------|:-----------------------------------------------------------------------------|:-------------------------|
+| `allowSchemeUTF32Codes`           | Allow scheme UTF-32 char codes (`\\xXXXXXXXX`).                              | `false`                  |
+| `allowDispatchChars`              | Allow dispatch UTF-32chars (`#\uXXXXXXXX`).                                  | `false`                  |
+| `ednClassDecoders`                | Functions for decoding tagged elements to objects.                           | `mapOf()`                |
+| `ednClassEncoders`                | Functions for encoding objects to tagged elements.                           | `mapOf()`                |
+| `allowTimeDispatch`               | Enable `##time` dispatch.                                                    | `false`                  |
+| `allowNumericSuffixes`            | Enable `_i8`, `_16`, `_i32`, `_64`, and `L` suffixes for integral numbers.   | `false`                  |
+| `allowMoreEncoderDecoderNames`    | Allow symbols without explicit namespaces for tagged elements.               | `false`                  |
+| `decodingSequenceSeparator`       | Separator between elements in lists, vectors, maps, and sets.                | `", "`                   |
+| `allowComplexNumberLiterals`      | Allow complex number literals.                                               | `false`                  |
+| `allowUTFSymbols`                 | Allow UTF-8 strings as symbols.                                              | `false`                  |
+| `sequenceElementLimit`            | Limit of elements after which lazy sequences are shortened.                  | `10000`                  |
+| `listToPersistentListConverter`   | Converter function from Kotlin's default List to your preferred list type.   | `{PersistentList(it)}`   |
+| `listToPersistentVectorConverter` | Converter function from Kotlin's default List to your preferred vector type. | `{PersistentVector(it)}` |
+| `setToPersistentSetConverter`     | Converter function from sets (`LinkedHashSet`) to your preferred set type.   | `{PersistentSet(it)}`    |
+| `mapToPersistentMapConverter`     | Converter function from maps (`LinkedHashMap`) to your preferred map type.   | `{PersistentMap(it)}`    |
 
 ☑ `0o` and `0b` prefixes for numbers (for octal and binary respectively). (Option: `moreNumberPrefixes`)
 
@@ -73,27 +90,13 @@ I included some non-standard features. All of these can be turned off (see examp
 
 ☑ Tags can be more free in their naming. (Option: `allowMoreEncoderDecoderNames`)
 
-
-| Option                            | Description                                                                  | Default                    |
-|:----------------------------------|:-----------------------------------------------------------------------------|:---------------------------|
-| `allowSchemeUTF32Codes`           | Allow scheme UTF-32 char codes (`\\xXXXXXXXX`).                              | `false`                    |
-| `allowDispatchChars`              | Allow dispatch UTF-32chars (`#\uXXXXXXXX`).                                  | `false`                    |
-| `ednClassDecoders`                | Functions for decoding tagged elements to objects.                           | `mapOf()`                  |
-| `ednClassEncoders`                | Functions for encoding objects to tagged elements.                           | `mapOf()`                  |
-| `allowTimeDispatch`               | Enable `##time` dispatch.                                                    | `false`                    |
-| `allowNumericSuffixes`            | Enable `_i8`, `_16`, `_i32`, `_64`, and `L` suffixes for integral numbers.   | `false`                    |
-| `allowMoreEncoderDecoderNames`    | Allow symbols without explicit namespaces for tagged elements.               | `false`                    |
-| `decodingSequenceSeparator`       | Separator between elements in lists, vectors, maps, and sets.                | `", "`                     |
-| `listToPersistentListConverter`   | Converter function from Kotlin's default List to your preferred list type.   | `{ PersistentList(it) }`   |
-| `listToPersistentVectorConverter` | Converter function from Kotlin's default List to your preferred vector type. | `{ PersistentVector(it) }` |
-| `setToPersistentSetConverter`     | Converter function from sets (`LinkedHashSet`) to your preferred set type.   | `{ PersistentSet(it) }`    |
-| `mapToPersistentMapConverter`     | Converter function from maps (`LinkedHashMap`) to your preferred map type.   | `{ PersistentMap(it) }`    |
-| `allowComplexNumberLiterals`      | Allow complex number literals.                                               | `false`                    |
-| `allowUTFSymbols`                 | Allow UTF-8 strings as symbols.                                              | `false`                    |
-| `sequenceElementLimit`            | Limit of elements after which lazy sequences are shortened.                  | `10000`                    |
-
 ## Examples
 
+```kotlin
+import kleinert.soap.edn.EDN
+
+val parsed = EDN.read()
+```
 
 ☑
 ☐
