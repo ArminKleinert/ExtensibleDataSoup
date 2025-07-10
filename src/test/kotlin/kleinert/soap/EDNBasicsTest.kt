@@ -17,6 +17,13 @@ class EDNBasicsTest {
 
         // The expression "\\u8" is invalid, but is ignored in the comment
         Assertions.assertEquals(1L, EDN.read(";\\u8\n1"))
+
+        // Test an error I found: When a comment appears just before the terminator of a sequence,
+        // the sequence is not terminated correctly.
+        Assertions.assertEquals(listOf<Any?>(), EDN.read("(;\n)"))
+        Assertions.assertEquals(listOf<Any?>(), EDN.read("[;\n]"))
+        Assertions.assertEquals(mapOf<Any?,Any?>(), EDN.read("{;\n}"))
+        Assertions.assertEquals(setOf<Any?>(), EDN.read("#{;\n}"))
     }
 
     @Test

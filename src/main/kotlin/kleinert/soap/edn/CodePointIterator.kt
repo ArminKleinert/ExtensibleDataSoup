@@ -103,8 +103,10 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     }
 
     fun skipLine() {
-        while (hasNext())
-            if (nextInt() == '\n'.code) break
+        while (hasNext()) {
+            val ni = nextInt()
+            if (ni == '\n'.code) break
+        }
     }
 
     fun skipWhile(condition: (Int) -> Boolean) {

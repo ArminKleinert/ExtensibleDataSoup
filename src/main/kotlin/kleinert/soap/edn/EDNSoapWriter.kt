@@ -58,7 +58,6 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> encodePredefinedNumberType(obj as Number)
             is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
             is Map.Entry<*, *> -> {
-                println("entry: $obj")
                 encode(obj.key)
                 writer.append(' ')
                 encode (obj.value)
@@ -100,7 +99,22 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
         }
     }
 
-    private fun encodeString(obj: String) = writer.append('"').append(obj).append('"')
+    private fun encodeString(obj: String): Appendable {
+        writer.append('"')
+        for (code in obj) {
+            when (code) {
+                '\t' -> writer.append("\\t")
+                '\b' -> writer.append("\\b")
+                '\n' -> writer.append("\\n")
+                '\r' -> writer.append("\\r")
+                '\"' -> writer.append("\\\"")
+                '\\' -> writer.append("\\\\")
+                else -> writer.append(code)
+            }
+        }
+        writer.append('"')
+        return writer
+    }
 
     private fun encodeChar(obj: Char) = writer.append('\\').append(obj)
 

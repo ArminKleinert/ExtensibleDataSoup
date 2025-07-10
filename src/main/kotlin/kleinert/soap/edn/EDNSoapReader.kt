@@ -461,7 +461,10 @@ class EDNSoapReader private constructor(private val options: EDNSoapOptions = ED
                     res.add(parseNumber(cpi.unread(codePoint)))
 
                 ')'.code, ']'.code, '}'.code ->
-                    throw EdnReaderException("Unexpected character ${Char(codePoint)}.")
+                    if (level == 0) throw EdnReaderException("Unexpected character ${Char(codePoint)}.")
+                    else {
+                        cpi.unread(codePoint); return NOTHING
+                    }
 
                 '+'.code -> {
                     res.add(

@@ -29,6 +29,9 @@ class EDN {
             return cpi1.use { cpi -> EDNSoapReader.read(cpi, options) }
         }
 
+        fun pprint(string: Any?, file: File, options: EDNSoapOptions = defaultOptions) =
+            file.writer(Charsets.UTF_8).use{pprint(string, it, options)}
+
         fun pprint(string: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
             if (writer == null) EDNSoapWriter.pprint(string, options, System.out.writer())
             else EDNSoapWriter.pprint(string, options, writer)
