@@ -3,7 +3,7 @@ package kleinert.soap.edn
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class EDNDispatchTaggedUserDefTest {
+class EDNReaderDispatchTaggedUserDefTest {
     @Test
     fun parseDecoderNameErrorTest() {
         // invalid name

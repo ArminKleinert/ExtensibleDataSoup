@@ -49,10 +49,10 @@ fun main(args: Array<String>) {
 //        EDN.defaultOptions.copy(allowMoreEncoderDecoderNames = true, ednClassDecoders = mapOf("dice" to anyToDice))
 //    println(EDN.read("#dice [6]", opts))
 
-    println(Ratio.estimate(1.5))
-    println(Ratio.estimate(0.5))
-    println(Ratio.estimate(0.0))
-    println(Ratio.estimate(1.0))
-    println(Ratio.estimate(3.1415))
-    println(Ratio.estimate(0.31415))
+    val pi = 3.141592653589793
+    println(Ratio.estimate(pi, 1E-1))
+    println(Ratio.estimate(pi, 1E-2))
+    println(Ratio.estimate(pi, 1E-3))
+    println(Ratio.estimate(pi, 1E-4))
+    println(Ratio.estimate(pi))
 }

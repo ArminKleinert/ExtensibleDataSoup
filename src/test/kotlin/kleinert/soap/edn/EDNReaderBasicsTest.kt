@@ -3,7 +3,7 @@ package kleinert.soap.edn
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class EDNBasicsTest {
+class EDNReaderBasicsTest {
     @Test
     fun parseCommentTest() {
         // Empty output

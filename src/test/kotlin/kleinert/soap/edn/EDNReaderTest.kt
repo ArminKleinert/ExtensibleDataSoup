@@ -3,7 +3,7 @@ package kleinert.soap.edn
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class EDNSoapReaderTest {
+class EDNReaderTest {
     @Test
     fun parseStringBasicTest() {
         assertInstanceOf(String::class.java, EDN.read("\"\""))

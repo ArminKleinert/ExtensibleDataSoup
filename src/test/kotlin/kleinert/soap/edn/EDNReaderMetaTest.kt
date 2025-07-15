@@ -6,7 +6,7 @@ import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class EDNMetaTest {
+class EDNReaderMetaTest {
     @Test
     fun parseMetaErrors() {
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^") }

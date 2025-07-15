@@ -6,13 +6,13 @@ import java.math.MathContext
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
-class Ratio private constructor(var num: Long, val den: Long) : Number(), Comparable<Number> {
+class Ratio private constructor(val num: Long, val den: Long) : Number(), Comparable<Number> {
     companion object {
-        val ZERO: Ratio = Ratio(0, 1)
+        val ZERO: Ratio = valueOf(0, 1)
 
-        fun valueOf(numerator1: Long, denominator1: Long = 1L): Ratio {
-            var numerator = numerator1
-            var denominator = denominator1
+        fun valueOf(numeratorInput: Long, denominatorInput: Long = 1L): Ratio {
+            var numerator = numeratorInput
+            var denominator = denominatorInput
 
             if (denominator == 0L)
                 throw NumberFormatException("kleinert.soap.Ratio with 0 denominator.")
@@ -43,26 +43,33 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
         fun valueOf(x: Double, epsilon: Double = 1E-10): Ratio =
             estimate(x, epsilon)
 
+        fun valueOfOrNull(s: String): Ratio? {
+            val parts = s.split('/')
+            if (parts.isEmpty() || parts.size > 2)
+                return null
+
+            val num = parts[0].toLongOrNull() ?: return null
+            val den = if (parts.size == 2) parts[1].toLongOrNull() ?: return null else 1L
+            return valueOf(num, den)
+        }
+
         fun valueOf(s: String): Ratio {
-            val divIndex = s.indexOf('/')
-            val part1 = s.substring(0, divIndex).toLongOrNull()
-                ?: throw NumberFormatException("Illegal format for rational number $s.")
-            val part2 = s.substring(divIndex + 1).toLongOrNull()
-                ?: throw NumberFormatException("Illegal format for rational number $s.")
-            return valueOf(part1, part2)
+            return valueOfOrNull(s) ?: throw NumberFormatException("Illegal format for rational number $s.")
         }
 
         /**
          * Approximate rational number for a double.
          */
-        fun estimate(x: Double, epsilon: Double = 1E-10): Ratio {
+        fun estimate(xIn: Double, epsilon: Double = 1E-10): Ratio {
+            val sign = if (xIn < 0.0) -1 else 1
+            val xAbs = xIn.absoluteValue
             var leftNum = 0L
             var leftDen = 1L
             var rightNum = 1L
             var rightDen = 0L
-            var bestNum = leftNum
+            var bestNum = 0L // = leftNum
             var bestDen = leftDen
-            var bestError = abs(x)
+            var bestError = abs(xAbs)
 
             // do Stern-Brocot binary search
             while (bestError > epsilon) {
@@ -72,7 +79,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
                 val mediantDen: Long = leftDen + rightDen
                 val mediantDouble = mediantNum / mediantDen.toDouble()
 
-                if (x < mediantDouble) { // go left
+                if (xAbs < mediantDouble) { // go left
                     rightNum = mediantNum
                     rightDen = mediantDen
                 } else {
@@ -82,7 +89,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
                 }
 
                 // check if better and update champion
-                val error: Double = abs(mediantDouble - x)
+                val error: Double = abs(mediantDouble - xAbs)
                 if (error < bestError) {
                     bestNum = mediantNum
                     bestDen = mediantDen
@@ -91,14 +98,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
                 }
             }
 
-            return Ratio.valueOf(bestNum, bestDen)
-        }
-
-        fun valueOfOrNull(s: String): Ratio? {
-            val divIndex = s.indexOf('/')
-            val part1 = s.substring(0, divIndex).toLongOrNull() ?: return null
-            val part2 = s.substring(divIndex + 1).toLongOrNull() ?: return null
-            return valueOf(part1, part2)
+            return valueOf(sign * bestNum, bestDen)
         }
 
         private fun gcd(m: Long, n: Long): Long =
@@ -109,10 +109,6 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
             val m = if (m1 < 0) -m1 else m1
             val n = if (n1 < 0) -n1 else n1
             return m * (n / gcd(m, n)) // parentheses important to avoid overflow
-        }
-
-        fun mediant(rNum: Long, rDen: Long, sNum: Long, sDen: Long): Ratio {
-            return Ratio(rNum + sNum, rDen + sDen)
         }
     }
 
@@ -146,9 +142,9 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
     fun abs(): Ratio = if (num >= 0) this else negate()
 
     // return (b, a)
-    fun reciprocal() = Ratio(den, num)
+    fun reciprocal() = valueOf(den, num)
 
-    fun negate(): Ratio = Ratio(-num, den)
+    fun negate(): Ratio = valueOf(-num, den)
     operator fun unaryMinus() = negate()
 
     // return a + b, staving off overflow
@@ -164,11 +160,10 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
         val g = gcd(a.den.absoluteValue, b.den)
 
         // add cross-product terms for numerator
-        val s = Ratio(a.num / f * (b.den / g) + b.num / f * (a.den / g), lcm(a.den, b.den))
+        val s = valueOf(a.num / f * (b.den / g) + b.num / f * (a.den / g), lcm(a.den, b.den))
 
         // multiply back in
-        s.num *= f
-        return s
+        return valueOf(s.num * f, s.den)
     }
 
     operator fun minus(b: Ratio): Ratio =
@@ -177,7 +172,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
     operator fun times(b: Ratio): Ratio {
         val c = valueOf(this.num, b.den)
         val d = valueOf(b.num, this.den)
-        return Ratio(c.num * d.num, c.den * d.den)
+        return valueOf(c.num * d.num, c.den * d.den)
     }
 
     operator fun div(b: Ratio): Ratio =

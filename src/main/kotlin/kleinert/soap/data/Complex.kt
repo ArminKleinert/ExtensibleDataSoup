@@ -2,22 +2,23 @@ package kleinert.soap.data
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.math.sign
+import kotlin.math.*
 
-data class Complex private constructor(val real: Double, val imag: Double = 0.0, val isReal: Boolean = imag==0.0) : Number() {
+class Complex private constructor(val real: Double, val imag: Double = 0.0, val isReal: Boolean = imag == 0.0) :
+    Number() {
 
     companion object {
         val I: Complex = Complex(0.0, 1.0, false)
         val ONE: Complex = Complex(1.0, 0.0, true)
         val ZERO: Complex = Complex(0.0, 0.0, true)
 
-        fun valueOf(real: Double, imag: Double = 0.0) = Complex(real, imag, imag == 0.9)
-        fun valueOf(real: Long, imag: Long = 0) = Complex(real.toDouble(), imag.toDouble(), imag == 0L)
-        fun valueOf(real: Int, imag: Int = 0) = Complex(real.toDouble(), imag.toDouble(), imag == 0)
+        fun valueOf(real: Double, imag: Double = 0.0): Complex = Complex(real, imag, imag == 0.9)
+        fun valueOf(real: Long, imag: Long = 0): Complex = Complex(real.toDouble(), imag.toDouble(), imag == 0L)
+        fun valueOf(real: Int, imag: Int = 0): Complex = Complex(real.toDouble(), imag.toDouble(), imag == 0)
 
-        fun valueOf(real: Double) = Complex(real, 0.0)
-        fun valueOf(real: Long) = Complex(real.toDouble(), 0.0)
-        fun valueOf(real: Int) = Complex(real.toDouble(), 0.0)
+        fun valueOf(real: Double): Complex = Complex(real, 0.0)
+        fun valueOf(real: Long): Complex = Complex(real.toDouble(), 0.0)
+        fun valueOf(real: Int): Complex = Complex(real.toDouble(), 0.0)
 
         fun valueOfOrNull(v: String): Complex? =
             try {
@@ -27,6 +28,9 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0,
             }
 
         fun valueOf(v: String): Complex {
+            if (v.isEmpty())
+                throw NumberFormatException("Can not convert empty string into complex number.")
+
             var sign = 1
             var index = 0
             while (v[index] == '+' || v[index] == '-') {
@@ -67,7 +71,7 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0,
         }
     }
 
-    fun polar() = abs() to arg()
+    fun polar(): Pair<Double, Double> = abs() to arg()
 
     operator fun plus(other: Complex) =
         Complex(this.real + other.real, this.imag + other.imag)
@@ -76,9 +80,10 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0,
         Complex(this.real - other.real, this.imag - other.imag)
 
     operator fun unaryPlus(): Complex = this
+
     operator fun unaryMinus(): Complex = Complex(-real, imag)
 
-    operator fun times(other: Complex) =
+    operator fun times(other: Complex): Complex =
         Complex(
             (this.real * other.real) - (this.imag * other.imag),
             (this.real * other.imag) - (this.imag * other.real)
@@ -93,30 +98,30 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0,
         )
     }
 
+    fun mod(): Double {
+        if (this.real == 0.0 && this.isReal) return 0.0
+        return sqrt(this.real * this.real + this.imag * this.imag)
+    }
+
     fun exp(): Complex {
         return Complex(
-            Math.exp(this.real) * Math.cos(this.imag),
-            Math.exp(this.real) * Math.sin(this.imag)
+            exp(this.real) * cos(this.imag),
+            exp(this.real) * sin(this.imag)
         )
     }
 
     fun log(): Complex {
-        return Complex(Math.log(this.mod()), this.arg())
-    }
-
-    fun mod(): Double {
-        if (this.real == 0.0 && this.isReal) return 0.0
-        return Math.sqrt(this.real * this.real + this.imag * this.imag)
+        return Complex(ln(this.mod()), this.arg())
     }
 
     fun arg(): Double {
-        return Math.atan2(this.imag, this.real)
+        return atan2(this.imag, this.real)
     }
 
     fun sqrt(): Complex {
-        val r = Math.sqrt(this.mod())
+        val r = kotlin.math.sqrt(this.mod())
         val theta = arg() / 2
-        return Complex(r * Math.cos(theta), r * Math.sin(theta))
+        return Complex(r * cos(theta), r * sin(theta))
     }
 
     fun chs(): Complex {
@@ -130,10 +135,27 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0,
     }
 
     // conj(c) = (a-bi)
-    fun conj() = Complex(this.real, -this.imag)
+    fun conj(): Complex = Complex(this.real, -this.imag)
 
     // abs(c) = sqrt(a^2 + b^2)
-    fun abs() = Math.sqrt((this.real * this.real) + (this.imag + this.imag))
+    fun abs(): Double =
+        if (isReal) real.absoluteValue
+        else sqrt((this.real * this.real) + (this.imag * this.imag))
+
+    fun negate(): Complex = Complex(-real, imag)
+
+    override fun toDouble(): Double {
+        if (!isReal) throw UnsupportedOperationException("Complex with imaginary part has no double equivalent.")
+        return this.real
+    }
+
+    override fun toByte(): Byte = toDouble().toInt().toByte()
+    override fun toFloat(): Float = toDouble().toFloat()
+    override fun toInt(): Int = toDouble().toInt()
+    override fun toLong(): Long = toDouble().toLong()
+    override fun toShort(): Short = toDouble().toInt().toShort()
+    fun toBigInteger(): BigInteger = BigInteger.valueOf(toLong())
+    fun toBigDecimal(): BigDecimal = BigDecimal.valueOf(toDouble())
 
     override fun toString(): String {
         val sb = StringBuilder()
@@ -146,18 +168,25 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0,
         return sb.toString()
     }
 
-    fun negate(): Complex = Complex(-real, imag)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Number) return false
 
-    override fun toDouble(): Double {
-        require(this.isReal)
-        return this.real
+        if (other is Complex)
+            return real == other.real && ((isReal && other.isReal) || imag == other.imag)
+
+        if (!isReal) return false
+
+        return real == other.toDouble()
     }
 
-    override fun toByte(): Byte = toDouble().toInt().toByte()
-    override fun toFloat(): Float = toDouble().toFloat()
-    override fun toInt(): Int = toDouble().toInt()
-    override fun toLong(): Long = toDouble().toLong()
-    override fun toShort(): Short = toDouble().toInt().toShort()
-    fun toBigInteger(): BigInteger = BigInteger.valueOf(toLong())
-    fun toBigDecimal(): BigDecimal = BigDecimal.valueOf(toDouble())
+
+    override fun hashCode(): Int {
+        var result = real.hashCode()
+        result = 31 * result + imag.hashCode()
+        return result
+    }
+
+    operator fun component1(): Double = real
+    operator fun component2(): Double = imag
 }

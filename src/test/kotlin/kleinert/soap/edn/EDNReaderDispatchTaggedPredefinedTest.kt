@@ -7,7 +7,7 @@ import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class EDNDispatchTaggedPredefinedTest {
+class EDNReaderDispatchTaggedPredefinedTest {
     private fun parse(s: String) =
         EDN.read(
             s,
