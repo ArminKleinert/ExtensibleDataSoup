@@ -1,9 +1,6 @@
 package kleinert.soap.edn
 
-import kleinert.soap.data.Keyword
-import kleinert.soap.data.PersistentList
-import kleinert.soap.data.Ratio
-import kleinert.soap.data.Symbol
+import kleinert.soap.data.*
 import java.io.Flushable
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -57,23 +54,37 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             is Char -> encodeChar(obj)
             is Byte, is Short, is Int, is Long, is Float, is Double, is Ratio -> encodePredefinedNumberType(obj as Number)
             is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
+
             is Map.Entry<*, *> -> {
                 encode(obj.key)
                 writer.append(' ')
                 encode(obj.value)
             }
 
+            is IObj<*> -> {
+                writer.append('^')
+                encode(obj.meta)
+                writer.append(' ')
+                encode(obj.obj)
+            }
+
             is PersistentList<*> -> if (!tryEncoder(obj)) encodePersistentList(obj)
-            is ByteArray -> if (!tryEncoder(obj)) encode(obj.toList())
-            is ShortArray -> if (!tryEncoder(obj)) encode(obj.toList())
-            is IntArray -> if (!tryEncoder(obj)) encode(obj.toList())
-            is LongArray -> if (!tryEncoder(obj)) encode(obj.toList())
-            is FloatArray -> if (!tryEncoder(obj)) encode(obj.toList())
-            is DoubleArray -> if (!tryEncoder(obj)) encode(obj.toList())
-            is Array<*> -> if (!tryEncoder(obj)) encode(obj.toList())
-            is List<*> -> if (!tryEncoder(obj)) encodeList(obj)
+
+            // User-defined encoder or as vector
+            is Pair<*, *> -> if (!tryEncoder(obj)) encodeList(listOf(obj.first, obj.second))
+
+            is ByteArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is ShortArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is IntArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is LongArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is FloatArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is DoubleArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is Array<*> -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
+            is List<*> -> if (!tryEncoder(obj)) encodeList(obj) // Vector
+
             is Set<*> -> if (!tryEncoder(obj)) encodeSet(obj)
             is Map<*, *> -> if (!tryEncoder(obj)) encodeMap(obj)
+
             is Iterable<*> -> if (!tryEncoder(obj)) encodeOtherIterable(obj)
             is Sequence<*> -> if (!tryEncoder(obj)) encodeSequence(obj)
             is UUID -> writer.append("#uuid ").append(obj.toString())
