@@ -60,8 +60,9 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             is Map.Entry<*, *> -> {
                 encode(obj.key)
                 writer.append(' ')
-                encode (obj.value)
+                encode(obj.value)
             }
+
             is PersistentList<*> -> if (!tryEncoder(obj)) encodePersistentList(obj)
             is ByteArray -> if (!tryEncoder(obj)) encode(obj.toList())
             is ShortArray -> if (!tryEncoder(obj)) encode(obj.toList())

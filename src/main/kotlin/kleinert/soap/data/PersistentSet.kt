@@ -59,7 +59,8 @@ class PersistentMap<K, V>(
 ) :
     MutableMap<K, V> {
     class Entry<K, V>(override val key: K, override val value: V) : MutableMap.MutableEntry<K, V> {
-        override fun setValue(newValue: V): V = throw UnsupportedOperationException("Not possible on persistent map entry.")
+        override fun setValue(newValue: V): V =
+            throw UnsupportedOperationException("Not possible on persistent map entry.")
 
         override fun toString(): String {
             return "[$key=$value]"

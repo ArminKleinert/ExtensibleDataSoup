@@ -1,8 +1,7 @@
-package kleinert.soap
+package kleinert.soap.edn
 
 import kleinert.soap.data.Complex
 import kleinert.soap.data.Ratio
-import kleinert.soap.edn.EDN
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -86,23 +85,23 @@ class EDNReaderNumberRatioComplexTest {
 
         EDN.read("1+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1, 0), it)
+            Assertions.assertEquals(Complex.valueOf(1, 1), it)
         }
         EDN.read("+1+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(+1, 0), it)
+            Assertions.assertEquals(Complex.valueOf(+1, 1), it)
         }
         EDN.read("-1+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(-1, 0), it)
+            Assertions.assertEquals(Complex.valueOf(-1, 1), it)
         }
         EDN.read("1.5+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(1.5, 0.0), it)
+            Assertions.assertEquals(Complex.valueOf(1.5, 1.0), it)
         }
         EDN.read("+1.5+i", optionsWithComplex).let {
             Assertions.assertInstanceOf(Complex::class.java, it)
-            Assertions.assertEquals(Complex.valueOf(+1.5, 0.0), it)
+            Assertions.assertEquals(Complex.valueOf(+1.5, 1.0), it)
         }
 
         EDN.read("1+2i", optionsWithComplex).let {

@@ -1,4 +1,4 @@
-package kleinert.soap
+package kleinert.soap.edn
 
 import kleinert.soap.edn.EDN
 import org.junit.jupiter.api.Assertions

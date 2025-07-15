@@ -1,6 +1,5 @@
-package kleinert.soap
+package kleinert.soap.data
 
-import kleinert.soap.data.Ratio
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal

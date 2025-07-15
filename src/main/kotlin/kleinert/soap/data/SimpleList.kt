@@ -118,7 +118,7 @@ interface SimpleList<T> : MutableList<T> {
             throw IndexOutOfBoundsException("Index range $index to $toIndex (exclusive) out of bounds 0 to $size (exclusive).")
     }
 
-     fun commonEquals(other: Any?): Boolean {
+    fun commonEquals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is List<*>) return false
 

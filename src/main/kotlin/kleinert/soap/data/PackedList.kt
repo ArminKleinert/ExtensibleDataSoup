@@ -68,42 +68,6 @@ class PackedList<T> : SimpleList<List<T>> {
         return old
     }
 
-//    class PackedListIterator<T>(private val packedList: PackedList<T>, startIndex: Int = 0) : ListIterator<List<T>> {
-//        private var index: Int = startIndex
-//
-//        init {
-//            if (index != 0 || packedList.size != 0)
-//                packedList.checkBounds(startIndex)
-//        }
-//
-//        override fun hasNext(): Boolean = index < packedList.size
-//        override fun hasPrevious(): Boolean = index > 0
-//        override fun nextIndex(): Int = index
-//        override fun previousIndex(): Int = index - 1
-//
-//        override fun next(): List<T> {
-//            val temp = packedList[index]
-//            index++
-//            return temp
-//        }
-//
-//        override fun previous(): List<T> {
-//            index--
-//            return packedList[index]
-//        }
-//    }
-
-//    override fun subList(fromIndex: Int, toIndex: Int): MutableList<List<T>> {
-//        checkBoundsRange(fromIndex, toIndex)
-//        val subListSize = this.subListSize
-//        return PackedList(
-//            toIndex - fromIndex,
-//            subListSize,
-//            packed.subList(subListSize * fromIndex, subListSize * toIndex),
-//            unsafe = true, frozen = false
-//        )
-//    }
-
     override fun lastIndexOf(element: List<T>): Int {
         if (element.size != subListSize)
             return -1
@@ -158,6 +122,7 @@ class PackedList<T> : SimpleList<List<T>> {
         if (index < 0 || innerIndex < 0 || index >= size || innerIndex >= subListSize)
             throw IndexOutOfBoundsException("Index [$index, $innerIndex] out of bounds [0, 0] to [$size, $subListSize] (both exclusive).")
     }
+
     override fun toString(): String = joinToString(", ", prefix="[", postfix = "]")
 
     override fun equals(other: Any?): Boolean = commonEquals(other)

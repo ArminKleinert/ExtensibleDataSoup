@@ -9,10 +9,17 @@ import java.util.function.IntConsumer
 import java.util.stream.IntStream
 import kotlin.math.min
 
+
 internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
-    private var index = -1
+    private var memoryIndex = -1
     private var memory: IntArray
     private val iterator: PrimitiveIterator.OfInt
+
+    var textIndex: Int = 0
+        private set
+
+    var lineIdx: Int = 0
+        private set
 
     constructor(codepointStream: IntStream, memorySize: Int = 32) {
         memory = IntArray(memorySize)
@@ -34,32 +41,34 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     }
 
     override fun hasNext(): Boolean =
-        index >= 0 || iterator.hasNext()
+        memoryIndex >= 0 || iterator.hasNext()
 
     fun peek(): Int {
-        if (index >= 0)
-            return memory[index]
-        val temp = next()
+        if (memoryIndex >= 0)
+            return memory[memoryIndex]
+        val temp = nextInt()
         unread(temp)
         return temp
     }
 
-    override fun next(): Int {
-        if (index >= 0) {
-            val temp = memory[index]
-            index--
-            return temp
-        }
-        return if (iterator.hasNext()) iterator.nextInt() else -1
-    }
+    override fun next(): Int = nextInt()
 
     override fun nextInt(): Int {
-        if (index >= 0) {
-            val temp = memory[index]
-            index--
-            return temp
+        val code: Int
+        if (memoryIndex >= 0) {
+            code = memory[memoryIndex]
+            memoryIndex--
+            textIndex++
+        } else if (iterator.hasNext()) {
+            code = iterator.nextInt()
+            textIndex++
+        } else {
+            code = -1
         }
-        return if (iterator.hasNext()) iterator.nextInt() else -1
+        if (code == '\n'.code) {
+            lineIdx++
+        }
+        return code
     }
 
     override fun forEachRemaining(p0: IntConsumer?) {
@@ -67,10 +76,13 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     }
 
     fun unread(v: Int): CodePointIterator {
-        index++
-        if (index == memory.size)
+        memoryIndex++
+        if (memoryIndex == memory.size)
             memory = memory.copyOf(memory.size + min(memory.size / 2, 8))
-        memory[index] = v
+        memory[memoryIndex] = v
+        textIndex--
+        if (v == '\n'.code)
+            lineIdx--
         return this
     }
 
@@ -126,7 +138,7 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     }
 }
 
-internal class IntermediateReader(private var reader: BufferedReader) : PrimitiveIterator.OfInt, Closeable {
+private class IntermediateReader(private var reader: BufferedReader) : PrimitiveIterator.OfInt, Closeable {
     private var memory: Int = -1
 
     override fun hasNext(): Boolean {
@@ -159,7 +171,7 @@ internal class IntermediateReader(private var reader: BufferedReader) : Primitiv
     }
 }
 
-internal class IntermediateInputStream(private var input: InputStream) : PrimitiveIterator.OfInt {
+private class IntermediateInputStream(private var input: InputStream) : PrimitiveIterator.OfInt {
     private var memory: Int = -1
 
     override fun hasNext(): Boolean {

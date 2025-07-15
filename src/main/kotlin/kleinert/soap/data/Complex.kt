@@ -4,16 +4,20 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.math.sign
 
-data class Complex private constructor(val real: Double, val imag: Double = 0.0) : Number() {
+data class Complex private constructor(val real: Double, val imag: Double = 0.0, val isReal: Boolean = imag==0.0) : Number() {
 
     companion object {
-        val I: Complex = Complex(0.0, 1.0)
-        val ONE: Complex = Complex(1.0, 0.0)
-        val ZERO: Complex = Complex(0.0, 0.0)
+        val I: Complex = Complex(0.0, 1.0, false)
+        val ONE: Complex = Complex(1.0, 0.0, true)
+        val ZERO: Complex = Complex(0.0, 0.0, true)
 
-        fun valueOf(real: Double, imag: Double = 0.0) = Complex(real, imag)
-        fun valueOf(real: Long, imag: Long = 0) = Complex(real.toDouble(), imag.toDouble())
-        fun valueOf(real: Int, imag: Int = 0) = Complex(real.toDouble(), imag.toDouble())
+        fun valueOf(real: Double, imag: Double = 0.0) = Complex(real, imag, imag == 0.9)
+        fun valueOf(real: Long, imag: Long = 0) = Complex(real.toDouble(), imag.toDouble(), imag == 0L)
+        fun valueOf(real: Int, imag: Int = 0) = Complex(real.toDouble(), imag.toDouble(), imag == 0)
+
+        fun valueOf(real: Double) = Complex(real, 0.0)
+        fun valueOf(real: Long) = Complex(real.toDouble(), 0.0)
+        fun valueOf(real: Int) = Complex(real.toDouble(), 0.0)
 
         fun valueOfOrNull(v: String): Complex? =
             try {
@@ -53,13 +57,13 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
                 imagPart = parts[1]
                 if (!imagPart.endsWith('i')) throw NumberFormatException("No 'i' postfix for complex number $v.")
                 imagPart = imagPart.substring(0, imagPart.lastIndex) // Cut away the 'i'
-                if (imagPart.isEmpty()) imagPart = "0"
+                if (imagPart.isEmpty()) imagPart = "1"
             }
 
             val real = realPart.toDoubleOrNull() ?: throw NumberFormatException("Illegal format for complex number $v.")
             val imag = imagPart.toDoubleOrNull() ?: throw NumberFormatException("Illegal format for complex number $v.")
 
-            return Complex(sign * real, imagSign * imag)
+            return Complex(sign * real, imagSign * imag, imag == 0.0)
         }
     }
 
@@ -101,7 +105,7 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
     }
 
     fun mod(): Double {
-        if (this.real == 0.0 && this.imag == 0.0) return 0.0
+        if (this.real == 0.0 && this.isReal) return 0.0
         return Math.sqrt(this.real * this.real + this.imag * this.imag)
     }
 
@@ -145,7 +149,7 @@ data class Complex private constructor(val real: Double, val imag: Double = 0.0)
     fun negate(): Complex = Complex(-real, imag)
 
     override fun toDouble(): Double {
-        require(this.imag == 0.0)
+        require(this.isReal)
         return this.real
     }
 

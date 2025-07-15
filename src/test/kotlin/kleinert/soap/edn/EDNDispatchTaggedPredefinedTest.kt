@@ -1,13 +1,9 @@
-package kleinert.soap
+package kleinert.soap.edn
 
 import kleinert.soap.edn.EdnReaderException.EdnClassConversionError
 import kleinert.soap.data.Keyword
 import kleinert.soap.data.PackedList
 import kleinert.soap.data.Symbol
-import kleinert.soap.edn.EDN
-import kleinert.soap.edn.EDNSoapOptions
-import kleinert.soap.edn.EDNSoapReader
-import kleinert.soap.edn.ExtendedEDNDecoders
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -140,6 +136,4 @@ class EDNDispatchTaggedPredefinedTest {
             parse("#packed2D [[1 2] [3 4]]")
         )
     }
-
-
 }

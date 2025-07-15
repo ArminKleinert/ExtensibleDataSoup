@@ -38,6 +38,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
 
         fun valueOf(n: BigInteger): Ratio = valueOf(n.toLong(), 1)
         fun valueOf(n: Int): Ratio = valueOf(n.toLong(), 1)
+        fun valueOf(n: Double): Ratio = TODO()
 
         fun valueOf(s: String): Ratio {
             val divIndex = s.indexOf('/')
@@ -84,9 +85,10 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
     override fun toDouble(): Double = num.toDouble() / den.toDouble()
 
     fun toBigDecimal(mc: MathContext? = MathContext.UNLIMITED): BigDecimal =
-        BigDecimal(num, mc) .divide( BigDecimal(den, mc))
+        BigDecimal(num, mc).divide(BigDecimal(den, mc))
 
     fun toBigInteger(): BigInteger = BigInteger.valueOf(num).divide(BigInteger.valueOf(den))
+
     // return |a|
     fun abs(): Ratio = if (num >= 0) this else negate()
 
@@ -139,7 +141,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
             is BigInteger -> den == 1L && num.toBigInteger() == other
             is Float, is Double -> toDouble() == other.toDouble()
             is BigDecimal -> toBigDecimal() == other
-            is Complex -> other.imag == 0.0 && equals(other.real)
+            is Complex -> other.isReal && equals(other.real)
 
             else -> false
         }
@@ -147,10 +149,10 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
 
     override operator fun compareTo(other: Number): Int = when (other) {
         is Byte, is Short, is Int, is Long, is Float, is Double ->
-            (num.toDouble()/den.toDouble()).compareTo(other.toDouble())
+            (num.toDouble() / den.toDouble()).compareTo(other.toDouble())
 
-        is BigInteger-> toBigDecimal().compareTo(BigDecimal(other))
-        is BigDecimal ->toBigDecimal().compareTo(other)
+        is BigInteger -> toBigDecimal().compareTo(BigDecimal(other))
+        is BigDecimal -> toBigDecimal().compareTo(other)
 
         is Ratio -> {
             val a: Ratio = this
@@ -163,7 +165,7 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
         }
 
         is Complex -> {
-            if (other.imag != 0.0) throw IllegalArgumentException()
+            if (!other.isReal) throw IllegalArgumentException()
             toDouble().compareTo(other.real)
         }
 

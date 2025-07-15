@@ -1,7 +1,5 @@
-package kleinert.soap
+package kleinert.soap.edn
 
-import kleinert.soap.edn.EDN
-import kleinert.soap.edn.EdnReaderException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
