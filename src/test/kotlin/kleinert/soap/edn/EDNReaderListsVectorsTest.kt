@@ -99,13 +99,13 @@ class EDNReaderListsVectorsTest {
     @Test
     fun parseWithConverter() {
         run {
-            val options = EDN.defaultOptions.copy(listToPersistentListConverter = {LinkedList (it)})
+            val options = EDN.defaultOptions.copy(listToPersistentListConverter = { LinkedList(it) })
             val parsed = EDN.read("(1 2)", options)
             Assertions.assertInstanceOf(LinkedList::class.java, parsed)
             Assertions.assertEquals(listOf(1L, 2L), parsed)
         }
         run {
-            val options = EDN.defaultOptions.copy(listToPersistentVectorConverter = {LinkedList (it)})
+            val options = EDN.defaultOptions.copy(listToPersistentVectorConverter = { LinkedList(it) })
             val parsed = EDN.read("[1 2]", options)
             Assertions.assertInstanceOf(LinkedList::class.java, parsed)
             Assertions.assertEquals(listOf(1L, 2L), parsed)
