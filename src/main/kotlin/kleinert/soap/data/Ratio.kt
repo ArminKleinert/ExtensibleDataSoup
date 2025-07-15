@@ -3,6 +3,7 @@ package kleinert.soap.data
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 class Ratio private constructor(var num: Long, val den: Long) : Number(), Comparable<Number> {
@@ -33,12 +34,14 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
             return Ratio(numerator, denominator)
         }
 
-        fun valueOf(numerator: Int, denominator: Int): Ratio =
+        fun valueOf(numerator: Int, denominator: Int = 1): Ratio =
             valueOf(numerator.toLong(), denominator.toLong())
 
-        fun valueOf(n: BigInteger): Ratio = valueOf(n.toLong(), 1)
-        fun valueOf(n: Int): Ratio = valueOf(n.toLong(), 1)
-        fun valueOf(n: Double): Ratio = TODO()
+        fun valueOf(n: BigInteger): Ratio =
+            valueOf(n.toLong(), 1)
+
+        fun valueOf(x: Double, epsilon: Double = 1E-10): Ratio =
+            estimate(x, epsilon)
 
         fun valueOf(s: String): Ratio {
             val divIndex = s.indexOf('/')
@@ -47,6 +50,48 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
             val part2 = s.substring(divIndex + 1).toLongOrNull()
                 ?: throw NumberFormatException("Illegal format for rational number $s.")
             return valueOf(part1, part2)
+        }
+
+        /**
+         * Approximate rational number for a double.
+         */
+        fun estimate(x: Double, epsilon: Double = 1E-10): Ratio {
+            var leftNum = 0L
+            var leftDen = 1L
+            var rightNum = 1L
+            var rightDen = 0L
+            var bestNum = leftNum
+            var bestDen = leftDen
+            var bestError = abs(x)
+
+            // do Stern-Brocot binary search
+            while (bestError > epsilon) {
+
+                // compute next possible rational approximation
+                val mediantNum: Long = leftNum + rightNum
+                val mediantDen: Long = leftDen + rightDen
+                val mediantDouble = mediantNum / mediantDen.toDouble()
+
+                if (x < mediantDouble) { // go left
+                    rightNum = mediantNum
+                    rightDen = mediantDen
+                } else {
+                    // go right
+                    leftNum = mediantNum
+                    leftDen = mediantDen
+                }
+
+                // check if better and update champion
+                val error: Double = abs(mediantDouble - x)
+                if (error < bestError) {
+                    bestNum = mediantNum
+                    bestDen = mediantDen
+                    bestError = error
+                    //print("$bestNum/$bestDen ")
+                }
+            }
+
+            return Ratio.valueOf(bestNum, bestDen)
         }
 
         fun valueOfOrNull(s: String): Ratio? {
@@ -64,6 +109,10 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
             val m = if (m1 < 0) -m1 else m1
             val n = if (n1 < 0) -n1 else n1
             return m * (n / gcd(m, n)) // parentheses important to avoid overflow
+        }
+
+        fun mediant(rNum: Long, rDen: Long, sNum: Long, sDen: Long): Ratio {
+            return Ratio(rNum + sNum, rDen + sDen)
         }
     }
 
@@ -88,6 +137,10 @@ class Ratio private constructor(var num: Long, val den: Long) : Number(), Compar
         BigDecimal(num, mc).divide(BigDecimal(den, mc))
 
     fun toBigInteger(): BigInteger = BigInteger.valueOf(num).divide(BigInteger.valueOf(den))
+
+    fun mediant(s: Ratio): Ratio {
+        return valueOf(num + s.num, den + s.den)
+    }
 
     // return |a|
     fun abs(): Ratio = if (num >= 0) this else negate()
