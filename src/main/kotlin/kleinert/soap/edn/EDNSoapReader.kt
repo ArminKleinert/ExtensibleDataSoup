@@ -1,6 +1,7 @@
 package kleinert.soap.edn
 
 import kleinert.soap.data.*
+import kleinert.soap.data.IObj
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
@@ -453,6 +454,9 @@ class EDNSoapReader private constructor(
                         } while (temp == NOTHING)
                         //res.add(readForm(cpi, level))
                         if (stopAfterOne) return NOTHING
+                    } else if (cpi.hasNext() && cpi.peek() == '^'.code) {
+                        cpi.nextInt()
+                        res.add(parseMeta(level))
                     } else {
                         res.add(parseDispatch(level + 1))
                     }
@@ -481,6 +485,10 @@ class EDNSoapReader private constructor(
                     res.add(if (isNumber) parseNumber() else parseOther(level + 1))
                 }
 
+                '^'.code -> {
+                    res.add(parseMeta(level))
+                }
+
                 else -> {
                     cpi.unread(codePoint)
                     res.add(parseOther(level + 1))
@@ -496,6 +504,20 @@ class EDNSoapReader private constructor(
             throw ednReaderException("Reader requires exactly one expression, but got ${res.size}.")
         }
         return res
+    }
+
+    private fun parseMeta(level: Int): IObj<Any?> {
+        val meta = when (val m = readForm(level, true)) {
+            is String, is Symbol -> PersistentMap(mapOf(Keyword["tag"] to m))
+            is Keyword -> PersistentMap(mapOf(m to true))
+            !is Map<*, *> -> throw ednReaderException("Metadata must be Symbol,Keyword,String or Map")
+            else -> m
+        }
+
+        val obj = readForm(level, true)
+        if (obj === NOTHING) throw ednReaderException("Required object for metadata, but got nothing.")
+
+        return IObj(meta, obj)
     }
 
     private fun readToken(condition: (Int) -> Boolean): String {
