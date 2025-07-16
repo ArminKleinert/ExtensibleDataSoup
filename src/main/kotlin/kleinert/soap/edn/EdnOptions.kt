@@ -188,15 +188,15 @@ data class EDNSoapOptions(
     val allowSchemeUTF32Codes: Boolean = false,
     val allowDispatchChars: Boolean = false,
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
-    val ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?> = mapOf(),
+    val ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(),
     val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
     val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList(it) },
     val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector(it) },
-    val setToPersistentSetConverter: (LinkedHashSet<*>) -> Set<*> = { PersistentSet(it, ordered = true) },
-    val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap(it, ordered = true) },
+    val setToPersistentSetConverter: (LinkedHashSet<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
+    val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
     val allowComplexNumberLiterals: Boolean = false,
     val allowUTFSymbols: Boolean = false,
     val sequenceElementLimit: Int = 10000,
@@ -221,10 +221,10 @@ data class EDNSoapOptions(
                 allowComplexNumberLiterals = true,
                 allowUTFSymbols = true,
                 ednClassDecoders = ednClassDecoder,
-                ednClassEncoders = mapOf(),
+                ednClassEncoders = listOf(),
             )
 
-        fun extendedWriterOptions(ednClassEncoders: Map<Class<*>?, (Any?) -> Pair<String, Any?>?>) =
+        fun extendedWriterOptions(ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>>) =
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,

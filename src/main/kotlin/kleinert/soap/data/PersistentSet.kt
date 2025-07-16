@@ -15,8 +15,44 @@ class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIte
     override fun set(element: T) = throw UnsupportedOperationException("Not possible on persistent iterators.")
 }
 
-class PersistentSet<T>(private val inner: Set<T>, val sorted: Boolean = false, val ordered: Boolean = false) :
-    MutableSet<T> {
+class PersistentSet<T> : MutableSet<T> {
+
+    companion object {
+        fun <T> of(vararg elements: T): PersistentSet<T> =
+            PersistentSet(LinkedHashSet(elements.toList()), ordered = true)
+
+        fun <T> wrap(xs:Set<T>, ordered: Boolean=false,sorted: Boolean=false) :PersistentSet<T> =
+            PersistentSet(xs, ordered=ordered, sorted=sorted)
+    }
+
+    val inner: Set<T>
+    val sorted: Boolean
+    val ordered: Boolean
+
+    constructor(xs: List<T>) {
+        this.inner = LinkedHashSet(xs)
+        this.sorted = false
+        this.ordered = true
+    }
+
+    constructor(xs: Collection<T>) {
+        this.inner = LinkedHashSet(xs)
+        this.sorted = false
+        this.ordered = true
+    }
+
+    constructor(xs: Set<T>) {
+        this.   inner = xs.minus(xs).plus(xs)
+        this.   sorted = false
+        this.  ordered = false
+    }
+
+    private constructor(xs: Set<T>, ordered:Boolean = false, sorted:Boolean = false) {
+        this.inner = xs
+        this.sorted = sorted
+        this.ordered = ordered
+    }
+
     override val size: Int
         get() = inner.size
 
@@ -52,12 +88,8 @@ class PersistentSet<T>(private val inner: Set<T>, val sorted: Boolean = false, v
 }
 
 
-class PersistentMap<K, V>(
-    private val inner: Map<K, V>,
-    val sorted: Boolean = false,
-    val ordered: Boolean = false
-) :
-    MutableMap<K, V> {
+class PersistentMap<K, V>:    MutableMap<K, V> {
+
     class Entry<K, V>(override val key: K, override val value: V) : MutableMap.MutableEntry<K, V> {
         override fun setValue(newValue: V): V =
             throw UnsupportedOperationException("Not possible on persistent map entry.")
@@ -79,6 +111,46 @@ class PersistentMap<K, V>(
         }
     }
 
+    private val inner: Map<K, V>
+    val sorted: Boolean
+    val ordered: Boolean
+
+    companion object {
+        fun <K, V> of(vararg entries: Pair<K, V>): PersistentMap<K, V> =
+            PersistentMap(entries.toList())
+
+        fun <K,V> wrap(xs:Map<K,V>, ordered: Boolean=false,sorted: Boolean=false) :PersistentMap<K,V> =
+            PersistentMap(xs, ordered=ordered, sorted=sorted)
+    }
+
+    constructor(xs: List<Pair<K,V>>) {
+        inner = LinkedHashMap(xs.size*2)
+        for ((k,v) in xs)
+            inner[k]=v
+        sorted = false
+        ordered = true
+    }
+
+    constructor(xs: Collection<Pair<K,V>>) {
+        inner = LinkedHashMap(xs.size*2)
+        for ((k,v) in xs)
+            inner[k]=v
+        sorted = false
+        ordered = false
+    }
+
+    constructor(xs: Map<K,V>) {
+        this.inner = xs
+        this.sorted = false
+        this.ordered = false
+    }
+
+    private constructor(xs: Map<K,V>, ordered:Boolean, sorted:Boolean) {
+        this.inner = xs
+        this.sorted = sorted
+        this.ordered = ordered
+    }
+
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
         get() = PersistentSet(inner.entries.mapTo(mutableSetOf()) { Entry(it.key, it.value) })
     override val keys: MutableSet<K>
@@ -94,15 +166,13 @@ class PersistentMap<K, V>(
     override fun isEmpty(): Boolean = inner.isEmpty()
 
     override fun clear() = throw UnsupportedOperationException("Not possible on persistent map.")
-    override fun remove(key: K): V? = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun remove(key: K): V = throw UnsupportedOperationException("Not possible on persistent map.")
     override fun putAll(from: Map<out K, V>) = throw UnsupportedOperationException("Not possible on persistent map.")
-    override fun put(key: K, value: V): V? = throw UnsupportedOperationException("Not possible on persistent map.")
+    override fun put(key: K, value: V): V = throw UnsupportedOperationException("Not possible on persistent map.")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Map<*, *>) return false
-
-        other as Map<*, *>
 
         if (size != other.size) return false
 
@@ -122,7 +192,27 @@ class PersistentMap<K, V>(
     }
 }
 
-class PersistentList<T>(private val inner: List<T>) : MutableList<T> {
+class PersistentList<T> : MutableList<T> {
+    companion object {
+        fun <T> of(vararg elements: T): PersistentList<T> = PersistentList(elements.toList())
+
+        fun <T> wrap(xs:List<T>) :PersistentList<T> = PersistentList(xs, true)
+    }
+
+    private val inner: List<T>
+
+    constructor(xs: List<T>, wrapMarker:Boolean) {
+        inner = xs
+        !wrapMarker
+    }
+
+    constructor(xs: List<T>) {
+        inner = xs.toList()
+    }
+
+    constructor(xs: Collection<T>){
+        inner = xs.toList()}
+
     override val size: Int
         get() = inner.size
 
@@ -170,7 +260,27 @@ class PersistentList<T>(private val inner: List<T>) : MutableList<T> {
     }
 }
 
-class PersistentVector<T>(private val inner: List<T>) : MutableList<T> {
+class PersistentVector<T>: MutableList<T> {
+    companion object {
+        fun <T> of(vararg elements: T): PersistentVector<T> = PersistentVector(elements.toList())
+
+        fun <T> wrap(xs:List<T>) : PersistentVector<T> = PersistentVector(xs, true)
+    }
+
+    private val inner: List<T>
+
+    constructor(xs: List<T>, wrapMarker:Boolean) {
+        inner = xs
+        !wrapMarker
+    }
+
+    constructor(xs: List<T>) {
+        inner = xs.toList()
+    }
+
+    constructor(xs: Collection<T>){
+        inner = xs.toList()}
+
     override val size: Int
         get() = inner.size
 

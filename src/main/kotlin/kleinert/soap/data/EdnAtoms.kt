@@ -125,6 +125,8 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
 
         fun symbol(prefix: String?, name: String) = Symbol(prefix, name)
         fun symbol(name: String) = Symbol(null, name)
+
+        operator fun get(s: String): Symbol = parse(s) ?: throw IllegalStateException("Illegal symbol format: $s")
     }
 
     val length: Int
