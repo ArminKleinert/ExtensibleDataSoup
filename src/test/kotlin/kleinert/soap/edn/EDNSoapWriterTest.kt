@@ -47,7 +47,7 @@ class EDNSoapWriterTest {
 
     @Test
     fun encodeCharCode() {
-        Assertions.assertEquals('\u271D', EDN.read("\\u271D")) // Latin cross
+        Assertions.assertEquals("\\u271d", EDN.pprintToString('\u271D'))
     }
 
     @Test
@@ -55,6 +55,11 @@ class EDNSoapWriterTest {
         Assertions.assertEquals("0", EDN.pprintToString(0.toByte()))
         Assertions.assertEquals("1", EDN.pprintToString(1.toByte()))
         Assertions.assertEquals("-1", EDN.pprintToString((-1).toByte()))
+
+        val options = EDN.defaultOptions.copy(allowNumericSuffixes = true)
+        Assertions.assertEquals("0_i8", EDN.pprintToString(0.toByte(), options))
+        Assertions.assertEquals("1_i8", EDN.pprintToString(1.toByte(), options))
+        Assertions.assertEquals("-1_i8", EDN.pprintToString((-1).toByte(), options))
     }
 
     @Test
@@ -62,6 +67,11 @@ class EDNSoapWriterTest {
         Assertions.assertEquals("0", EDN.pprintToString(0.toShort()))
         Assertions.assertEquals("1", EDN.pprintToString(1.toShort()))
         Assertions.assertEquals("-1", EDN.pprintToString((-1).toShort()))
+
+        val options = EDN.defaultOptions.copy(allowNumericSuffixes = true)
+        Assertions.assertEquals("0_i6", EDN.pprintToString(0.toByte(), options))
+        Assertions.assertEquals("1_i16", EDN.pprintToString(1.toByte(), options))
+        Assertions.assertEquals("-1_i16", EDN.pprintToString((-1).toByte(), options))
     }
 
     @Test
@@ -69,6 +79,11 @@ class EDNSoapWriterTest {
         Assertions.assertEquals("0", EDN.pprintToString(0))
         Assertions.assertEquals("1", EDN.pprintToString(1))
         Assertions.assertEquals("-1", EDN.pprintToString(-1))
+
+        val options = EDN.defaultOptions.copy(allowNumericSuffixes = true)
+        Assertions.assertEquals("0_i32", EDN.pprintToString(0.toByte(), options))
+        Assertions.assertEquals("1_i32", EDN.pprintToString(1.toByte(), options))
+        Assertions.assertEquals("-1_i32", EDN.pprintToString((-1).toByte(), options))
     }
 
     @Test

@@ -71,7 +71,7 @@ class EDNSoapReader private constructor(
         }
     }
 
-    private fun parseNumberHelper(negate: Boolean = false): Number {
+    private fun parseNumberHelper(): Number {
         val token = readToken(::isNotBreakingSymbol)
 
         val floatyRegex = Regex("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?")
@@ -162,8 +162,8 @@ class EDNSoapReader private constructor(
                         'r'.code -> currentToken.append('\r')
                         '"'.code -> currentToken.append('\"')
                         '\\'.code -> currentToken.append("\\")
-                        'u'.code -> currentToken.append(Char(parseUnicodeChar(4, 4, 'u'))) // UTF-16 code
-                        'x'.code -> currentToken.appendCodePoint(parseUnicodeChar(8, 8, 'x')) // UTF-32 code
+                        'u'.code -> currentToken.append(parseUnicodeChar(4, 4, 'u').toChar()) // UTF-16 code
+                        'x'.code -> currentToken.appendCodePoint(parseUnicodeChar(8, 8, 'x').code) // UTF-32 code
                         else ->
                             throw ednReaderException("Invalid escape sequence: \\${codePt2.toChar()} in string $currentToken")
                     }
@@ -180,18 +180,18 @@ class EDNSoapReader private constructor(
         minLength: Int,
         maxLength: Int,
         initChar: Char
-    ): Int {
+    ): Char32 {
         val token = cpi.takeCodePoints(StringBuilder(), maxLength, ::isHexNum)
         if (token.length < minLength || token.length > maxLength)
             throw ednReaderException("Invalid unicode sequence \\$initChar$token")
         return parseUnicodeChar(token, 16, initChar)
     }
 
-    private fun parseUnicodeChar(token: CharSequence, base: Int, initChar: Char): Int {
+    private fun parseUnicodeChar(token: CharSequence, base: Int, initChar: Char): Char32 {
         try {
             var code = 0
             for (it in token) code = code * base + it.digitToInt(base)
-            return code
+            return Char32(code)
         } catch (nfe: NumberFormatException) {
             throw ednReaderException(nfe.message ?: "Invalid unicode sequence \\$initChar$token")
         }
@@ -261,27 +261,27 @@ class EDNSoapReader private constructor(
 
     private fun parseChar(): Char {
         val token = readToken(::isNotBreakingSymbol)
-        return Char(parseDispatchUnicodeChar(token, false))
+        return parseDispatchUnicodeChar(token, false).toChar()
     }
 
     private fun parseDispatchUnicodeChar(
         initialToken: CharSequence,
         isDispatch: Boolean = false
-    ): Int {
+    ): Char32 {
         val token =
             if (initialToken.isEmpty() && cpi.hasNext()) cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle)
             else initialToken
 
         if (token.length == 1)
-            return token[0].code
+            return Char32(token[0].code)
 
         when (token) {
-            "newline" -> return '\n'.code
-            "space" -> return ' '.code
-            "tab" -> return '\t'.code
-            "backspace" -> return '\b'.code
-            "formfeed" -> return 12 // '\f'
-            "return" -> return '\r'.code
+            "newline" -> return Char32('\n'.code)
+            "space" -> return Char32(' '.code)
+            "tab" -> return Char32('\t'.code)
+            "backspace" -> return Char32('\b'.code)
+            "formfeed" -> return Char32(12) // '\f'
+            "return" -> return Char32('\r'.code)
         }
 
         val reducedToken = token.subSequence(1, token.length)
@@ -342,7 +342,7 @@ class EDNSoapReader private constructor(
                     val subToken = token.subSequence(1, token.length)
                     val uniChar = parseDispatchUnicodeChar(subToken, true)
                     return StringBuilder()
-                        .appendCodePoint(uniChar)
+                        .appendCodePoint(uniChar.code)
                         .toString()
                 }
 
@@ -405,7 +405,7 @@ class EDNSoapReader private constructor(
         return decoder!!(form)
     }
 
-    private fun parseOther(level: Int): Any? {
+    private fun parseOther(): Any? {
         val token = cpi.takeCodePoints(StringBuilder(), ::isValidSymbolChar).toString()
 
         if (token.length > 1)
@@ -476,13 +476,13 @@ class EDNSoapReader private constructor(
                 '+'.code -> {
                     val isNumber = cpi.hasNext() && cpi.peek() in '0'.code..'9'.code
                     cpi.unread(codePoint)
-                    res.add(if (isNumber) parseNumber() else parseOther(level + 1))
+                    res.add(if (isNumber) parseNumber() else parseOther())
                 }
 
                 '-'.code -> {
                     val isNumber = cpi.hasNext() && cpi.peek() in '0'.code..'9'.code
                     cpi.unread(codePoint)
-                    res.add(if (isNumber) parseNumber() else parseOther(level + 1))
+                    res.add(if (isNumber) parseNumber() else parseOther())
                 }
 
                 '^'.code -> {
@@ -491,7 +491,7 @@ class EDNSoapReader private constructor(
 
                 else -> {
                     cpi.unread(codePoint)
-                    res.add(parseOther(level + 1))
+                    res.add(parseOther())
                 }
             }
 

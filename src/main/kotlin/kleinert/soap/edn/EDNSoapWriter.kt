@@ -163,7 +163,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
         12.toChar() -> writer.append("\\formfeed")
         '\r' -> writer.append("\\return")
 
-        else -> writer.append(String.format("\\u%04x"))
+        else -> writer.append(String.format("\\u%04x", obj.code))
     }
 
     private fun encodeSequence(obj: Sequence<*>) = obj.joinTo(
