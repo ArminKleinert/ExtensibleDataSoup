@@ -6,7 +6,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
-class EDNReaderSimpleDispatchTest {
+class EDNReaderDispatchSimpleTest {
     @Test
     fun parseSymbolicTest() {
         Assertions.assertTrue((EDN.read("##NaN") as Double).isNaN())
