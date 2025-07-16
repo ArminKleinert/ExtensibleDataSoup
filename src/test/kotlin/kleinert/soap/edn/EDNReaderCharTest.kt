@@ -1,5 +1,6 @@
 package kleinert.soap.edn
 
+import kleinert.soap.data.Char32
 import kleinert.soap.edn.EDN
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -49,7 +50,14 @@ class EDNReaderCharTest {
         Assertions.assertEquals('\u2626', EDN.read("\\u2626")) // Orthodox cross
         Assertions.assertEquals('\u271D', EDN.read("\\u271D")) // Latin cross
 
-        Assertions.assertEquals("\uD83D\uDD46", EDN.read("#\\u0001F546", options = EDN.extendedOptions)) // White latin cross
-        Assertions.assertEquals("\uD83D\uDD47", EDN.read("#\\u0001F547", options = EDN.extendedOptions)) // Heavy latin cross
+        Assertions.assertEquals(Char32('\n'.code), EDN.read("#\\newline", options = EDN.extendedOptions))
+        Assertions.assertEquals(Char32(' '.code), EDN.read("#\\space", options = EDN.extendedOptions))
+        Assertions.assertEquals(Char32('\t'.code), EDN.read("#\\tab", options = EDN.extendedOptions))
+        Assertions.assertEquals(Char32('\b'.code), EDN.read("#\\backspace", options = EDN.extendedOptions))
+        Assertions.assertEquals(Char32(12), EDN.read("#\\formfeed", options = EDN.extendedOptions))
+        Assertions.assertEquals(Char32('\r'.code), EDN.read("#\\return", options = EDN.extendedOptions))
+
+        Assertions.assertEquals(Char32.valueOf("\uD83D\uDD46"), EDN.read("#\\u0001F546", options = EDN.extendedOptions)) // White latin cross
+        Assertions.assertEquals(Char32.valueOf("\uD83D\uDD47"), EDN.read("#\\u0001F547", options = EDN.extendedOptions)) // Heavy latin cross
     }
 }

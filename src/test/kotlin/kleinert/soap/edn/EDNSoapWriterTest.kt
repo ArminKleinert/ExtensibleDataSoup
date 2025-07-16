@@ -51,6 +51,36 @@ class EDNSoapWriterTest {
     }
 
     @Test
+    fun encodeChar32() {
+        Assertions.assertEquals("#\\a", EDN.pprintToString(Char32('a'.code), EDN.extendedOptions))
+
+        Assertions.assertEquals("#\\newline", EDN.pprintToString(Char32('\n'.code), EDN.extendedOptions))
+        Assertions.assertEquals("#\\space", EDN.pprintToString(Char32(' '.code), EDN.extendedOptions))
+        Assertions.assertEquals("#\\tab", EDN.pprintToString(Char32('\t'.code), EDN.extendedOptions))
+        Assertions.assertEquals("#\\backspace", EDN.pprintToString(Char32('\b'.code), EDN.extendedOptions))
+        Assertions.assertEquals("#\\formfeed", EDN.pprintToString(Char32(12), EDN.extendedOptions))
+        Assertions.assertEquals("#\\return", EDN.pprintToString(Char32('\r'.code), EDN.extendedOptions))
+
+        Assertions.assertEquals("#\\u0000271d", EDN.pprintToString(Char32('\u271D'.code), EDN.extendedOptions))
+        Assertions.assertEquals("#\\u0001f546", EDN.pprintToString(Char32(0x0001F546), EDN.extendedOptions))
+    }
+
+    @Test
+    fun encodeChar32AsString() {
+        Assertions.assertEquals("\"a\"", EDN.pprintToString(Char32('a'.code)))
+
+        Assertions.assertEquals("\"\n\"", EDN.pprintToString(Char32('\n'.code)))
+        Assertions.assertEquals("\" \"", EDN.pprintToString(Char32(' '.code)))
+        Assertions.assertEquals("\"\t\"", EDN.pprintToString(Char32('\t'.code)))
+        Assertions.assertEquals("\"\b\"", EDN.pprintToString(Char32('\b'.code)))
+        Assertions.assertEquals("\"\u000C\"", EDN.pprintToString(Char32(12)))
+        Assertions.assertEquals("\"\r\"", EDN.pprintToString(Char32('\r'.code)))
+
+        Assertions.assertEquals("\"✝\"", EDN.pprintToString(Char32('\u271D'.code)))
+        Assertions.assertEquals("\"\ud83d\udd46\"", EDN.pprintToString(Char32(0x0001F546)))
+    }
+
+    @Test
     fun encodeByte() {
         Assertions.assertEquals("0", EDN.pprintToString(0.toByte()))
         Assertions.assertEquals("1", EDN.pprintToString(1.toByte()))
@@ -69,9 +99,9 @@ class EDNSoapWriterTest {
         Assertions.assertEquals("-1", EDN.pprintToString((-1).toShort()))
 
         val options = EDN.defaultOptions.copy(allowNumericSuffixes = true)
-        Assertions.assertEquals("0_i6", EDN.pprintToString(0.toByte(), options))
-        Assertions.assertEquals("1_i16", EDN.pprintToString(1.toByte(), options))
-        Assertions.assertEquals("-1_i16", EDN.pprintToString((-1).toByte(), options))
+        Assertions.assertEquals("0_i16", EDN.pprintToString(0.toShort(), options))
+        Assertions.assertEquals("1_i16", EDN.pprintToString(1.toShort(), options))
+        Assertions.assertEquals("-1_i16", EDN.pprintToString((-1).toShort(), options))
     }
 
     @Test
@@ -81,9 +111,9 @@ class EDNSoapWriterTest {
         Assertions.assertEquals("-1", EDN.pprintToString(-1))
 
         val options = EDN.defaultOptions.copy(allowNumericSuffixes = true)
-        Assertions.assertEquals("0_i32", EDN.pprintToString(0.toByte(), options))
-        Assertions.assertEquals("1_i32", EDN.pprintToString(1.toByte(), options))
-        Assertions.assertEquals("-1_i32", EDN.pprintToString((-1).toByte(), options))
+        Assertions.assertEquals("0_i8", EDN.pprintToString(0.toByte(), options))
+        Assertions.assertEquals("1_i8", EDN.pprintToString(1.toByte(), options))
+        Assertions.assertEquals("-1_i8", EDN.pprintToString((-1).toByte(), options))
     }
 
     @Test
@@ -125,11 +155,6 @@ class EDNSoapWriterTest {
     }
 
     @Test
-    fun encodeMapEntry() {
-        Assertions.assertEquals("[2, 33]", EDN.pprintToString(mapOf(2 to 33).entries.first()))
-    }
-
-    @Test
     fun encodeIObj() {
         Assertions.assertEquals("^{:tag \"abc\"} :a", EDN.pprintToString(IObj.valueOf("abc", Keyword["a"])))
         Assertions.assertEquals("^{:abc true} :a", EDN.pprintToString(IObj.valueOf(Keyword["abc"], Keyword["a"])))
@@ -144,11 +169,6 @@ class EDNSoapWriterTest {
     }
 
     @Test
-    fun encodePair() {
-        Assertions.assertEquals("[2, 33]", EDN.pprintToString(2 to 33))
-    }
-
-    @Test
     fun encodeByteArray() {
         Assertions.assertEquals("[]", EDN.pprintToString(ByteArray(0)))
         Assertions.assertEquals("[0, 0]", EDN.pprintToString(ByteArray(2)))
@@ -156,7 +176,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             ByteArray::class.java to { "bytearray" to (it as ByteArray).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#bytearray [0, 0]", EDN.pprintToString(ByteArray(2), options))
     }
 
@@ -168,7 +189,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             ShortArray::class.java to { "shortarray" to (it as ShortArray).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#shortarray [0, 0]", EDN.pprintToString(ShortArray(2), options))
     }
 
@@ -180,7 +202,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             IntArray::class.java to { "intarray" to (it as IntArray).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#intarray [0, 0]", EDN.pprintToString(IntArray(2), options))
     }
 
@@ -192,7 +215,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             LongArray::class.java to { "longarray" to (it as LongArray).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#longarray [0, 0]", EDN.pprintToString(LongArray(2), options))
     }
 
@@ -204,7 +228,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             FloatArray::class.java to { "floatarray" to (it as FloatArray).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#floatarray [0.0, 0.0]", EDN.pprintToString(FloatArray(2), options))
     }
 
@@ -216,7 +241,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             DoubleArray::class.java to { "doublearray" to (it as DoubleArray).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#doublearray [0.0, 0.0]", EDN.pprintToString(DoubleArray(2), options))
     }
 
@@ -228,7 +254,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             Array::class.java to { "array" to (it as Array<*>).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals("#array [:a, :b]", EDN.pprintToString(arrayOf(Keyword["a"], Keyword["b"]), options))
     }
 
@@ -247,7 +274,8 @@ class EDNSoapWriterTest {
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
             PersistentSet::class.java to { "set" to (it as Set<*>).toList() }
         )
-        val options = EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals(
             "#set [:a, :b]",
             EDN.pprintToString(PersistentSet.of(Keyword["a"], Keyword["b"]), options)
@@ -311,5 +339,18 @@ class EDNSoapWriterTest {
     @Test
     fun encodeSymbol() {
         Assertions.assertEquals("abc", EDN.pprintToString(Symbol.symbol("abc")))
+    }
+
+    @Test
+    fun encodeCustom() {
+        val encoders = listOf(
+            Pair::class.java to { it: Any? -> "pair" to (it as Pair<*, *>).toList() }
+        )
+        val options =
+            EDNSoapOptions.defaultOptions.copy(ednClassEncoders = encoders)
+        Assertions.assertEquals(
+            "#pair [:a, :b]",
+            EDN.pprintToString((Keyword["a"] to Keyword["b"]), options)
+        )
     }
 }

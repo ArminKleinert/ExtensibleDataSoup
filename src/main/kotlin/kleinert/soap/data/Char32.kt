@@ -57,7 +57,7 @@ value class Char32(val code: Int) : Comparable<Char32> {
     fun toFloat(): Float = code.toFloat()
     fun toDouble(): Double = code.toDouble()
 
-    override fun toString(): String = StringBuilder().appendCodePoint(code).toString()
+    override fun toString(): String = String(intArrayOf(code), 0, 1)
 
     override fun compareTo(other: Char32): Int = code.compareTo(other.code)
     operator fun rangeTo(other: Char32): Char32Range = Char32Range(this, other)
@@ -201,6 +201,7 @@ public class Char32Range(start: Char32, endInclusive: Char32) : Char32Progressio
     override fun toString(): String = "$first..$last"
 }
 
+fun Char.toChar32() = Char32(this.code)
 fun Byte.toChar32() = Char32(this.toInt())
 fun Short.toChar32() = Char32(this.toInt())
 fun Int.toChar32() = Char32(this)

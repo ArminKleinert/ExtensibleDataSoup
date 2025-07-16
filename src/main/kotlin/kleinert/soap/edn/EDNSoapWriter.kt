@@ -60,11 +60,11 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             false -> writer.append("false")
             is String -> encodeString(obj)
             is Char -> encodeChar(obj)
+            is Char32 -> encodeChar32(obj)
             is Byte, is Short, is Int, is Long, is Ratio -> encodePredefinedNumberType(obj as Number)
             is Float -> encodeFloat(obj)
             is Double -> encodeDouble(obj)
             is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
-            is Map.Entry<*, *> -> encode(listOf(obj.key, obj.value))
 
             is IObj<*> -> {
                 writer.append('^')
@@ -74,9 +74,6 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             }
 
             is PersistentList<*> -> if (!tryEncoder(obj)) encodePersistentList(obj)
-
-            // User-defined encoder or as vector
-            is Pair<*, *> -> if (!tryEncoder(obj)) encodeList(listOf(obj.first, obj.second))
 
             is ByteArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
             is ShortArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
@@ -164,6 +161,38 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
         '\r' -> writer.append("\\return")
 
         else -> writer.append(String.format("\\u%04x", obj.code))
+    }
+
+    private fun encodeChar32(obj: Char32) {
+        if (!options.allowDispatchChars) {
+            writer.append('"').append(obj.toString()).append('"')
+            return
+        }
+
+        when (obj.code) {
+            '!'.code, '"'.code, '#'.code, '$'.code, '%'.code, '&'.code, '\''.code, '('.code, ')'.code, '*'.code, '+'.code,
+            ','.code, '-'.code, '.'.code, '/'.code,
+            '0'.code, '1'.code, '2'.code, '3'.code, '4'.code, '5'.code, '6'.code, '7'.code, '8'.code, '9'.code,
+            ':'.code, ';'.code, '<'.code, '='.code, '>'.code, '?'.code, '@'.code,
+            'A'.code, 'B'.code, 'C'.code, 'D'.code, 'E'.code, 'F'.code, 'G'.code, 'H'.code, 'I'.code, 'J'.code, 'K'.code,
+            'L'.code, 'M'.code, 'N'.code, 'O'.code, 'P'.code, 'Q'.code, 'R'.code, 'S'.code, 'T'.code, 'U'.code, 'V'.code,
+            'W'.code, 'X'.code, 'Y'.code, 'Z'.code,
+            '\\'.code, '^'.code, '_'.code, '`'.code,
+            'a'.code, 'b'.code, 'c'.code, 'd'.code, 'e'.code, 'f'.code, 'g'.code, 'h'.code, 'i'.code, 'j'.code, 'k'.code,
+            'l'.code, 'm'.code, 'n'.code, 'o'.code, 'p'.code, 'q'.code, 'r'.code, 's'.code, 't'.code, 'u'.code, 'v'.code,
+            'w'.code, 'x'.code, 'y'.code, 'z'.code,
+            '|'.code, '~'.code, '§'.code, '°'.code, '´'.code, '€'.code
+            -> writer.append("#\\").append(obj.toString())
+
+            '\n'.code -> writer.append("#\\newline")
+            ' '.code -> writer.append("#\\space")
+            '\t'.code -> writer.append("#\\tab")
+            '\b'.code -> writer.append("#\\backspace")
+            12 -> writer.append("#\\formfeed")
+            '\r'.code -> writer.append("#\\return")
+
+            else -> writer.append(String.format("#\\u%08x", obj.code))
+        }
     }
 
     private fun encodeSequence(obj: Sequence<*>) = obj.joinTo(

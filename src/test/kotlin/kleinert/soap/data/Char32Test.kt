@@ -10,22 +10,22 @@ class Char32Test {
         Assertions.assertThrows(IllegalArgumentException::class.java) { Char32(Char32.MAX_VALUE.code + 1) }
 
         Assertions.assertEquals(Char32(0), Char32(0))
-        Assertions.assertEquals(Char32.valueOf('A'), Char32('A'.code))
+        Assertions.assertEquals(Char32('A'.code), Char32.valueOf('A'))
         Assertions.assertEquals(Char32(0x0001F546), Char32.valueOf(0x0001F546u))
-        Assertions.assertEquals(Char32.valueOf(0x0001F546u), Char32.valueOf("\uD83D\uDD46"))
+        Assertions.assertEquals(Char32(0x0001F546), Char32.valueOf("\uD83D\uDD46"))
     }
 
     @Test
     fun dec() {
         Assertions.assertThrows(IllegalArgumentException::class.java) { Char32(Char32.MIN_VALUE.code).dec() }
-        Assertions.assertEquals(Char32.valueOf('A'), Char32.valueOf('B').dec())
+        Assertions.assertEquals(Char32('A'.code), Char32.valueOf('B').dec())
         Assertions.assertEquals(Char32('A'.code), Char32('B'.code).dec())
     }
 
     @Test
     fun inc() {
         Assertions.assertThrows(IllegalArgumentException::class.java) { Char32(Char32.MAX_VALUE.code).inc() }
-        Assertions.assertEquals(Char32.valueOf('B'), Char32.valueOf('A').inc())
+        Assertions.assertEquals(Char32('B'.code), Char32.valueOf('A').inc())
         Assertions.assertEquals(Char32('B'.code), Char32('A'.code).inc())
     }
 
@@ -54,7 +54,6 @@ class Char32Test {
 
     @Test
     fun toChar() {
-        println((Char32(Char.MAX_VALUE.code) + 1).code > Char.MAX_VALUE.code)
         Assertions.assertThrows(IllegalArgumentException::class.java) { (Char32(Char.MAX_VALUE.code) + 1).toChar() }
         Assertions.assertEquals('A', Char32.valueOf('A').toChar())
         Assertions.assertEquals('A', Char32('A'.code).toChar())
@@ -101,7 +100,8 @@ class Char32Test {
     @Test
     fun testToString() {
         Assertions.assertEquals("A", Char32.valueOf('A').toString())
-        Assertions.assertEquals("\uD83D\uDD46", Char32(0x0001F546).toString())
+        Assertions.assertEquals("\uD83D\uDD46", Char32(0x0001F546).toString()) // White latin cross
+        Assertions.assertEquals("\uD83C\uDF81", Char32(0x0001F381).toString()) // Wrapped present 🎁
     }
 
     @Test
@@ -138,6 +138,11 @@ class Char32Test {
     @Test
     fun getCode() {
         Assertions.assertEquals(65, Char32('A'.code).code)
+    }
+
+    @Test
+    fun charToChar32() {
+        Assertions.assertEquals(Char32('A'.code), 'A'.toChar32())
     }
 
     @Test

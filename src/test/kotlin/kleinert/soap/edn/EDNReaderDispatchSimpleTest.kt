@@ -1,5 +1,6 @@
 package kleinert.soap.edn
 
+import kleinert.soap.data.Char32
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -31,26 +32,26 @@ class EDNReaderDispatchSimpleTest {
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#\\x000003bb") }
 
         // Simple dispatch "char" (string)
-        Assertions.assertEquals("a", EDN.read("#\\a", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('a'.code), EDN.read("#\\a", EDN.extendedOptions))
 
         // Octal dispatch "char" (string)
-        Assertions.assertEquals("!", EDN.read("#\\o41", EDN.extendedOptions))
-        Assertions.assertEquals("!", EDN.read("#\\o041", EDN.extendedOptions))
-        Assertions.assertEquals("ǂ", EDN.read("#\\o702", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('!'.code), EDN.read("#\\o41", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('!'.code), EDN.read("#\\o041", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('ǂ'.code), EDN.read("#\\o702", EDN.extendedOptions))
 
         // Hexadecimal dispatch "char" (string)
-        Assertions.assertEquals("λ", EDN.read("#\\u03BB", EDN.extendedOptions))
-        Assertions.assertEquals("λ", EDN.read("#\\u000003bb", EDN.extendedOptions))
-        Assertions.assertEquals("λ", EDN.read("#\\x000003bb", EDN.extendedOptions))
-        Assertions.assertEquals("ῷ", EDN.read("#\\u1ff7", EDN.extendedOptions))
-        Assertions.assertEquals("ῷ", EDN.read("#\\u00001ff7", EDN.extendedOptions))
-        Assertions.assertEquals("ῷ", EDN.read("#\\x00001ff7", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('λ'.code), EDN.read("#\\u03BB", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('λ'.code), EDN.read("#\\u000003bb", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('λ'.code), EDN.read("#\\x000003bb", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('ῷ'.code), EDN.read("#\\u1ff7", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('ῷ'.code), EDN.read("#\\u00001ff7", EDN.extendedOptions))
+        Assertions.assertEquals(Char32('ῷ'.code), EDN.read("#\\x00001ff7", EDN.extendedOptions))
 
         // Hexadecimal dispatch "char" (string) over 2^16
-        Assertions.assertEquals("\uD83C\uDF81", EDN.read("#\\u0001F381", EDN.extendedOptions)) // Wrapped present 🎁
-        Assertions.assertEquals("\uD83C\uDF81", EDN.read("#\\x0001F381", EDN.extendedOptions)) // Wrapped present 🎁
-        Assertions.assertEquals("\uD83E\uDFF0", EDN.read("#\\u0001FBF0", EDN.extendedOptions)) // Segmented Digit Zero
-        Assertions.assertEquals("\uD83E\uDFF0", EDN.read("#\\x0001FBF0", EDN.extendedOptions)) // Segmented Digit Zero
+        Assertions.assertEquals(Char32.valueOf("\uD83C\uDF81"), EDN.read("#\\u0001F381", EDN.extendedOptions)) // Wrapped present 🎁
+        Assertions.assertEquals(Char32.valueOf("\uD83C\uDF81"), EDN.read("#\\x0001F381", EDN.extendedOptions)) // Wrapped present 🎁
+        Assertions.assertEquals(Char32.valueOf("\uD83E\uDFF0"), EDN.read("#\\u0001FBF0", EDN.extendedOptions)) // Segmented Digit Zero
+        Assertions.assertEquals(Char32.valueOf("\uD83E\uDFF0"), EDN.read("#\\x0001FBF0", EDN.extendedOptions)) // Segmented Digit Zero
     }
 
     @Test
