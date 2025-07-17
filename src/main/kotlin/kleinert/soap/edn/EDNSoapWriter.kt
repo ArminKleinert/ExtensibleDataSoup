@@ -64,6 +64,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
             is Byte, is Short, is Int, is Long, is Ratio -> encodePredefinedNumberType(obj as Number)
             is Float -> encodeFloat(obj)
             is Double -> encodeDouble(obj)
+            is Complex -> encodeComplex(obj)
             is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
 
             is IObj<*> -> {
@@ -126,6 +127,16 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
         else if (obj == Double.POSITIVE_INFINITY) writer.append("##INF")
         else if (obj == Double.NEGATIVE_INFINITY) writer.append("##-INF")
         else writer.append(obj.toString())
+    }
+
+    private fun encodeComplex(obj: Complex) {
+        if (options.allowComplexNumberLiterals) {
+            // Maybe some special handling?
+            writer.append(obj.toString())
+        } else {
+            // Maybe some special handling?
+            writer.append(obj.toString())
+        }
     }
 
     private fun encodeString(obj: String): Appendable {
