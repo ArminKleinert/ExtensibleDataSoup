@@ -60,6 +60,7 @@ value class Char32(val code: Int) : Comparable<Char32> {
     override fun toString(): String = String(intArrayOf(code), 0, 1)
 
     override fun compareTo(other: Char32): Int = code.compareTo(other.code)
+
     operator fun rangeTo(other: Char32): Char32Range = Char32Range(this, other)
 
     operator fun rangeUntil(other: Char32): Char32Range =
@@ -96,7 +97,7 @@ class Char32ProgressionIterator(first: Char32, last: Char32, private val step: I
 
 
 /**
- * A progression of values of type `Int`.
+ * A progression of values of type `Char32`.
  */
 open class Char32Progression
 internal constructor
@@ -130,7 +131,7 @@ internal constructor
             throw IllegalArgumentException("Step is zero.")
         }
 
-    override fun iterator(): Iterator<Char32> =
+    override fun iterator(): Char32Iterator =
         object : Char32Iterator {
             private val finalElement: Char32 = last
             private var hasNext: Boolean = if (step > 0) first <= last else first >= last
@@ -166,9 +167,9 @@ internal constructor
 }
 
 /**
- * A range of values of type `Int`.
+ * A range of values of type `Char32`.
  */
-public class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start, endInclusive, 1),
+class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start, endInclusive, 1),
     ClosedRange<Char32>, OpenEndRange<Char32> {
     companion object {
         /** An empty range of values of type Int. */
@@ -182,7 +183,7 @@ public class Char32Range(start: Char32, endInclusive: Char32) : Char32Progressio
             return last + 1
         }
 
-    override fun contains(value: Char32): Boolean = value in first..last
+    override fun contains(value: Char32): Boolean = !(value < first || value > endInclusive)
 
     /**
      * Checks whether the range is empty.

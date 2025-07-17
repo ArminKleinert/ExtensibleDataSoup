@@ -109,6 +109,9 @@ class Char32Test {
         Assertions.assertEquals(-1, Char32.valueOf('A').compareTo(Char32.valueOf('B')))
         Assertions.assertEquals(0, Char32.valueOf('A').compareTo(Char32.valueOf('A')))
         Assertions.assertEquals(1, Char32.valueOf('B').compareTo(Char32.valueOf('A')))
+
+        Assertions.assertTrue(Char32.valueOf('A') < Char32.valueOf('B'))
+        Assertions.assertTrue(Char32.valueOf('B') > Char32.valueOf('A'))
     }
 
     @Test
