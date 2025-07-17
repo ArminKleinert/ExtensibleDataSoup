@@ -173,7 +173,7 @@ class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start
     ClosedRange<Char32>, OpenEndRange<Char32> {
     companion object {
         /** An empty range of values of type Int. */
-        public val EMPTY: Char32Range = Char32Range(Char32(1), Char32(0))
+        val EMPTY: Char32Range = Char32Range(Char32(1), Char32(0))
     }
 
     override val endExclusive: Char32
