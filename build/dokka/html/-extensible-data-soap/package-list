@@ -8,8 +8,6 @@ $dokka.location://testEncoder/#/PointingToDeclaration/-extensible-data-soap/[ro
 $dokka.location://testReader/#/PointingToDeclaration/-extensible-data-soap/[root]/test-reader.html
 $dokka.location://testReaderExtended/#/PointingToDeclaration/-extensible-data-soap/[root]/test-reader-extended.html
 $dokka.location://testWriter/#/PointingToDeclaration/-extensible-data-soap/[root]/test-writer.html
-$dokka.location:/Numbers///PointingToDeclaration/-extensible-data-soap/[root]/-numbers/index.html
-$dokka.location:/Numbers/num/#kotlin.Long/PointingToDeclaration/-extensible-data-soap/[root]/-numbers/num.html
 $dokka.location:kleinert.soap.data////PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/index.html
 $dokka.location:kleinert.soap.data//toChar32/kotlin.Byte#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/to-char32.html
 $dokka.location:kleinert.soap.data//toChar32/kotlin.Char#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/to-char32.html
@@ -61,10 +59,6 @@ $dokka.location:kleinert.soap.data/Char32Progression/last/#/PointingToDeclaratio
 $dokka.location:kleinert.soap.data/Char32Progression/start/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression/start.html
 $dokka.location:kleinert.soap.data/Char32Progression/step/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression/step.html
 $dokka.location:kleinert.soap.data/Char32Progression/toString/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression/to-string.html
-$dokka.location:kleinert.soap.data/Char32ProgressionIterator///PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression-iterator/index.html
-$dokka.location:kleinert.soap.data/Char32ProgressionIterator/Char32ProgressionIterator/#kleinert.soap.data.Char32#kleinert.soap.data.Char32#kotlin.Int/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression-iterator/-char32-progression-iterator.html
-$dokka.location:kleinert.soap.data/Char32ProgressionIterator/hasNext/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression-iterator/has-next.html
-$dokka.location:kleinert.soap.data/Char32ProgressionIterator/nextChar32/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-progression-iterator/next-char32.html
 $dokka.location:kleinert.soap.data/Char32Range.Companion///PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-range/-companion/index.html
 $dokka.location:kleinert.soap.data/Char32Range.Companion/EMPTY/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-range/-companion/-e-m-p-t-y.html
 $dokka.location:kleinert.soap.data/Char32Range///PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-char32-range/index.html

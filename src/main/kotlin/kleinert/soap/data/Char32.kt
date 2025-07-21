@@ -1,17 +1,43 @@
 package kleinert.soap.data
 
+/**
+ * A unicode char using a 32 bit code. This class is a value class, so it takes up no extra space on the stack or heap.
+ *
+ * @property code The char code Should be between 0 and 0x10ffff.
+ * @constructor Creates a new [Char32].
+ *
+ * @author Armin Kleinert
+ */
 @JvmInline
 value class Char32(val code: Int) : Comparable<Char32> {
     companion object {
         val MIN_VALUE = Char32(0)
         val MAX_VALUE = Char32(0x10ffff)
 
-        fun valueOf(c: Int) = Char32(c)
+        /**
+         * Creates a [Char32] from the input [code].
+         * @return A new [Char32].
+         */
+        fun valueOf(code: Int) = Char32(code)
 
-        fun valueOf(c: UInt) = Char32(c.toInt())
+        /**
+         * Creates a [Char32] from the input [code].
+         * @return A new [Char32].
+         */
+        fun valueOf(code: UInt) = Char32(code.toInt())
 
-        fun valueOf(c: Char) = Char32(c.code)
+        /**
+         * Convert [Char] [chr] to [Char32].
+         * @return A new [Char32].
+         */
+        fun valueOf(chr: Char) = Char32(chr.code)
 
+        /**
+         * Takes the first codepoint from the [String] [s] and creates a [Char32] from it.
+         * The input must not be empty or have more than one codepoint.
+         * @throws IllegalArgumentException if [s] was empty or has too many codepoints.
+         * @return A new [Char32].
+         */
         fun valueOf(s: String): Char32 {
             val codePointIterator = s.codePoints().iterator()
             if (!codePointIterator.hasNext()) throw IllegalArgumentException("Can not get first char code from empty string.")
@@ -25,8 +51,18 @@ value class Char32(val code: Int) : Comparable<Char32> {
         require(code in 0..0x10ffff) { "Char code must be between 0 and 0x10ffff (inclusive)" }
     }
 
+    /**
+     * Decreases [code] by 1, creating a new [Char32].
+     * @return A new [Char32].
+     */
     fun dec(): Char32 = Char32(code - 1)
+
+    /**
+     * Increases [code] by 1, creating a new [Char32].
+     * @return A new [Char32].
+     */
     fun inc(): Char32 = Char32(code + 1)
+
     operator fun minus(other: Char32): Char32 = Char32(code - other.code)
     operator fun minus(other: Char): Char32 = Char32(code - other.code)
     operator fun minus(other: Int): Char32 = Char32(code - other)
@@ -34,29 +70,66 @@ value class Char32(val code: Int) : Comparable<Char32> {
     operator fun plus(other: Char): Char32 = Char32(code + other.code)
     operator fun plus(other: Char32): Char32 = Char32(code + other.code)
 
+    /**
+     * Converts the [Char32] to a [Char].
+     * @throws IllegalArgumentException if [code] is bigger than [Char.MAX_VALUE].
+     * @return the [Char32] as a [Char].
+     */
     fun toChar(): Char {
         if (code > Char.MAX_VALUE.code)
             throw IllegalArgumentException("Cannot convert Char32 to Char because the char code $code is too big.")
         return Char(code)
     }
 
+    /**
+     * Converts the [Char32] to a [Byte].
+     * @throws IllegalArgumentException if [code] is bigger than [Byte.MAX_VALUE].
+     * @return the [Char32] as a [Byte].
+     */
     fun toByte(): Byte {
         if (code > Byte.MAX_VALUE)
             throw IllegalArgumentException("Cannot convert Char32 to Byte because the char code $code is too big.")
         return code.toByte()
     }
 
+    /**
+     * Converts the [Char32] to a [Short].
+     * @throws IllegalArgumentException if [code] is bigger than [Short.MAX_VALUE].
+     * @return the [Char32] as a [Short].
+     */
     fun toShort(): Short {
         if (code > Short.MAX_VALUE)
             throw IllegalArgumentException("Cannot convert Char32 to Short because the char code $code is too big.")
         return code.toShort()
     }
 
+    /**
+     * Converts the [Char32] to a [Int]. This is equivalent to accessing [code] with no additional logic.
+     * @return the [Char32] as a [Int].
+     */
     fun toInt(): Int = code
+
+    /**
+     * Converts the [Char32] to a [Long].
+     * @return the [Char32] as a [Long].
+     */
     fun toLong(): Long = code.toLong()
+
+    /**
+     * Converts the [Char32] to a [Float].
+     * @return the [Char32] as a [Float].
+     */
     fun toFloat(): Float = code.toFloat()
+
+    /**
+     * Converts the [Char32] to a [Double].
+     * @return the [Char32] as a [Double].
+     */
     fun toDouble(): Double = code.toDouble()
 
+    /**
+     * @return A [String] with this [Char32] as its only codepoint.
+     */
     override fun toString(): String = String(intArrayOf(code), 0, 1)
 
     override fun compareTo(other: Char32): Int = code.compareTo(other.code)
@@ -75,26 +148,24 @@ interface Char32Iterator : Iterator<Char32> {
     fun nextChar32(): Char32
 }
 
-class Char32ProgressionIterator(first: Char32, last: Char32, private val step: Int) : Char32Iterator {
-    private val finalElement: Char32 = last
-    private var hasNext: Boolean = if (step > 0) first <= last else first >= last
-    private var next: Char32 = if (hasNext) first else finalElement
-
-    override fun hasNext(): Boolean = hasNext
-
-    override fun nextChar32(): Char32 {
-        IntProgression
-        val value = next
-        if (value == finalElement) {
-            if (!hasNext) throw NoSuchElementException()
-            hasNext = false
-        } else {
-            next += step
-        }
-        return value
-    }
-}
-
+//class Char32ProgressionIterator(first: Char32, last: Char32, private val step: Int) : Char32Iterator {
+//    private val finalElement: Char32 = last
+//    private var hasNext: Boolean = if (step > 0) first <= last else first >= last
+//    private var next: Char32 = if (hasNext) first else finalElement
+//
+//    override fun hasNext(): Boolean = hasNext
+//
+//    override fun nextChar32(): Char32 {
+//        val value = next
+//        if (value == finalElement) {
+//            if (!hasNext) throw NoSuchElementException()
+//            hasNext = false
+//        } else {
+//            next += step
+//        }
+//        return value
+//    }
+//}
 
 /**
  * A progression of values of type `Char32`.
@@ -167,7 +238,7 @@ internal constructor
 }
 
 /**
- * A range of values of type `Char32`.
+ * A range of values of type [Char32].
  */
 class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start, endInclusive, 1),
     ClosedRange<Char32>, OpenEndRange<Char32> {
@@ -189,6 +260,7 @@ class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start
      * Checks whether the range is empty.
      *
      * The range is empty if its start value is greater than the end value.
+     * @return true if the range is empty, false otherwise.
      */
     override fun isEmpty(): Boolean = first > last
 

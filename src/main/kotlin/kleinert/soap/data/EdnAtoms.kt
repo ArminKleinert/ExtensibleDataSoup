@@ -1,10 +1,24 @@
 package kleinert.soap.data
 
+/**
+ * A Keyword as specified in the EDN format specification.
+ * When a keyword is created, it is interned.
+ *
+ * @author Armin Kleinert
+ */
 class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
     companion object {
         private val definedKeywords = mutableMapOf<String, Int>()
         private val definedKeywordList = mutableListOf<Keyword>()
 
+        /**
+         * Creates a new [Keyword] from the input [s]. The input must start with a colon.
+         *
+         * @param s The format.
+         * @param allowUTF If true, the [Keyword] can include chars with more than 16 bits. This is not allowed by the EDN format specification.
+         *
+         * @return
+         */
         fun parse(s: String, allowUTF: Boolean = false): Keyword? {
             if (s.length <= 1) return null // Keywords must be at least 2 chars long
             if (s[0] != ':') return null // Keywords must start with a colon
@@ -22,6 +36,10 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
             return keyword(tempSymbol)
         }
 
+        /**
+         * Creates a new [Keyword]. Unlike [parse], this function performs no additional format checking.
+         * @return A new [Keyword] from the input [Symbol].
+         */
         fun keyword(s: Symbol): Keyword {
             val k = Keyword(s)
             val index = definedKeywordList.size
@@ -30,10 +48,19 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
             return k
         }
 
+        /**
+         * Creates a new [Keyword]. Unlike [parse], this function performs no additional format checking.
+         * @return A new [Keyword].
+         */
         fun keyword(prefix: String?, name: String): Keyword {
             return Keyword(Symbol.symbol(prefix, name))
         }
 
+        /**
+         * Equivalent to [parse], but Nicer to read.
+         * Keyword["abc"] == Keyword.parse("abc")
+         * @return A new [Keyword] from the input [Symbol].
+         */
         operator fun get(s: String): Keyword {
             val name = if (s.startsWith(':')) s else ":$s"
             return parse(name) ?: throw IllegalStateException("Illegal keyword format: $s")
