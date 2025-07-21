@@ -7,6 +7,8 @@ import kleinert.soap.data.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 object ExtendedEDNDecoders {
     private fun ensureAllIntegral(iterable: Iterable<*>): Boolean {
@@ -157,6 +159,24 @@ object ExtendedEDNDecoders {
         })
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun base64decode(it: Any?): Any {
+        require(it is String)
+        return String(Base64.Default.decode(it))
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun base64decodeUrlSafe(it: Any?): Any {
+        require(it is String)
+        return String(Base64.UrlSafe.decode(it))
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun base64DecodeMime(it: Any?): Any {
+        require(it is String)
+        return String(Base64.Mime.decode(it))
+    }
+
     val arrayDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
             "bytearray" to ExtendedEDNDecoders::listToByteArray,
@@ -182,6 +202,13 @@ object ExtendedEDNDecoders {
         get() = mapOf(
             "pretty" to { EDNSoapWriter.pprintToString(it) },
         )
+
+    val base64Decoders: Map<String, (Any?) -> Any?>
+        get() = mapOf(
+            "base64" to ::base64decode,
+            "base64urlSafe" to ::base64decodeUrlSafe,
+            "base64mime" to ::base64DecodeMime,
+        )
 }
 
 data class EDNSoapOptions(
@@ -189,7 +216,8 @@ data class EDNSoapOptions(
     val allowDispatchChars: Boolean = false,
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
     val ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(),
-    val allowTimeDispatch: Boolean = false,
+    val moreNumberPrefixes: Boolean = false,
+    //val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
@@ -214,7 +242,8 @@ data class EDNSoapOptions(
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,
-                allowTimeDispatch = true,
+                moreNumberPrefixes = true,
+                //allowTimeDispatch = true,
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
@@ -228,7 +257,8 @@ data class EDNSoapOptions(
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,
-                allowTimeDispatch = true,
+                moreNumberPrefixes = true,
+                //allowTimeDispatch = true,
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",

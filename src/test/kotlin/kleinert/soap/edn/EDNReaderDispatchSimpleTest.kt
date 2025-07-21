@@ -16,11 +16,11 @@ class EDNReaderDispatchSimpleTest {
         Assertions.assertEquals(Double.NEGATIVE_INFINITY, EDN.read("##-INF"))
     }
 
-    @Test
-    fun parseTimeTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("##time") }
-        Assertions.assertInstanceOf(LocalDateTime::class.java, EDN.read("##time", EDN.extendedOptions))
-    }
+//    @Test
+//    fun parseTimeTest() {
+//        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("##time") }
+//        Assertions.assertInstanceOf(LocalDateTime::class.java, EDN.read("##time", EDN.extendedOptions))
+//    }
 
     @Test
     fun parseDispatchChar() {

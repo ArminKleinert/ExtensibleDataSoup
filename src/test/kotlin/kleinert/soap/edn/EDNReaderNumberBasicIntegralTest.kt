@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test
 import java.math.BigInteger
 
 class EDNReaderNumberBasicIntegralTest {
+    private val allowMoreNumberPrefixes = EDN.defaultOptions.copy(moreNumberPrefixes = true)
+
     @Test
     fun parseIntegerDecimal() {
         EDN.read("0").let {
@@ -121,54 +123,54 @@ class EDNReaderNumberBasicIntegralTest {
 
         // Explicit base
 
-        EDN.read("0o0").let {
+        EDN.read("0o0", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(0L, it)
         }
-        EDN.read("+0o0").let {
+        EDN.read("+0o0", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(0L, it)
         }
-        EDN.read("-0o0").let {
+        EDN.read("-0o0", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(0L, it)
         }
 
-        EDN.read("0o1").let {
+        EDN.read("0o1", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(1L, it)
         }
-        EDN.read("+0o1").let {
+        EDN.read("+0o1", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(1L, it)
         }
-        EDN.read("-0o1").let {
+        EDN.read("-0o1", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(-1L, it)
         }
 
-        EDN.read("0o200").let {
+        EDN.read("0o200", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(128L, it)
         }
-        EDN.read("+0o200").let {
+        EDN.read("+0o200", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(128L, it)
         }
-        EDN.read("-0o200").let {
+        EDN.read("-0o200", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(-128L, it)
         }
 
-        EDN.read("0o377").let {
+        EDN.read("0o377", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(255L, it)
         }
-        EDN.read("+0o377").let {
+        EDN.read("+0o377", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(255L, it)
         }
-        EDN.read("-0o377").let {
+        EDN.read("-0o377", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(-255L, it)
         }
@@ -176,54 +178,54 @@ class EDNReaderNumberBasicIntegralTest {
 
     @Test
     fun parseIntegerBinary() {
-        EDN.read("0b0").let {
+        EDN.read("0b0", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(0L, it)
         }
-        EDN.read("+0b0").let {
+        EDN.read("+0b0", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(0L, it)
         }
-        EDN.read("-0b0").let {
+        EDN.read("-0b0", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(0L, it)
         }
 
-        EDN.read("0b1").let {
+        EDN.read("0b1", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(1L, it)
         }
-        EDN.read("+0b1").let {
+        EDN.read("+0b1", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(1L, it)
         }
-        EDN.read("-0b1").let {
+        EDN.read("-0b1", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(-1L, it)
         }
 
-        EDN.read("0b10000000").let {
+        EDN.read("0b10000000", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(128L, it)
         }
-        EDN.read("+0b10000000").let {
+        EDN.read("+0b10000000", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(128L, it)
         }
-        EDN.read("-0b10000000").let {
+        EDN.read("-0b10000000", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(-128L, it)
         }
 
-        EDN.read("0b11111111").let {
+        EDN.read("0b11111111", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(255L, it)
         }
-        EDN.read("+0b11111111").let {
+        EDN.read("+0b11111111", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(255L, it)
         }
-        EDN.read("-0b11111111").let {
+        EDN.read("-0b11111111", allowMoreNumberPrefixes).let {
             Assertions.assertTrue(it is Long)
             Assertions.assertEquals(-255L, it)
         }
@@ -310,27 +312,27 @@ class EDNReaderNumberBasicIntegralTest {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        EDN.read("0o0N").let {
+        EDN.read("0o0N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        EDN.read("+0o0N").let {
+        EDN.read("+0o0N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        EDN.read("-0o0N").let {
+        EDN.read("-0o0N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        EDN.read("0b0N").let {
+        EDN.read("0b0N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        EDN.read("+0b0N").let {
+        EDN.read("+0b0N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        EDN.read("-0b0N").let {
+        EDN.read("-0b0N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
@@ -371,27 +373,27 @@ class EDNReaderNumberBasicIntegralTest {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
-        EDN.read("0o1N").let {
+        EDN.read("0o1N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
-        EDN.read("+0o1N").let {
+        EDN.read("+0o1N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
-        EDN.read("-0o1N").let {
+        EDN.read("-0o1N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
-        EDN.read("0b1N").let {
+        EDN.read("0b1N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
-        EDN.read("+0b1N").let {
+        EDN.read("+0b1N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
-        EDN.read("-0b1N").let {
+        EDN.read("-0b1N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
@@ -433,27 +435,27 @@ class EDNReaderNumberBasicIntegralTest {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128.negate(), it)
         }
-        EDN.read("0o200N").let {
+        EDN.read("0o200N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128, it)
         }
-        EDN.read("+0o200N").let {
+        EDN.read("+0o200N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128, it)
         }
-        EDN.read("-0o200N").let {
+        EDN.read("-0o200N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128.negate(), it)
         }
-        EDN.read("0b10000000N").let {
+        EDN.read("0b10000000N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128, it)
         }
-        EDN.read("+0b10000000N").let {
+        EDN.read("+0b10000000N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128, it)
         }
-        EDN.read("-0b10000000N").let {
+        EDN.read("-0b10000000N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint128.negate(), it)
         }
@@ -495,27 +497,27 @@ class EDNReaderNumberBasicIntegralTest {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255.negate(), it)
         }
-        EDN.read("0o377N").let {
+        EDN.read("0o377N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255, it)
         }
-        EDN.read("+0o377N").let {
+        EDN.read("+0o377N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255, it)
         }
-        EDN.read("-0o377N").let {
+        EDN.read("-0o377N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255.negate(), it)
         }
-        EDN.read("0b11111111N").let {
+        EDN.read("0b11111111N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255, it)
         }
-        EDN.read("+0b11111111N").let {
+        EDN.read("+0b11111111N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255, it)
         }
-        EDN.read("-0b11111111N").let {
+        EDN.read("-0b11111111N", allowMoreNumberPrefixes).let {
             Assertions.assertInstanceOf(BigInteger::class.java, it)
             Assertions.assertEquals(bigint255.negate(), it)
         }

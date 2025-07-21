@@ -35,7 +35,7 @@ class EDNReaderNumberWithSuffixTest {
         for ((num, str) in numberPairs) {
             Assertions.assertEquals(
                 num,
-                EDN.read(str, EDN.defaultOptions.copy(allowNumericSuffixes = true))
+                EDN.read(str, EDN.defaultOptions.copy(allowNumericSuffixes = true, moreNumberPrefixes = true))
             )
         }
     }
@@ -55,7 +55,7 @@ class EDNReaderNumberWithSuffixTest {
         for ((num, str) in numberPairs) {
             Assertions.assertEquals(
                 num,
-                EDN.read(str, EDN.defaultOptions.copy(allowNumericSuffixes = true))
+                EDN.read(str, EDN.defaultOptions.copy(allowNumericSuffixes = true, moreNumberPrefixes = true))
             )
         }
     }

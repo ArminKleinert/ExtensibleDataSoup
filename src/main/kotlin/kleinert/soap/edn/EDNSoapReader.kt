@@ -100,8 +100,8 @@ class EDNSoapReader private constructor(
                 startIndex += 2
                 base = when (token[startIndex - 1]) {
                     'x' -> 16
-                    'o' -> 8
-                    'b' -> 2
+                    'o' -> if (options.moreNumberPrefixes) 8 else throw ednReaderException("Invalid number prefix in number $token.")
+                    'b' -> if (options.moreNumberPrefixes) 2 else throw ednReaderException("Invalid number prefix in number $token.")
                     else -> {
                         startIndex -= 2 // Reset start index
                         8
@@ -173,7 +173,7 @@ class EDNSoapReader private constructor(
             }
         }
 
-        throw ednReaderException("Unclosed String literal \"$currentToken\" .")
+        throw ednReaderException("Unclosed String literal \"$currentToken\".")
     }
 
     private fun parseUnicodeChar(
@@ -291,7 +291,7 @@ class EDNSoapReader private constructor(
             'o' -> {
                 if (reducedToken.length <= 1 || reducedToken.length > 3) {
                     val msg =
-                        "Invalid length of unicode sequence ${reducedToken.length} in sequence $errorTokenText (should be 4)"
+                        "Invalid length of unicode sequence ${reducedToken.length} in sequence $errorTokenText (should be 4)."
                     throw ednReaderException(msg)
                 }
                 return parseUnicodeChar(reducedToken, 8, 'o')
@@ -301,7 +301,7 @@ class EDNSoapReader private constructor(
                 if (reducedToken.length == 4 || (isDispatch && reducedToken.length == 8))
                     return parseUnicodeChar(reducedToken, 16, 'u')
                 val msg =
-                    "Invalid length of unicode sequence ${reducedToken.length} in char literal $errorTokenText (should be 4 or 8)"
+                    "Invalid length of unicode sequence ${reducedToken.length} in char literal $errorTokenText (should be 4 or 8)."
                 throw ednReaderException(msg)
             }
 
@@ -311,7 +311,7 @@ class EDNSoapReader private constructor(
                 if (reducedToken.length == 8)
                     return parseUnicodeChar(reducedToken, 16, 'x')
                 val msg =
-                    "Invalid length of unicode sequence ${reducedToken.length} in char literal $errorTokenText (should be 8)"
+                    "Invalid length of unicode sequence ${reducedToken.length} in char literal $errorTokenText (should be 8)."
                 throw ednReaderException(msg)
 
             }
@@ -353,9 +353,9 @@ class EDNSoapReader private constructor(
                     "##-NaN" -> -Double.NaN
                     "##INF" -> Double.POSITIVE_INFINITY
                     "##-INF" -> Double.NEGATIVE_INFINITY
-                    "##time" ->
-                        if (options.allowTimeDispatch) LocalDateTime.now()
-                        else throw ednReaderException("Unknown symbolic value $tokenAsString")
+//                    "##time" ->
+//                        if (options.allowTimeDispatch) LocalDateTime.now()
+//                        else throw ednReaderException("Unknown symbolic value $tokenAsString")
 
                     else -> throw ednReaderException("Unknown symbolic value $tokenAsString")
                 }
