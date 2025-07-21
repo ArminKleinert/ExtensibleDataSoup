@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kleinert.soap.data.OpsPlusMinus" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:47" hostname="pc1" time="0.037">
+  <properties/>
+  <testcase name="plusMinusFloat()" classname="kleinert.soap.data.OpsPlusMinus" time="0.006"/>
+  <testcase name="plusMinusRatio()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <testcase name="plusMinusShort()" classname="kleinert.soap.data.OpsPlusMinus" time="0.004"/>
+  <testcase name="plusMinusComplexFail()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <testcase name="plusMinusBigDecimal()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <testcase name="plusMinusByte()" classname="kleinert.soap.data.OpsPlusMinus" time="0.002"/>
+  <testcase name="plusMinusLong()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <testcase name="plusMinusInt()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <testcase name="plusMinusComplex()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <testcase name="plusMinusBigInt()" classname="kleinert.soap.data.OpsPlusMinus" time="0.002"/>
+  <testcase name="plusMinusDouble()" classname="kleinert.soap.data.OpsPlusMinus" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

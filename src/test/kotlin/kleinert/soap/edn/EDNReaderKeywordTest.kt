@@ -11,7 +11,7 @@ class EDNReaderKeywordTest {
             val text = ":ab"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -21,7 +21,7 @@ class EDNReaderKeywordTest {
             val text = ":a1"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -35,7 +35,7 @@ class EDNReaderKeywordTest {
             val text = ":a/b"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -49,7 +49,7 @@ class EDNReaderKeywordTest {
             val text = ":+"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -59,7 +59,7 @@ class EDNReaderKeywordTest {
             val text = ":+-"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -69,7 +69,7 @@ class EDNReaderKeywordTest {
             val text = ":->"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -79,7 +79,7 @@ class EDNReaderKeywordTest {
             val text = ":==="
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -90,18 +90,18 @@ class EDNReaderKeywordTest {
     @Test
     fun parseKeywordSymbolsMixTest() {
         EDN.read(":a+").let {
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             Assertions.assertEquals(Keyword.parse(":a+"), it)
         }
         EDN.read(":-a").let {
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             Assertions.assertEquals(Keyword.parse(":-a"), it)
         }
         run {
             val text = ":a+"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -111,7 +111,7 @@ class EDNReaderKeywordTest {
             val text = ":-a"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -125,7 +125,7 @@ class EDNReaderKeywordTest {
             val text = ":λ"
             val it = EDN.read(text)
             val keyword = Keyword.parse(text)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)
@@ -135,7 +135,7 @@ class EDNReaderKeywordTest {
             val text = ":🎁"
             val it = EDN.read(text, EDN.extendedOptions)
             val keyword = Keyword.parse(text, true)!!
-            Assertions.assertInstanceOf(Keyword::class.java, it)
+            Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
             Assertions.assertEquals(keyword.prefix, it.prefix)

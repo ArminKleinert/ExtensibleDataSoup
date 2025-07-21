@@ -9,11 +9,11 @@ class EDNReaderSetsMapsTest {
     @Test
     fun parseEmpty() {
         EDN.read("{}").let {
-            Assertions.assertInstanceOf(Map::class.java, it)
+            Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
         EDN.read("#{}").let {
-            Assertions.assertInstanceOf(Set::class.java, it)
+            Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
     }
@@ -21,7 +21,7 @@ class EDNReaderSetsMapsTest {
     @Test
     fun parseBasicList() {
         EDN.read("{a b c d}").let {
-            Assertions.assertInstanceOf(Map::class.java, it)
+            Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertEquals(
                 it,
                 mapOf(Symbol.symbol("a") to Symbol.symbol("b"), Symbol.symbol("c") to Symbol.symbol("d"))
@@ -31,7 +31,7 @@ class EDNReaderSetsMapsTest {
             Assertions.assertEquals(mapOf(1L to 2L, 3L to 4L), it)
         }
         EDN.read("#{1 2 3 4}").let {
-            Assertions.assertInstanceOf(Set::class.java, it)
+            Assertions.assertTrue(it is Set<*>)
             Assertions.assertEquals(setOf(1L, 2L, 3L, 4L), (it as Set<*>))
         }
     }
@@ -41,13 +41,13 @@ class EDNReaderSetsMapsTest {
         run {
             val options = EDN.defaultOptions.copy(mapToPersistentMapConverter = { IdentityHashMap(it) })
             val parsed = EDN.read("{1 2}", options)
-            Assertions.assertInstanceOf(IdentityHashMap::class.java, parsed)
+            Assertions.assertTrue(parsed is IdentityHashMap<*, *>)
             Assertions.assertEquals(mapOf(1L to 2L), parsed)
         }
         run {
             val options = EDN.defaultOptions.copy(setToPersistentSetConverter = { TreeSet<Long>() })
             val parsed = EDN.read("#{1 2}", options)
-            Assertions.assertInstanceOf(TreeSet::class.java, parsed)
+            Assertions.assertTrue(parsed is TreeSet<*>)
             Assertions.assertEquals(setOf<Long>(), parsed)
         }
     }

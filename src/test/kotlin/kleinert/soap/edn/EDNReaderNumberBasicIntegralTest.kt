@@ -289,248 +289,248 @@ class EDNReaderNumberBasicIntegralTest {
     @Test
     fun parseBigInt() {
         EDN.read("0N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("+0N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("-0N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("00N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("+00N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("-00N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("0o0N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("+0o0N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("-0o0N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("0b0N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("+0b0N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("-0b0N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("0x0N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("+0x0N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
         EDN.read("-0x0N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
 
         EDN.read("1N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("+1N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("-1N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
         EDN.read("01N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("+01N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("-01N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
         EDN.read("0o1N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("+0o1N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("-0o1N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
         EDN.read("0b1N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("+0b1N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("-0b1N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
         EDN.read("0x1N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("+0x1N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE, it)
         }
         EDN.read("-0x1N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ONE.negate(), it)
         }
 
         val bigint128 = BigInteger.valueOf(128L)
         EDN.read("128N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("+128N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("-128N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128.negate(), it)
         }
         EDN.read("0200N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("+0200N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("-0200N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128.negate(), it)
         }
         EDN.read("0o200N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("+0o200N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("-0o200N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128.negate(), it)
         }
         EDN.read("0b10000000N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("+0b10000000N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("-0b10000000N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128.negate(), it)
         }
         EDN.read("0x80N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("+0x80N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128, it)
         }
         EDN.read("-0x80N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128.negate(), it)
         }
 
         val bigint255 = BigInteger.valueOf(255L)
         EDN.read("255N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("+255N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("-255N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255.negate(), it)
         }
         EDN.read("0377N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("+0377N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("-0377N").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255.negate(), it)
         }
         EDN.read("0o377N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("+0o377N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("-0o377N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255.negate(), it)
         }
         EDN.read("0b11111111N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("+0b11111111N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("-0b11111111N", allowMoreNumberPrefixes).let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255.negate(), it)
         }
         EDN.read("0xFFN").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("+0xFFN").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255, it)
         }
         EDN.read("-0xFFN").let {
-            Assertions.assertInstanceOf(BigInteger::class.java, it)
+            Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint255.negate(), it)
         }
     }

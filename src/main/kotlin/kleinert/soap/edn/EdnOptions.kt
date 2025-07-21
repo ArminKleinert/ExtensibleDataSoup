@@ -13,29 +13,21 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 object ExtendedEDNDecoders {
     private fun ensureAllIntegral(iterable: Iterable<*>): Boolean {
         for (elem in iterable)
-            when (elem) {
-                is Long, is Int, is Byte, is Short, is BigInteger -> null
-                else -> throw EdnReaderException.EdnClassConversionError("Requires integral number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
-            }
+            if (elem !is Long && elem !is Int && elem !is Byte && elem !is Short && elem !is BigInteger)
+                throw EdnReaderException.EdnClassConversionError("Requires integral number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
         return true
     }
 
     private fun ensureAllFloaty(iterable: Iterable<*>): Boolean {
         for (elem in iterable)
-            when (elem) {
-                is Number -> null
-                else -> throw EdnReaderException.EdnClassConversionError("Requires number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
-            }
+           if (elem !is Number)
+               throw EdnReaderException.EdnClassConversionError("Requires number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
         return true
     }
 
     private inline fun <reified T> requireType(elem: Any?, s: String) {
         if (elem !is T)
             throw EdnReaderException.EdnClassConversionError("Needed $s, but got $elem of type ${elem?.javaClass ?: "null"}.")
-    }
-
-    private inline fun <reified T> requireAllType(elem: Iterable<Any?>, s: String) {
-        for (e in elem) requireType<T>(elem, s)
     }
 
     private fun vectorToIntegralArray(it: Any?, typeId: Int): Any {
@@ -238,12 +230,11 @@ data class EDNSoapOptions(
         val defaultOptions: EDNSoapOptions
             get() = EDNSoapOptions()
 
-        fun extendedReaderOptions(ednClassDecoder: Map<String, (Any?) -> Any?>) =
+        private fun extendedReaderOptions(ednClassDecoder: Map<String, (Any?) -> Any?>) =
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,
                 moreNumberPrefixes = true,
-                //allowTimeDispatch = true,
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 decodingSequenceSeparator = ", ",
@@ -253,7 +244,7 @@ data class EDNSoapOptions(
                 ednClassEncoders = listOf(),
             )
 
-        fun extendedWriterOptions(ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>>) =
+        private fun extendedWriterOptions(ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>>) =
             EDNSoapOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,

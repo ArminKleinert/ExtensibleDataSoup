@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kleinert.soap.edn.EDNReaderNumberFloatyTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:48" hostname="pc1" time="0.035">
+  <properties/>
+  <testcase name="parseBigDecimal()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.008"/>
+  <testcase name="parseDouble()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.005"/>
+  <testcase name="parseBigDecimalENotationBig2()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.002"/>
+  <testcase name="parseDoubleENotationBig()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.002"/>
+  <testcase name="parseDoubleENotationBig2()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.002"/>
+  <testcase name="parseBigDecimalENotation()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.003"/>
+  <testcase name="parseDoubleENotation2()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.002"/>
+  <testcase name="parseDoubleENotation()" classname="kleinert.soap.edn.EDNReaderNumberFloatyTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

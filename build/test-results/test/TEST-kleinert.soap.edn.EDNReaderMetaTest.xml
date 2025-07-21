@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kleinert.soap.edn.EDNReaderMetaTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:47" hostname="pc1" time="0.033">
+  <properties/>
+  <testcase name="parseDispatchMetaMapTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.004"/>
+  <testcase name="parseMetaSymbolTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.002"/>
+  <testcase name="parseDispatchMetaKeywordTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.002"/>
+  <testcase name="parseMetaMapTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.001"/>
+  <testcase name="parseDispatchMetaStringTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.001"/>
+  <testcase name="parseDispatchMetaErrors()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.004"/>
+  <testcase name="parseMetaErrors()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.003"/>
+  <testcase name="parseMetaStringTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.001"/>
+  <testcase name="parseMetaKeywordTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.001"/>
+  <testcase name="parseDispatchMetaSymbolTest()" classname="kleinert.soap.edn.EDNReaderMetaTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

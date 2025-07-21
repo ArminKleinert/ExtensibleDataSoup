@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kleinert.soap.data.Char32Test" tests="22" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:46" hostname="pc1" time="0.175">
+  <properties/>
+  <testcase name="charToChar32()" classname="kleinert.soap.data.Char32Test" time="0.002"/>
+  <testcase name="rangeUntil()" classname="kleinert.soap.data.Char32Test" time="0.052"/>
+  <testcase name="compareTo()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="intToChar32()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="toFloat()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="toShort()" classname="kleinert.soap.data.Char32Test" time="0.004"/>
+  <testcase name="testToString()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="toByte()" classname="kleinert.soap.data.Char32Test" time="0.002"/>
+  <testcase name="toChar()" classname="kleinert.soap.data.Char32Test" time="0.003"/>
+  <testcase name="toLong()" classname="kleinert.soap.data.Char32Test" time="0.002"/>
+  <testcase name="longToChar32()" classname="kleinert.soap.data.Char32Test" time="0.004"/>
+  <testcase name="getCode()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="dec()" classname="kleinert.soap.data.Char32Test" time="0.007"/>
+  <testcase name="inc()" classname="kleinert.soap.data.Char32Test" time="0.003"/>
+  <testcase name="plus()" classname="kleinert.soap.data.Char32Test" time="0.009"/>
+  <testcase name="byteToChar32()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="minus()" classname="kleinert.soap.data.Char32Test" time="0.005"/>
+  <testcase name="toInt()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="rangeTo()" classname="kleinert.soap.data.Char32Test" time="0.002"/>
+  <testcase name="shortToChar32()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <testcase name="testConstructor()" classname="kleinert.soap.data.Char32Test" time="0.019"/>
+  <testcase name="toDouble()" classname="kleinert.soap.data.Char32Test" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -11,7 +11,7 @@ class EDNReaderSymbolTest {
             val text = "ab"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -21,7 +21,7 @@ class EDNReaderSymbolTest {
             val text = "a1"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -35,7 +35,7 @@ class EDNReaderSymbolTest {
             val text = "a/b"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -49,7 +49,7 @@ class EDNReaderSymbolTest {
             val text = "+"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -59,7 +59,7 @@ class EDNReaderSymbolTest {
             val text = "+-"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -69,7 +69,7 @@ class EDNReaderSymbolTest {
             val text = "->"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -79,7 +79,7 @@ class EDNReaderSymbolTest {
             val text = "==="
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -93,7 +93,7 @@ class EDNReaderSymbolTest {
             val text = "a+"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -103,7 +103,7 @@ class EDNReaderSymbolTest {
             val text = "-a"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -117,7 +117,7 @@ class EDNReaderSymbolTest {
             val text = "λ"
             val it = EDN.read(text)
             val symbol = Symbol.parse(text)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)
@@ -127,7 +127,7 @@ class EDNReaderSymbolTest {
             val text = "🎁"
             val it = EDN.read(text, EDN.extendedOptions)
             val symbol = Symbol.parse(text, true)!!
-            Assertions.assertInstanceOf(Symbol::class.java, it)
+            Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
             Assertions.assertEquals(symbol.prefix, it.prefix)

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 class EDNReaderStringTest {
     @Test
     fun parseStringBasicTest() {
-        EDN.read("\"\"").let { Assertions.assertInstanceOf(String::class.java, it) }
+        EDN.read("\"\"").let { Assertions.assertTrue(it is String) }
         EDN.read("\"\"").let { Assertions.assertEquals("", it) }
         EDN.read("\"abc\"").let { Assertions.assertEquals("abc", it) }
     }

@@ -39,19 +39,6 @@ class EDNSoapReader private constructor(
     private fun ednReaderException(text: String, ex: Exception? = null) =
         EdnReaderException(text, ex, cpi.lineIdx, cpi.textIndex)
 
-
-//        private fun tokenizeString(chars: IntIterator, currentToken: String, options: EDNSoapOptions): String {
-//            var isStringEscaped = false
-//            val currentToken = StringBuilder()
-//
-//            while (chars.hasNext()) {
-//                val ch = chars.next()
-//                if (ch == '"'.code) return currentToken.toString()
-//            }
-//
-//            throw EdnReaderException("Unclosed String $currentToken")
-//        }
-
     private fun readString(): Any? {
         if (!cpi.hasNext())
             throw ednReaderException("Empty input string.")
@@ -353,10 +340,6 @@ class EDNSoapReader private constructor(
                     "##-NaN" -> -Double.NaN
                     "##INF" -> Double.POSITIVE_INFINITY
                     "##-INF" -> Double.NEGATIVE_INFINITY
-//                    "##time" ->
-//                        if (options.allowTimeDispatch) LocalDateTime.now()
-//                        else throw ednReaderException("Unknown symbolic value $tokenAsString")
-
                     else -> throw ednReaderException("Unknown symbolic value $tokenAsString")
                 }
             }
@@ -427,10 +410,8 @@ class EDNSoapReader private constructor(
         do {
             cpi.skipWhile(::isWhitespace)
 
-            if (!cpi.hasNext()) {
-                //throw EdnReaderException.EdnEmptyInputException("Expected anything but got EOF.")
+            if (!cpi.hasNext())
                 break
-            }
 
             when (val codePoint = cpi.nextInt()) {
                 ';'.code -> {
@@ -449,7 +430,6 @@ class EDNSoapReader private constructor(
                         do {
                             val temp = readForm(level + 1, true)
                         } while (temp == NOTHING)
-                        //res.add(readForm(cpi, level))
                         if (stopAfterOne) return NOTHING
                     } else if (cpi.hasNext() && cpi.peek() == '^'.code) {
                         cpi.nextInt()
@@ -497,9 +477,9 @@ class EDNSoapReader private constructor(
             }
         } while (true)
 
-        if (res.size != 1) {
+        if (res.size != 1)
             throw ednReaderException("Reader requires exactly one expression, but got ${res.size}.")
-        }
+
         return res
     }
 
@@ -519,16 +499,7 @@ class EDNSoapReader private constructor(
 
     private fun readToken(condition: (Int) -> Boolean): String {
         val currentToken = StringBuilder()
-
-//        while (cpi.hasNext()) {
-//            val codepoint = cpi.nextInt()
-//            if (isBreakingSymbol(codepoint)) {
-//                cpi.unread(codepoint)
-//                return currentToken.toString()
-//            }
-//        }
         cpi.takeCodePoints(currentToken) { condition(it) }
-
         return currentToken.toString()
     }
 

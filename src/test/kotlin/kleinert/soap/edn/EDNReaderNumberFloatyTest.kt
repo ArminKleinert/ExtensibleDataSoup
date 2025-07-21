@@ -302,113 +302,113 @@ class EDNReaderNumberFloatyTest {
     fun parseBigDecimal() {
         var temp = BigDecimal.valueOf(0.0)
         EDN.read("0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(0), it)
         }
         EDN.read("0.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("+0.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("-0.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp.negate(), it)
         }
 
         temp = BigDecimal.valueOf(0.5)
         EDN.read("0.5M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("+0.5M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("-0.5M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp.negate(), it)
         }
 
         temp = BigDecimal.valueOf(1.0)
         EDN.read("1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(1L), it)
         }
         EDN.read("-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(1L).negate(), it)
         }
         EDN.read("1.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("+1.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("-1.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp.negate(), it)
         }
 
         temp = BigDecimal.valueOf(128.0)
         EDN.read("128M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(128L), it)
         }
         EDN.read("-128M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(128L).negate(), it)
         }
         EDN.read("128.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("+128.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("-128.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp.negate(), it)
         }
 
         temp = BigDecimal.valueOf(255.0)
         EDN.read("255M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(255), it)
         }
         EDN.read("-255M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal.valueOf(255).negate(), it)
         }
         EDN.read("255.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("+255.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("-255.0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp.negate(), it)
         }
 
         temp = BigDecimal.valueOf(255.25)
         EDN.read("255.25M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("+255.25M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp, it)
         }
         EDN.read("-255.25M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(temp.negate(), it)
         }
     }
@@ -416,52 +416,52 @@ class EDNReaderNumberFloatyTest {
     @Test
     fun parseBigDecimalENotation() {
         EDN.read("0.0e+0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e+0"), it)
         }
         EDN.read("0.0e-0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e-0"), it)
         }
         EDN.read("0.0e+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e+1"), it)
         }
         EDN.read("0.0e-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e-1"), it)
         }
         EDN.read("-0.0e+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.0e+1"), it)
         }
         EDN.read("-0.0e-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.0e-1"), it)
         }
 
         EDN.read("0.5e+0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e+0"), it)
         }
         EDN.read("0.5e-0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e-0"), it)
         }
         EDN.read("0.5e+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e+1"), it)
         }
         EDN.read("0.5e-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e-1"), it)
         }
         EDN.read("-0.5e+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.5e+1"), it)
         }
         EDN.read("-0.5e-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.5e-1"), it)
         }
     }
@@ -469,52 +469,52 @@ class EDNReaderNumberFloatyTest {
     @Test
     fun parseBigDecimalENotationBig2() {
         EDN.read("0.0E+0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e+0"), it)
         }
         EDN.read("0.0E-0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e-0"), it)
         }
         EDN.read("0.0E+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e+1"), it)
         }
         EDN.read("0.0E-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.0e-1"), it)
         }
         EDN.read("-0.0E+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.0e+1"), it)
         }
         EDN.read("-0.0E-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.0e-1"), it)
         }
 
         EDN.read("0.5E+0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e+0"), it)
         }
         EDN.read("0.5E-0M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e-0"), it)
         }
         EDN.read("0.5E+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e+1"), it)
         }
         EDN.read("0.5E-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("0.5e-1"), it)
         }
         EDN.read("-0.5E+1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.5e+1"), it)
         }
         EDN.read("-0.5E-1M").let {
-            Assertions.assertInstanceOf(BigDecimal::class.java, it)
+            Assertions.assertTrue(it is BigDecimal)
             Assertions.assertEquals(BigDecimal("-0.5e-1"), it)
         }
     }

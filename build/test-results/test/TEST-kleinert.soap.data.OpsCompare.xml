@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kleinert.soap.data.OpsCompare" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:47" hostname="pc1" time="0.208">
+  <properties/>
+  <testcase name="compareBigInt()" classname="kleinert.soap.data.OpsCompare" time="0.016"/>
+  <testcase name="compareDouble()" classname="kleinert.soap.data.OpsCompare" time="0.019"/>
+  <testcase name="compareComplexFail()" classname="kleinert.soap.data.OpsCompare" time="0.006"/>
+  <testcase name="compareInt()" classname="kleinert.soap.data.OpsCompare" time="0.029"/>
+  <testcase name="compareByte()" classname="kleinert.soap.data.OpsCompare" time="0.02"/>
+  <testcase name="compareLong()" classname="kleinert.soap.data.OpsCompare" time="0.018"/>
+  <testcase name="compareBigDecimal()" classname="kleinert.soap.data.OpsCompare" time="0.019"/>
+  <testcase name="compareFloat()" classname="kleinert.soap.data.OpsCompare" time="0.018"/>
+  <testcase name="compareRatio()" classname="kleinert.soap.data.OpsCompare" time="0.016"/>
+  <testcase name="compareShort()" classname="kleinert.soap.data.OpsCompare" time="0.012"/>
+  <testcase name="compareComplex()" classname="kleinert.soap.data.OpsCompare" time="0.014"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

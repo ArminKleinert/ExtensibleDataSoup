@@ -26,7 +26,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseMetaSymbolTest() {
         EDN.read("^a b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to Symbol.symbol("a")), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -36,7 +36,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseMetaStringTest() {
         EDN.read("^\"a\" b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to "a"), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -46,7 +46,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseMetaKeywordTest() {
         EDN.read("^:a b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["a"] to true), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -56,7 +56,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseMetaMapTest() {
         EDN.read("^{\"a\" \"c\"} b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf("a" to "c"), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -66,7 +66,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseDispatchMetaSymbolTest() {
         EDN.read("#^a b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to Symbol.symbol("a")), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -76,7 +76,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseDispatchMetaStringTest() {
         EDN.read("#^\"a\" b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to "a"), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -86,7 +86,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseDispatchMetaKeywordTest() {
         EDN.read("#^:a b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["a"] to true), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)
@@ -96,7 +96,7 @@ class EDNReaderMetaTest {
     @Test
     fun parseDispatchMetaMapTest() {
         EDN.read("#^{\"a\" \"c\"} b").let {
-            Assertions.assertInstanceOf(IObj::class.java, it)
+            Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf("a" to "c"), it.meta)
             Assertions.assertEquals(Symbol.symbol("b"), it.obj)

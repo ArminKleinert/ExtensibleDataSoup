@@ -10,40 +10,40 @@ class EDNReaderListsVectorsTest {
     fun parseEmptyList() {
         // Normal
         EDN.read("()").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
         // Normal
         EDN.read("[]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
 
         // Whitespace does not matter
         EDN.read("(  )").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
         EDN.read("(\t \n)").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
         EDN.read("(\n)").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
 
         // Whitespace does not matter
         EDN.read("[  ]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
         EDN.read("[\t \n]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
         EDN.read("[\n]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
     }
@@ -51,19 +51,19 @@ class EDNReaderListsVectorsTest {
     @Test
     fun parseBasicList() {
         EDN.read("(1)").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(1L), (it as List<*>))
         }
         EDN.read("[1]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(1L), (it as List<*>))
         }
         EDN.read("(1 2 3)").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(1L, 2L, 3L), (it as List<*>))
         }
         EDN.read("[1 2 3]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(1L, 2L, 3L), (it as List<*>))
         }
     }
@@ -71,27 +71,27 @@ class EDNReaderListsVectorsTest {
     @Test
     fun parseNestedList() {
         EDN.read("((1))").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         EDN.read("([1])").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         EDN.read("[(1)]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         EDN.read("[(1)]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(listOf(1L)), (it as List<*>))
         }
         EDN.read("(1 (2 3))").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(1L, listOf(2L, 3L)), (it as List<*>))
         }
         EDN.read("[1 (2 3)]").let {
-            Assertions.assertInstanceOf(List::class.java, it)
+            Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf(1L, listOf(2L, 3L)), (it as List<*>))
         }
     }
@@ -101,13 +101,13 @@ class EDNReaderListsVectorsTest {
         run {
             val options = EDN.defaultOptions.copy(listToPersistentListConverter = { LinkedList(it) })
             val parsed = EDN.read("(1 2)", options)
-            Assertions.assertInstanceOf(LinkedList::class.java, parsed)
+            Assertions.assertTrue(parsed is LinkedList<*>)
             Assertions.assertEquals(listOf(1L, 2L), parsed)
         }
         run {
             val options = EDN.defaultOptions.copy(listToPersistentVectorConverter = { LinkedList(it) })
             val parsed = EDN.read("[1 2]", options)
-            Assertions.assertInstanceOf(LinkedList::class.java, parsed)
+            Assertions.assertTrue(parsed is LinkedList<*>)
             Assertions.assertEquals(listOf(1L, 2L), parsed)
         }
     }
