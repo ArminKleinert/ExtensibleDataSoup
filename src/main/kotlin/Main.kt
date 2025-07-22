@@ -246,7 +246,7 @@ fun testEncoder() {
     EDN.pprintln(Dice(20), options = EDN.defaultOptions.copy(ednClassEncoders = encoders))
 }
 
-fun main(args: Array<String>) {
+fun main() {
     testReader()
     testEncoder()
     println("\uD83D\uDE28")

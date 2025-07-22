@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderListsVectorsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:47" hostname="pc1" time="0.022">
+<testsuite name="kleinert.soap.edn.EDNReaderListsVectorsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:25" hostname="pc1" time="0.026">
   <properties/>
-  <testcase name="parseNestedList()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.003"/>
-  <testcase name="invalidTest()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.007"/>
-  <testcase name="parseWithConverter()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.003"/>
-  <testcase name="parseBasicList()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.002"/>
+  <testcase name="parseNestedList()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.004"/>
+  <testcase name="invalidTest()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.005"/>
+  <testcase name="parseWithConverter()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.005"/>
+  <testcase name="parseBasicList()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.006"/>
   <testcase name="parseEmptyList()" classname="kleinert.soap.edn.EDNReaderListsVectorsTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

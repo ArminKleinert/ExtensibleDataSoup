@@ -3,7 +3,6 @@ package kleinert.soap.edn
 import kleinert.soap.data.*
 import kleinert.soap.data.IObj
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -31,7 +30,7 @@ class EDNSoapReader private constructor(
         if (!options.allowMoreEncoderDecoderNames) {
             for (key in options.ednClassDecoders.keys) {
                 val name = Symbol.parse(key)
-                if (name?.prefix == null) throw EdnReaderException("Invalid decoder name: \"$key\" (parsed as $name)")
+                if (name?.namespace == null) throw EdnReaderException("Invalid decoder name: \"$key\" (parsed as $name)")
             }
         }
     }

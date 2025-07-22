@@ -14,7 +14,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
         run {
@@ -24,7 +24,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
     }
@@ -38,7 +38,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
     }
@@ -52,7 +52,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
         run {
@@ -62,7 +62,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
         run {
@@ -72,7 +72,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
         run {
@@ -82,7 +82,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
     }
@@ -104,7 +104,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
         run {
@@ -114,7 +114,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
     }
@@ -128,7 +128,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
@@ -138,7 +138,7 @@ class EDNReaderKeywordTest {
             Assertions.assertTrue(it is Keyword)
             it as Keyword
             Assertions.assertEquals(keyword, it)
-            Assertions.assertEquals(keyword.prefix, it.prefix)
+            Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
     }

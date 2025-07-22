@@ -136,9 +136,8 @@ $dokka.location:kleinert.soap.data/Keyword/equals/#kotlin.Any?/PointingToDeclara
 $dokka.location:kleinert.soap.data/Keyword/fullyQualified/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/fully-qualified.html
 $dokka.location:kleinert.soap.data/Keyword/hashCode/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/hash-code.html
 $dokka.location:kleinert.soap.data/Keyword/invoke/#kotlin.collections.Map[*,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/invoke.html
-$dokka.location:kleinert.soap.data/Keyword/length/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/length.html
 $dokka.location:kleinert.soap.data/Keyword/name/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/name.html
-$dokka.location:kleinert.soap.data/Keyword/prefix/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/prefix.html
+$dokka.location:kleinert.soap.data/Keyword/namespace/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/namespace.html
 $dokka.location:kleinert.soap.data/Keyword/toString/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-keyword/to-string.html
 $dokka.location:kleinert.soap.data/MutableListView///PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-mutable-list-view/index.html
 $dokka.location:kleinert.soap.data/MutableListView/MutableListView/#kotlin.Int#kotlin.Int#kotlin.collections.MutableList[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-mutable-list-view/-mutable-list-view.html
@@ -512,11 +511,9 @@ $dokka.location:kleinert.soap.data/Symbol/compareTo/#kleinert.soap.data.Symbol/P
 $dokka.location:kleinert.soap.data/Symbol/equals/#kotlin.Any?/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/equals.html
 $dokka.location:kleinert.soap.data/Symbol/fullyQualified/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/fully-qualified.html
 $dokka.location:kleinert.soap.data/Symbol/hashCode/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/hash-code.html
-$dokka.location:kleinert.soap.data/Symbol/length/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/length.html
 $dokka.location:kleinert.soap.data/Symbol/name/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/name.html
-$dokka.location:kleinert.soap.data/Symbol/prefix/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/prefix.html
+$dokka.location:kleinert.soap.data/Symbol/namespace/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/namespace.html
 $dokka.location:kleinert.soap.data/Symbol/toString/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/to-string.html
-$dokka.location:kleinert.soap.data/Symbol/toStringInner/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.data/-symbol/to-string-inner.html
 $dokka.location:kleinert.soap.edn////PointingToDeclaration/-extensible-data-soap/kleinert.soap.edn/index.html
 $dokka.location:kleinert.soap.edn/EDN.Companion///PointingToDeclaration/-extensible-data-soap/kleinert.soap.edn/-e-d-n/-companion/index.html
 $dokka.location:kleinert.soap.edn/EDN.Companion/defaultOptions/#/PointingToDeclaration/-extensible-data-soap/kleinert.soap.edn/-e-d-n/-companion/default-options.html

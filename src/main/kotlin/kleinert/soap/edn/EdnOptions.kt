@@ -7,6 +7,7 @@ import kleinert.soap.data.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -93,17 +94,37 @@ object ExtendedEDNDecoders {
     private fun listToIntArray(it: Any?): IntArray = vectorToIntegralArray(it, 2) as IntArray
     private fun listToLongArray(it: Any?): LongArray = vectorToIntegralArray(it, 3) as LongArray
     private fun listToBigIntArray(it: Any?): Array<BigInteger> {
-        val temp = vectorToIntegralArray(it, 4)
-        require(temp is Array<*> && temp.isArrayOf<BigInteger>())
-        return temp as Array<BigInteger>
+        require(it is List<*>)
+        val res = Array(it.size) { index ->
+            val v = it[index]
+            require(v is Number)
+            when (v) {
+                is Byte,is Short,is Int,is Long -> v.toLong().toBigInteger()
+                is BigInteger -> v
+                else -> throw IllegalArgumentException("Element must be an Integral number type.")
+            }
+        }
+        return res
     }
 
     private fun listToFloatArray(it: Any?): FloatArray = vectorToFloatyArray(it, 0) as FloatArray
     private fun listToDoubleArray(it: Any?): DoubleArray = vectorToFloatyArray(it, 1) as DoubleArray
     private fun listToBigDecimalArray(it: Any?): Array<BigDecimal> {
-        val temp = vectorToFloatyArray(it, 2)
-        require(temp is Array<*> && temp.isArrayOf<BigDecimal>())
-        return temp as Array<BigDecimal>
+        require(it is List<*>)
+        val res = Array(it.size) { index ->
+            val v = it[index]
+            require(v is Number)
+            when (v) {
+                is Byte,is Short,is Int,is Long -> v.toLong().toBigDecimal()
+                is BigInteger -> v.toBigDecimal()
+                is Float -> v.toBigDecimal()
+                is Double -> v.toBigDecimal()
+                is Ratio-> v.toBigDecimal()
+                is Complex -> v.toBigDecimal()
+                else -> throw IllegalArgumentException("Element must be a number type.")
+            }
+        }
+        return res
     }
 
     private fun listToStringArray(it: Any?): Array<String> {
@@ -130,13 +151,14 @@ object ExtendedEDNDecoders {
     }
 
     private fun packed2dList(it: Any?): PackedList<Any?> {
-        requireType<List<*>>(it, "List")
         require(it is List<*>)
-        for (e in it) {
-            requireType<List<*>>(e, "List")
+        val lst = mutableListOf<List<Any?>>()
+        for (subList in it) {
+            require(subList is List<*>)
+            lst.add(subList)
         }
         return try {
-            PackedList(it as List<List<Any?>>)
+            PackedList(lst)
         } catch (iae: IllegalArgumentException) {
             throw EdnReaderException.EdnClassConversionError(iae)
         }

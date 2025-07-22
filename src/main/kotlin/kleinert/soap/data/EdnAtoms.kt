@@ -4,6 +4,10 @@ package kleinert.soap.data
  * A Keyword as specified in the EDN format specification.
  * When a keyword is created, it is interned.
  *
+ * @property namespace The Keyword as a [String] without the colon and without [name].
+ * @property name The Keyword as a [String] without the colon and the namespace.
+ * @property fullyQualified True if [namespace] is not null.
+ *
  * @author Armin Kleinert
  */
 class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
@@ -12,12 +16,12 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
         private val definedKeywordList = mutableListOf<Keyword>()
 
         /**
-         * Creates a new [Keyword] from the input [s]. The input must start with a colon.
+         * Creates a new [Keyword] from the input [s]. The input must start with a colon.2
          *
          * @param s The format.
          * @param allowUTF If true, the [Keyword] can include chars with more than 16 bits. This is not allowed by the EDN format specification.
          *
-         * @return
+         * @return null if the parse was invalid or a [Keyword] if it was valid.
          */
         fun parse(s: String, allowUTF: Boolean = false): Keyword? {
             if (s.length <= 1) return null // Keywords must be at least 2 chars long
@@ -67,20 +71,17 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
         }
     }
 
-    val length
-        get() = s.length
-
     val fullyQualified: Boolean
         get() = s.fullyQualified
 
-    val prefix
-        get() = s.prefix
+    val namespace
+        get() = s.namespace
 
     val name
         get() = s.name
 
     override fun toString() = ":$s"
-    override fun hashCode() = definedKeywords[s.toString()] ?: 0
+    override fun hashCode() = (definedKeywords[s.toString()] ?: 0) xor 0xCAFEBEEF.toInt()
 
     override fun compareTo(other: Keyword): Int =
         when {
@@ -94,15 +95,34 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
         return this === other
     }
 
-    //operator fun <T> invoke(m: Map<Keyword, T>): T? = m[this]
-
     operator fun <T> invoke(m: Map<*, T>): T? = m[this]
 }
 
-class Symbol private constructor(val prefix: String?, val name: String) : Comparable<Symbol> {
+/**
+ * A Symbol as specified in the EDN format specification.
+ *
+ * @property namespace The [Symbol] as a [String] without the colon and without [name].
+ * @property name The [Symbol] as a [String] without the colon and the namespace.
+ * @property fullyQualified True if [namespace] is not null.
+ *
+ * @author Armin Kleinert
+ */
+class Symbol private constructor(val namespace: String?, val name: String) : Comparable<Symbol> {
     companion object {
+        /**
+         * @see isValidSymbol
+         *
+         * @param s The input string.
+         * @param allowUTF Allow char codes over [Char.MAX_VALUE].
+         *
+         * @return -1 if the string does not include '/', null if the string is invalid or the index of the '/' in the string.
+         */
         private fun dividerIndexIfValid(s: String, allowUTF: Boolean = false): Int? {
+            if (s.isEmpty())
+                return null
+
             var dividerIndex = -1
+
             for ((index, chr) in s.codePoints().toArray().withIndex()) {
                 when (chr) {
                     // First-char restriction: If the name starts with dot, plus, or minus, the second char can not be numeric
@@ -124,18 +144,43 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
                     in 'a'.code..'z'.code, in 'A'.code..'Z'.code -> {}
 
                     else -> {
-                        if (chr < Char.MIN_VALUE.code || chr > Char.MAX_VALUE.code)
-                            if (!allowUTF) return null
-                            else if (chr.toChar().isWhitespace()) return null
+                        if (chr.toChar().isWhitespace()) return null
+                        if (!allowUTF && (chr < Char.MIN_VALUE.code || chr > Char.MAX_VALUE.code)) return null
                     }
                 }
             }
             return dividerIndex
         }
 
+        /**
+         * Checks whether [s] conforms to the EDN standard, returns true, false otherwise.
+         * The naming rules are described in the documentation of [parse].
+         *
+         * @param s The input string.
+         * @param allowUTF Allow char codes over [Char.MAX_VALUE].
+         *
+         * @return -1 if the string does not include '/', null if the string is invalid or the index of the '/' in the string.
+         */
         fun isValidSymbol(s: String, allowUTF: Boolean = false): Boolean =
             dividerIndexIfValid(s, allowUTF) != null
 
+        /**
+         * Parses a [String] into a [Symbol]. If the input is invalid, returns null.
+         *
+         * The string can no more than one '/'. If there is one, the part in front of it is the [namespace] and part
+         * after the '/' the [name]. If there  is no '/', the [Symbol] has no [namespace].
+         *
+         * The standard only allows digits, letters and most chars in the normal char range of 0 to 2^16-1 are allowed.
+         * Other char codes can be allowed with the [allowUTF] option.
+         *
+         * In regex form, the symbol would be as follows:
+         * [a-zA-Z.+\\-\*!_?$%&=<>][a-zA-Z0-9.+\\-\*!_?$%&=<>]*(/[a-zA-Z.+\\-\*!_?$%&=<>][a-zA-Z0-9.+\\-\*!_?$%&=<>]*)?
+         *
+         * @param s The input string.
+         * @param allowUTF Allow char codes over [Char.MAX_VALUE].
+         *
+         * @return -1 if the string does not include '/', null if the string is invalid or the index of the '/' in the string.
+         */
         fun parse(s: String, allowUTF: Boolean = false): Symbol? {
             if (s == "/")
                 return symbol(null, "/")
@@ -150,32 +195,53 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
             return symbol(null, s)
         }
 
-        fun symbol(prefix: String?, name: String) = Symbol(prefix, name)
+        /**
+         * Creates a new [Symbol]. Unlike [parse], no format checking is performed.
+         *
+         * @param namespace The new [Symbol]'s [namespace].
+         * @param name The new [Symbol]'s [name].
+         *
+         * @return A new [Symbol].
+         */
+        fun symbol(namespace: String?, name: String) = Symbol(namespace, name)
+
+
+        /**
+         * Creates a new [Symbol]. Unlike [parse], no format checking is performed.
+         *
+         * @param name The new [Symbol]'s [name].
+         *
+         * @return A new [Symbol].
+         */
         fun symbol(name: String) = Symbol(null, name)
 
-        operator fun get(s: String): Symbol = parse(s) ?: throw IllegalStateException("Illegal symbol format: $s")
+        /**
+         * Parses [s] into a [Symbol]. Throws an exception if parsing fails.
+         *
+         * @throws IllegalArgumentException If parsing failed.
+         *
+         * @see parse
+         *
+         * @param s The input [String].
+         *
+         * @return A new [Symbol].
+         */
+        operator fun get(s: String): Symbol = parse(s) ?: throw IllegalArgumentException("Illegal symbol format: $s")
     }
 
-    val length: Int
-        get() = if (prefix?.isEmpty() != false) name.length else prefix.length + name.length
-
     val fullyQualified: Boolean
-        get() = prefix?.isNotEmpty() ?: false
+        get() = namespace?.isNotEmpty() ?: false
 
-    override fun toString() = if (prefix.isNullOrEmpty()) name else "$prefix/$name"
+    override fun toString() = if (namespace.isNullOrEmpty()) name else "$namespace/$name"
 
     override fun compareTo(other: Symbol): Int {
         val prefixCompare = when {
-            prefix == null -> if (other.prefix == null) 0 else -1
-            other.prefix == null -> 1
-            else -> prefix.compareTo(other.prefix)
+            namespace == null -> if (other.namespace == null) 0 else -1
+            other.namespace == null -> 1
+            else -> namespace.compareTo(other.namespace)
         }
         if (prefixCompare != 0) return prefixCompare
         return name.compareTo(name)
-    }
-
-    fun toStringInner(): String {
-        return "Symbol(prefix=$prefix, name='$name', length=$length, fullyQualified=$fullyQualified)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -184,14 +250,14 @@ class Symbol private constructor(val prefix: String?, val name: String) : Compar
 
         other as Symbol
 
-        if (prefix != other.prefix) return false
+        if (namespace != other.namespace) return false
         if (name != other.name) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = prefix?.hashCode() ?: 0
+        var result = namespace?.hashCode() ?: 0
         result = 31 * result + name.hashCode()
         return result
     }

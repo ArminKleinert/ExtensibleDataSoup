@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-07-21T21:14:48" hostname="pc1" time="0.025">
+<testsuite name="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:25" hostname="pc1" time="0.02">
   <properties/>
-  <testcase name="parseComplex2()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.01"/>
+  <testcase name="parseComplex2()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.005"/>
   <testcase name="testComplexNumberRecognitionMatchRealOnly()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.001"/>
   <testcase name="testComplexNumberRecognitionMatchImagOnly()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.0"/>
-  <testcase name="parseRatio()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.002"/>
-  <testcase name="testComplexNumberRecognitionMatchAll()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.003"/>
-  <testcase name="testComplexNumberRecognitionNoMatch()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.001"/>
+  <testcase name="parseRatio()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.003"/>
+  <testcase name="testComplexNumberRecognitionMatchAll()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.001"/>
+  <testcase name="testComplexNumberRecognitionNoMatch()" classname="kleinert.soap.edn.EDNReaderNumberRatioComplexTest" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

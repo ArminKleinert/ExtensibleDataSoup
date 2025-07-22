@@ -37,20 +37,11 @@ class PackedList<T> : SimpleList<List<T>> {
         this.frozen = frozen
     }
 
-    constructor(m: Int, n: Int, packed: MutableList<T>, frozen: Boolean = true, unsafe: Boolean = false) {
-        if (m < 0) throw IllegalArgumentException("Index $m is negative.")
-        if (n < 0) throw IllegalArgumentException("Inner index $n is negative.")
-        if (packed.size != m * n) throw IllegalArgumentException("Invalid size of packed list. Must be ${m * n} ($m*$n) but is ${packed.size}.")
-        size = m
-        this.packed = if (!unsafe || frozen) packed.toMutableList() else packed
-        this.frozen = frozen
-    }
-
     fun unpack(): List<List<T>> =
         (0..<size).map { getUnchecked(it) }
 
     override fun getUnchecked(index: Int): List<T> =
-        packed.subList(index * subListSize, index * subListSize + subListSize)
+        ArrayList(packed).subList(index * subListSize, index * subListSize + subListSize)
 
     override fun setUnchecked(index: Int, element: List<T>): List<T> {
         if (frozen)

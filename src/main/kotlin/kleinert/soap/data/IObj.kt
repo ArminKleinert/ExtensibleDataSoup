@@ -1,5 +1,10 @@
 package kleinert.soap.data
 
+/**
+ * @property meta The metadata map.
+ * @property obj The object itself.
+ * @author Armin Kleinert
+ */
 data class IObj<T>(val meta: Map<out Any?, Any?>?, val obj: T) {
     companion object {
         fun <T> valueOf(meta:String, obj:T) = IObj(PersistentMap(mapOf(Keyword["tag"] to meta)), obj)

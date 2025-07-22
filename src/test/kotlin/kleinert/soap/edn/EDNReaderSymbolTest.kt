@@ -14,7 +14,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
         run {
@@ -24,7 +24,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
     }
@@ -38,7 +38,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
     }
@@ -52,7 +52,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
         run {
@@ -62,7 +62,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
         run {
@@ -72,7 +72,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
         run {
@@ -82,7 +82,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
     }
@@ -96,7 +96,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
         run {
@@ -106,7 +106,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
     }
@@ -120,7 +120,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
         run { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
@@ -130,7 +130,7 @@ class EDNReaderSymbolTest {
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)
-            Assertions.assertEquals(symbol.prefix, it.prefix)
+            Assertions.assertEquals(symbol.namespace, it.namespace)
             Assertions.assertEquals(symbol.name, it.name)
         }
     }

@@ -15,17 +15,21 @@ class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIte
     override fun set(element: T) = throw UnsupportedOperationException("Not possible on persistent iterators.")
 }
 
+/**
+ * A wrapper around a [MutableSet]
+ * @param T The type of the elements.
+ * @author Armin Kleinert
+ */
 class PersistentSet<T> : MutableSet<T> {
-
     companion object {
         fun <T> of(vararg elements: T): PersistentSet<T> =
             PersistentSet(LinkedHashSet(elements.toList()), ordered = true)
 
-        fun <T> wrap(xs:Set<T>, ordered: Boolean=false,sorted: Boolean=false) :PersistentSet<T> =
-            PersistentSet(xs, ordered=ordered, sorted=sorted)
+        fun <T> wrap(xs: Set<T>, ordered: Boolean = false, sorted: Boolean = false): PersistentSet<T> =
+            PersistentSet(xs, ordered = ordered, sorted = sorted)
     }
 
-    val inner: Set<T>
+    private val inner: Set<T>
     val sorted: Boolean
     val ordered: Boolean
 
@@ -42,12 +46,12 @@ class PersistentSet<T> : MutableSet<T> {
     }
 
     constructor(xs: Set<T>) {
-        this.   inner = xs.minus(xs).plus(xs)
-        this.   sorted = false
-        this.  ordered = false
+        this.inner = xs.minus(xs).plus(xs)
+        this.sorted = false
+        this.ordered = false
     }
 
-    private constructor(xs: Set<T>, ordered:Boolean = false, sorted:Boolean = false) {
+    private constructor(xs: Set<T>, ordered: Boolean = false, sorted: Boolean = false) {
         this.inner = xs
         this.sorted = sorted
         this.ordered = ordered
@@ -88,7 +92,7 @@ class PersistentSet<T> : MutableSet<T> {
 }
 
 
-class PersistentMap<K, V>:    MutableMap<K, V> {
+class PersistentMap<K, V> : MutableMap<K, V> {
 
     class Entry<K, V>(override val key: K, override val value: V) : MutableMap.MutableEntry<K, V> {
         override fun setValue(newValue: V): V =
@@ -119,33 +123,33 @@ class PersistentMap<K, V>:    MutableMap<K, V> {
         fun <K, V> of(vararg entries: Pair<K, V>): PersistentMap<K, V> =
             PersistentMap(entries.toList())
 
-        fun <K,V> wrap(xs:Map<K,V>, ordered: Boolean=false,sorted: Boolean=false) :PersistentMap<K,V> =
-            PersistentMap(xs, ordered=ordered, sorted=sorted)
+        fun <K, V> wrap(xs: Map<K, V>, ordered: Boolean = false, sorted: Boolean = false): PersistentMap<K, V> =
+            PersistentMap(xs, ordered = ordered, sorted = sorted)
     }
 
-    constructor(xs: List<Pair<K,V>>) {
-        inner = LinkedHashMap(xs.size*2)
-        for ((k,v) in xs)
-            inner[k]=v
+    constructor(xs: List<Pair<K, V>>) {
+        inner = LinkedHashMap(xs.size * 2)
+        for ((k, v) in xs)
+            inner[k] = v
         sorted = false
         ordered = true
     }
 
-    constructor(xs: Collection<Pair<K,V>>) {
-        inner = LinkedHashMap(xs.size*2)
-        for ((k,v) in xs)
-            inner[k]=v
+    constructor(xs: Collection<Pair<K, V>>) {
+        inner = LinkedHashMap(xs.size * 2)
+        for ((k, v) in xs)
+            inner[k] = v
         sorted = false
         ordered = false
     }
 
-    constructor(xs: Map<K,V>) {
+    constructor(xs: Map<K, V>) {
         this.inner = xs
         this.sorted = false
         this.ordered = false
     }
 
-    private constructor(xs: Map<K,V>, ordered:Boolean, sorted:Boolean) {
+    private constructor(xs: Map<K, V>, ordered: Boolean, sorted: Boolean) {
         this.inner = xs
         this.sorted = sorted
         this.ordered = ordered
@@ -196,12 +200,12 @@ class PersistentList<T> : MutableList<T> {
     companion object {
         fun <T> of(vararg elements: T): PersistentList<T> = PersistentList(elements.toList())
 
-        fun <T> wrap(xs:List<T>) :PersistentList<T> = PersistentList(xs, true)
+        fun <T> wrap(xs: List<T>): PersistentList<T> = PersistentList(xs, true)
     }
 
     private val inner: List<T>
 
-    constructor(xs: List<T>, wrapMarker:Boolean) {
+    private constructor(xs: List<T>, wrapMarker: Boolean) {
         inner = xs
         !wrapMarker
     }
@@ -210,8 +214,7 @@ class PersistentList<T> : MutableList<T> {
         inner = xs.toList()
     }
 
-    constructor(xs: Collection<T>){
-        inner = xs.toList()}
+    constructor(xs: Collection<T>) : this(xs.toList())
 
     override val size: Int
         get() = inner.size
@@ -260,16 +263,16 @@ class PersistentList<T> : MutableList<T> {
     }
 }
 
-class PersistentVector<T>: MutableList<T> {
+class PersistentVector<T> : MutableList<T> {
     companion object {
         fun <T> of(vararg elements: T): PersistentVector<T> = PersistentVector(elements.toList())
 
-        fun <T> wrap(xs:List<T>) : PersistentVector<T> = PersistentVector(xs, true)
+        fun <T> wrap(xs: List<T>): PersistentVector<T> = PersistentVector(xs, true)
     }
 
     private val inner: List<T>
 
-    constructor(xs: List<T>, wrapMarker:Boolean) {
+    private constructor(xs: List<T>, wrapMarker: Boolean) {
         inner = xs
         !wrapMarker
     }
@@ -278,8 +281,9 @@ class PersistentVector<T>: MutableList<T> {
         inner = xs.toList()
     }
 
-    constructor(xs: Collection<T>){
-        inner = xs.toList()}
+    constructor(xs: Collection<T>) {
+        inner = xs.toList()
+    }
 
     override val size: Int
         get() = inner.size
