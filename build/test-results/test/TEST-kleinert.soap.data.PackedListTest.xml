@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.PackedListTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:24" hostname="pc1" time="0.079">
+<testsuite name="kleinert.soap.data.PackedListTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:16" hostname="pc1" time="0.16">
   <properties/>
-  <testcase name="test3x2Unpacked()" classname="kleinert.soap.data.PackedListTest" time="0.012"/>
-  <testcase name="testEmptyUnpacked()" classname="kleinert.soap.data.PackedListTest" time="0.008"/>
-  <testcase name="test3x2Packed()" classname="kleinert.soap.data.PackedListTest" time="0.001"/>
-  <testcase name="testSimplePacked()" classname="kleinert.soap.data.PackedListTest" time="0.001"/>
-  <testcase name="testSimpleUnpacked()" classname="kleinert.soap.data.PackedListTest" time="0.001"/>
-  <testcase name="testEmptyPacked()" classname="kleinert.soap.data.PackedListTest" time="0.002"/>
-  <testcase name="testSingletonPacked()" classname="kleinert.soap.data.PackedListTest" time="0.008"/>
-  <testcase name="testIndexOutOfBoundsCases()" classname="kleinert.soap.data.PackedListTest" time="0.013"/>
-  <testcase name="textFrozen()" classname="kleinert.soap.data.PackedListTest" time="0.004"/>
-  <testcase name="testSingletonUnpacked()" classname="kleinert.soap.data.PackedListTest" time="0.011"/>
+  <testcase name="test3x2Unpacked()" classname="kleinert.soap.data.PackedListTest" time="0.04"/>
+  <testcase name="testEmptyUnpacked()" classname="kleinert.soap.data.PackedListTest" time="0.01"/>
+  <testcase name="test3x2Packed()" classname="kleinert.soap.data.PackedListTest" time="0.002"/>
+  <testcase name="testSimplePacked()" classname="kleinert.soap.data.PackedListTest" time="0.005"/>
+  <testcase name="testSimpleUnpacked()" classname="kleinert.soap.data.PackedListTest" time="0.006"/>
+  <testcase name="testEmptyPacked()" classname="kleinert.soap.data.PackedListTest" time="0.008"/>
+  <testcase name="testSingletonPacked()" classname="kleinert.soap.data.PackedListTest" time="0.005"/>
+  <testcase name="testIndexOutOfBoundsCases()" classname="kleinert.soap.data.PackedListTest" time="0.025"/>
+  <testcase name="textFrozen()" classname="kleinert.soap.data.PackedListTest" time="0.008"/>
+  <testcase name="testSingletonUnpacked()" classname="kleinert.soap.data.PackedListTest" time="0.018"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

@@ -381,7 +381,19 @@ class EDNSoapReader private constructor(
             }
         }
 
-        return decoder!!(form)
+        try {
+            return decoder!!(form)
+        } catch (ex: IllegalArgumentException) {
+            // For UUID.fromString
+            throw EdnReaderException.EdnClassConversionError(ex)
+        } catch (ex: NumberFormatException) {
+            // For UUID.fromString
+            throw EdnReaderException.EdnClassConversionError(ex)
+        } catch (ex: DateTimeParseException) {
+            // For Instant.parse.
+            throw EdnReaderException.EdnClassConversionError(ex)
+        }
+
     }
 
     private fun parseOther(): Any? {

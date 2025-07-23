@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderBasicsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:24" hostname="pc1" time="0.096">
+<testsuite name="kleinert.soap.edn.EDNReaderBasicsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:16" hostname="pc1" time="0.137">
   <properties/>
-  <testcase name="parseCommaTest()" classname="kleinert.soap.edn.EDNReaderBasicsTest" time="0.063"/>
-  <testcase name="parseDirectConstantsTest()" classname="kleinert.soap.edn.EDNReaderBasicsTest" time="0.004"/>
-  <testcase name="parseCommentTest()" classname="kleinert.soap.edn.EDNReaderBasicsTest" time="0.027"/>
+  <testcase name="parseCommaTest()" classname="kleinert.soap.edn.EDNReaderBasicsTest" time="0.102"/>
+  <testcase name="parseDirectConstantsTest()" classname="kleinert.soap.edn.EDNReaderBasicsTest" time="0.003"/>
+  <testcase name="parseCommentTest()" classname="kleinert.soap.edn.EDNReaderBasicsTest" time="0.028"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

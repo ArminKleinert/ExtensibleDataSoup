@@ -7,7 +7,7 @@ class PackedListTest {
     @Test
     fun testEmptyPacked() {
         run {
-            val lst = PackedList<Int>(0, 0, listOf())
+            val lst = PackedList<Int>(0, listOf())
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(lst.isEmpty())
             Assertions.assertEquals(listOf<List<Int>>(), lst)
@@ -49,7 +49,7 @@ class PackedListTest {
     @Test
     fun testIndexOutOfBoundsCases() {
         run {
-            val lst = PackedList<Int>(0, 0, listOf())
+            val lst = PackedList<Int>(0, listOf())
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2) }
@@ -67,7 +67,7 @@ class PackedListTest {
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2)[0] = listOf(6) }
         }
         run {
-            val lst = PackedList(1, 1, listOf(55))
+            val lst = PackedList(1, listOf(55))
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[1] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[1, 0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 1] }
@@ -87,7 +87,7 @@ class PackedListTest {
     @Test
     fun testSingletonPacked() {
         run {
-            val lst = PackedList(1, 1, listOf(55))
+            val lst = PackedList(1, listOf(55))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(55)), lst)
@@ -132,7 +132,7 @@ class PackedListTest {
     @Test
     fun testSimplePacked() {
         run {
-            val lst = PackedList(2, 2, listOf(1, 2, 3, 4))
+            val lst = PackedList(2, listOf(1, 2, 3, 4))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(1, 2), listOf(3, 4)), lst)
@@ -173,7 +173,7 @@ class PackedListTest {
     @Test
     fun test3x2Packed() {
         run {
-            val lst = PackedList(3, 2, listOf(1, 2, 3, 4, 5, 6))
+            val lst = PackedList(3, listOf(1, 2, 3, 4, 5, 6))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)), lst)

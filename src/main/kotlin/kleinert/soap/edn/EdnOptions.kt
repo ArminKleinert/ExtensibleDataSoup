@@ -82,7 +82,7 @@ object ExtendedEDNDecoders {
 
             2 -> Array<BigDecimal>(it.size) { BigDecimal.ZERO }.apply {
                 for ((index, num) in it.withIndex())
-                    this[index] = BigDecimal.valueOf((num as Number).toLong())
+                    this[index] = BigDecimal.valueOf((num as Number).toDouble())
             }
 
             else -> throw IllegalStateException()
@@ -101,7 +101,7 @@ object ExtendedEDNDecoders {
             when (v) {
                 is Byte,is Short,is Int,is Long -> v.toLong().toBigInteger()
                 is BigInteger -> v
-                else -> throw IllegalArgumentException("Element must be an Integral number type.")
+                else -> throw IllegalArgumentException("Element must be an Integral number type, but is $v (${v.javaClass}).")
             }
         }
         return res
@@ -115,13 +115,13 @@ object ExtendedEDNDecoders {
             val v = it[index]
             require(v is Number)
             when (v) {
-                is Byte,is Short,is Int,is Long -> v.toLong().toBigDecimal()
-                is BigInteger -> v.toBigDecimal()
-                is Float -> v.toBigDecimal()
-                is Double -> v.toBigDecimal()
+                is Byte,is Short,is Int,is Long -> BigDecimal.valueOf(v.toLong())
+                is BigInteger -> BigDecimal(v)
+                is Float, is Double -> BigDecimal.valueOf(v.toDouble())
                 is Ratio-> v.toBigDecimal()
                 is Complex -> v.toBigDecimal()
-                else -> throw IllegalArgumentException("Element must be a number type.")
+                is BigDecimal -> v
+                else -> throw IllegalArgumentException("Element must be a number type, but is $v (${v.javaClass}).")
             }
         }
         return res

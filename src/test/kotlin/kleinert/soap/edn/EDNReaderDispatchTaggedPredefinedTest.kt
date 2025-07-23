@@ -6,6 +6,7 @@ import kleinert.soap.data.PackedList
 import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class EDNReaderDispatchTaggedPredefinedTest {
     private fun parse(s: String) =
@@ -68,9 +69,9 @@ class EDNReaderDispatchTaggedPredefinedTest {
             DoubleArray(4) { it.toDouble() },
             parse("#doublearray [0.0 1.0 2.0 3.0]") as DoubleArray
         )
-        Assertions.assertArrayEquals(Array(4) { it.toBigDecimal() }, parse("#bigdecimalarray [0 1 2 3]") as Array<*>)
+        Assertions.assertArrayEquals(Array(4) { it.toLong().toBigDecimal() }, parse("#bigdecimalarray [0 1 2 3]") as Array<*>)
         Assertions.assertArrayEquals(
-            Array(4) { it.toBigDecimal() },
+            arrayOf(BigDecimal("0.0"), BigDecimal("1.0"), BigDecimal(2L), BigDecimal(3)),
             parse("#bigdecimalarray [0.0 1.0M 2M 3]") as Array<*>
         )
     }

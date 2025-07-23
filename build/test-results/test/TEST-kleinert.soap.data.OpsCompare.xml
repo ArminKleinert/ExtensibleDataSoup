@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.OpsCompare" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:24" hostname="pc1" time="0.234">
+<testsuite name="kleinert.soap.data.OpsCompare" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:15" hostname="pc1" time="0.786">
   <properties/>
-  <testcase name="compareBigInt()" classname="kleinert.soap.data.OpsCompare" time="0.024"/>
-  <testcase name="compareDouble()" classname="kleinert.soap.data.OpsCompare" time="0.021"/>
-  <testcase name="compareComplexFail()" classname="kleinert.soap.data.OpsCompare" time="0.011"/>
-  <testcase name="compareInt()" classname="kleinert.soap.data.OpsCompare" time="0.032"/>
-  <testcase name="compareByte()" classname="kleinert.soap.data.OpsCompare" time="0.028"/>
-  <testcase name="compareLong()" classname="kleinert.soap.data.OpsCompare" time="0.016"/>
-  <testcase name="compareBigDecimal()" classname="kleinert.soap.data.OpsCompare" time="0.012"/>
-  <testcase name="compareFloat()" classname="kleinert.soap.data.OpsCompare" time="0.014"/>
-  <testcase name="compareRatio()" classname="kleinert.soap.data.OpsCompare" time="0.018"/>
-  <testcase name="compareShort()" classname="kleinert.soap.data.OpsCompare" time="0.021"/>
-  <testcase name="compareComplex()" classname="kleinert.soap.data.OpsCompare" time="0.016"/>
+  <testcase name="compareBigInt()" classname="kleinert.soap.data.OpsCompare" time="0.071"/>
+  <testcase name="compareDouble()" classname="kleinert.soap.data.OpsCompare" time="0.099"/>
+  <testcase name="compareComplexFail()" classname="kleinert.soap.data.OpsCompare" time="0.041"/>
+  <testcase name="compareInt()" classname="kleinert.soap.data.OpsCompare" time="0.087"/>
+  <testcase name="compareByte()" classname="kleinert.soap.data.OpsCompare" time="0.077"/>
+  <testcase name="compareLong()" classname="kleinert.soap.data.OpsCompare" time="0.078"/>
+  <testcase name="compareBigDecimal()" classname="kleinert.soap.data.OpsCompare" time="0.056"/>
+  <testcase name="compareFloat()" classname="kleinert.soap.data.OpsCompare" time="0.075"/>
+  <testcase name="compareRatio()" classname="kleinert.soap.data.OpsCompare" time="0.045"/>
+  <testcase name="compareShort()" classname="kleinert.soap.data.OpsCompare" time="0.054"/>
+  <testcase name="compareComplex()" classname="kleinert.soap.data.OpsCompare" time="0.041"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

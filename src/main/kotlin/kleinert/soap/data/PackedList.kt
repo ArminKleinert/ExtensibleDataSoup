@@ -13,10 +13,14 @@ class PackedList<T> : SimpleList<List<T>> {
 
     val frozen: Boolean
 
-    constructor(m: Int, n: Int, packed: List<T>, frozen: Boolean = true) {
+    constructor(m: Int, packed: List<T>, frozen: Boolean = true) {
         if (m < 0) throw IllegalArgumentException("Index $m is negative.")
-        if (n < 0) throw IllegalArgumentException("Inner index $n is negative.")
-        if (packed.size != m * n) throw IllegalArgumentException("Invalid size of packed list. Must be ${m * n} ($m*$n) but is ${packed.size}.")
+
+        if (m == 0 && packed.isNotEmpty())
+            throw IllegalArgumentException("With m=$m, the packed List must be empty.")
+        else if (m != 0 && packed.size % m != 0)
+            throw IllegalArgumentException("Invalid size of packed list. Must be divisble by $m but is ${packed.size}.")
+
         size = m
         this.packed = packed.toMutableList()
         this.frozen = frozen

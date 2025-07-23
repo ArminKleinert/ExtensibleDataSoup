@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.RatioTest" tests="29" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:24" hostname="pc1" time="0.126">
+<testsuite name="kleinert.soap.data.RatioTest" tests="29" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:16" hostname="pc1" time="0.47">
   <properties/>
-  <testcase name="valueOfString()" classname="kleinert.soap.data.RatioTest" time="0.009"/>
-  <testcase name="valueOfStringOrNull()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
+  <testcase name="valueOfString()" classname="kleinert.soap.data.RatioTest" time="0.007"/>
+  <testcase name="valueOfStringOrNull()" classname="kleinert.soap.data.RatioTest" time="0.006"/>
   <testcase name="compareTo()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="getDen()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="getNum()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
-  <testcase name="toFloat()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
-  <testcase name="toShort()" classname="kleinert.soap.data.RatioTest" time="0.0"/>
-  <testcase name="testToString()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="negate()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="toByte()" classname="kleinert.soap.data.RatioTest" time="0.0"/>
-  <testcase name="toLong()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="valueOfLongLong()" classname="kleinert.soap.data.RatioTest" time="0.004"/>
-  <testcase name="reciprocal()" classname="kleinert.soap.data.RatioTest" time="0.005"/>
-  <testcase name="abs()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
+  <testcase name="getDen()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
+  <testcase name="getNum()" classname="kleinert.soap.data.RatioTest" time="0.006"/>
+  <testcase name="toFloat()" classname="kleinert.soap.data.RatioTest" time="0.01"/>
+  <testcase name="toShort()" classname="kleinert.soap.data.RatioTest" time="0.005"/>
+  <testcase name="testToString()" classname="kleinert.soap.data.RatioTest" time="0.098"/>
+  <testcase name="negate()" classname="kleinert.soap.data.RatioTest" time="0.019"/>
+  <testcase name="toByte()" classname="kleinert.soap.data.RatioTest" time="0.014"/>
+  <testcase name="toLong()" classname="kleinert.soap.data.RatioTest" time="0.034"/>
+  <testcase name="valueOfLongLong()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
+  <testcase name="reciprocal()" classname="kleinert.soap.data.RatioTest" time="0.014"/>
+  <testcase name="abs()" classname="kleinert.soap.data.RatioTest" time="0.008"/>
   <testcase name="div()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="plus()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="minus()" classname="kleinert.soap.data.RatioTest" time="0.0"/>
+  <testcase name="plus()" classname="kleinert.soap.data.RatioTest" time="0.007"/>
+  <testcase name="minus()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
   <testcase name="times()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
   <testcase name="toInt()" classname="kleinert.soap.data.RatioTest" time="0.0"/>
-  <testcase name="unaryMinus()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="equalsRatioTest()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
-  <testcase name="mediant()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
+  <testcase name="unaryMinus()" classname="kleinert.soap.data.RatioTest" time="0.005"/>
+  <testcase name="equalsRatioTest()" classname="kleinert.soap.data.RatioTest" time="0.008"/>
+  <testcase name="mediant()" classname="kleinert.soap.data.RatioTest" time="0.004"/>
   <testcase name="equalsFullTest()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="toBigDecimal()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
-  <testcase name="valueOfBigInt()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="valueOfDouble()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="valueOfIntInt()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
-  <testcase name="toBigInteger()" classname="kleinert.soap.data.RatioTest" time="0.007"/>
-  <testcase name="toDouble()" classname="kleinert.soap.data.RatioTest" time="0.001"/>
+  <testcase name="toBigDecimal()" classname="kleinert.soap.data.RatioTest" time="0.007"/>
+  <testcase name="valueOfBigInt()" classname="kleinert.soap.data.RatioTest" time="0.004"/>
+  <testcase name="valueOfDouble()" classname="kleinert.soap.data.RatioTest" time="0.003"/>
+  <testcase name="valueOfIntInt()" classname="kleinert.soap.data.RatioTest" time="0.008"/>
+  <testcase name="toBigInteger()" classname="kleinert.soap.data.RatioTest" time="0.009"/>
+  <testcase name="toDouble()" classname="kleinert.soap.data.RatioTest" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

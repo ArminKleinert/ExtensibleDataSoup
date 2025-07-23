@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EdnReaderExceptionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:25" hostname="pc1" time="0.003">
+<testsuite name="kleinert.soap.edn.EdnReaderExceptionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:19" hostname="pc1" time="0.005">
   <properties/>
-  <testcase name="positionStartTest()" classname="kleinert.soap.edn.EdnReaderExceptionTest" time="0.001"/>
-  <testcase name="positionTest()" classname="kleinert.soap.edn.EdnReaderExceptionTest" time="0.001"/>
+  <testcase name="positionStartTest()" classname="kleinert.soap.edn.EdnReaderExceptionTest" time="0.002"/>
+  <testcase name="positionTest()" classname="kleinert.soap.edn.EdnReaderExceptionTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

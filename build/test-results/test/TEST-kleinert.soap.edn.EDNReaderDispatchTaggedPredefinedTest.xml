@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-07-22T23:13:25" hostname="pc1" time="0.058">
+<testsuite name="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:17" hostname="pc1" time="0.184">
   <properties/>
-  <testcase name="parseArrayDecodersTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.013"/>
-  <testcase name="parsePackedListDecodeTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.005"/>
-  <testcase name="parseArrayDecodersFailureTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.019"/>
-  <testcase name="parseNumericArrayDecodersTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.017"/>
+  <testcase name="parseArrayDecodersTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.041"/>
+  <testcase name="parsePackedListDecodeTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.016"/>
+  <testcase name="parseArrayDecodersFailureTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.055"/>
+  <testcase name="parseNumericArrayDecodersTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedPredefinedTest" time="0.043"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
