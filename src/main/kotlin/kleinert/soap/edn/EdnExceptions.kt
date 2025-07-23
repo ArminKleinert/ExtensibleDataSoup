@@ -1,19 +1,11 @@
 package kleinert.soap.edn
 
-
 open class EdnReaderException(
-    text: String, cause: Throwable? = null,
-    val lineIndex: Int = -1, val textIndex: Int = -1
+    val lineIndex: Int, val textIndex: Int,
+    text: String?, cause: Throwable? = null,
 ) : Exception(text, cause) {
-    class EdnClassConversionError : Exception {
-        constructor(text: String) : super(text)
-        constructor(ex: Exception) : super(ex)
-    }
-
-    class EdnEmptyInputException : Exception {
-        constructor(text: String) : super(text)
-        constructor(ex: Exception) : super(ex)
-    }
+    class EdnClassConversionError(lineIndex: Int, textIndex: Int, text: String? = null, cause: Throwable? = null) :
+        EdnReaderException(lineIndex, textIndex, text, cause)
 }
 
 class EdnWriterException(text: String) : Exception(text)

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.MutableListViewTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:15" hostname="pc1" time="0.035">
+<testsuite name="kleinert.soap.data.MutableListViewTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:06" hostname="pc1" time="0.054">
   <properties/>
-  <testcase name="testSet()" classname="kleinert.soap.data.MutableListViewTest" time="0.01"/>
-  <testcase name="testEmpty()" classname="kleinert.soap.data.MutableListViewTest" time="0.004"/>
-  <testcase name="testErrors()" classname="kleinert.soap.data.MutableListViewTest" time="0.007"/>
-  <testcase name="testSimple()" classname="kleinert.soap.data.MutableListViewTest" time="0.001"/>
+  <testcase name="testSet()" classname="kleinert.soap.data.MutableListViewTest" time="0.016"/>
+  <testcase name="testEmpty()" classname="kleinert.soap.data.MutableListViewTest" time="0.001"/>
+  <testcase name="testErrors()" classname="kleinert.soap.data.MutableListViewTest" time="0.012"/>
+  <testcase name="testSimple()" classname="kleinert.soap.data.MutableListViewTest" time="0.008"/>
   <testcase name="testSublist()" classname="kleinert.soap.data.MutableListViewTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

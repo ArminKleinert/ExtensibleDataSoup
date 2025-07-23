@@ -13,7 +13,7 @@ class EdnReaderExceptionTest {
         }
         try {EDN.read("]")}
         catch(ex:EdnReaderException){
-            Assertions.assertEquals(1, ex.textIndex)
+            Assertions.assertEquals(0, ex.textIndex)
             Assertions.assertEquals(0, ex.lineIndex)
         }
     }
@@ -26,7 +26,7 @@ class EdnReaderExceptionTest {
         }
         try {EDN.read("\n\n   ]")}
         catch(ex:EdnReaderException){
-            Assertions.assertEquals(6, ex.textIndex)
+            Assertions.assertEquals(5, ex.textIndex)
             Assertions.assertEquals(2, ex.lineIndex)
         }
     }

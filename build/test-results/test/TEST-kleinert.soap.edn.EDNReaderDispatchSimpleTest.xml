@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderDispatchSimpleTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:17" hostname="pc1" time="0.234">
+<testsuite name="kleinert.soap.edn.EDNReaderDispatchSimpleTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:07" hostname="pc1" time="0.11">
   <properties/>
-  <testcase name="parseDiscardTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.048"/>
-  <testcase name="parseInstTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.13"/>
-  <testcase name="parseSymbolicTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.004"/>
-  <testcase name="parseDispatchChar()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.018"/>
-  <testcase name="parseUuidTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.01"/>
+  <testcase name="parseDiscardTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.018"/>
+  <testcase name="parseInstTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.068"/>
+  <testcase name="parseSymbolicTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.007"/>
+  <testcase name="parseDispatchChar()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.004"/>
+  <testcase name="parseUuidTest()" classname="kleinert.soap.edn.EDNReaderDispatchSimpleTest" time="0.007"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

@@ -15,20 +15,20 @@ object ExtendedEDNDecoders {
     private fun ensureAllIntegral(iterable: Iterable<*>): Boolean {
         for (elem in iterable)
             if (elem !is Long && elem !is Int && elem !is Byte && elem !is Short && elem !is BigInteger)
-                throw EdnReaderException.EdnClassConversionError("Requires integral number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
+                throw IllegalArgumentException("Requires integral number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
         return true
     }
 
     private fun ensureAllFloaty(iterable: Iterable<*>): Boolean {
         for (elem in iterable)
-           if (elem !is Number)
-               throw EdnReaderException.EdnClassConversionError("Requires number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
+            if (elem !is Number)
+                throw IllegalArgumentException("Requires number type, but got $elem of type ${elem?.javaClass ?: "null"}.")
         return true
     }
 
     private inline fun <reified T> requireType(elem: Any?, s: String) {
         if (elem !is T)
-            throw EdnReaderException.EdnClassConversionError("Needed $s, but got $elem of type ${elem?.javaClass ?: "null"}.")
+            throw IllegalArgumentException("Needed $s, but got $elem of type ${elem?.javaClass ?: "null"}.")
     }
 
     private fun vectorToIntegralArray(it: Any?, typeId: Int): Any {
@@ -99,7 +99,7 @@ object ExtendedEDNDecoders {
             val v = it[index]
             require(v is Number)
             when (v) {
-                is Byte,is Short,is Int,is Long -> v.toLong().toBigInteger()
+                is Byte, is Short, is Int, is Long -> v.toLong().toBigInteger()
                 is BigInteger -> v
                 else -> throw IllegalArgumentException("Element must be an Integral number type, but is $v (${v.javaClass}).")
             }
@@ -115,10 +115,10 @@ object ExtendedEDNDecoders {
             val v = it[index]
             require(v is Number)
             when (v) {
-                is Byte,is Short,is Int,is Long -> BigDecimal.valueOf(v.toLong())
+                is Byte, is Short, is Int, is Long -> BigDecimal.valueOf(v.toLong())
                 is BigInteger -> BigDecimal(v)
                 is Float, is Double -> BigDecimal.valueOf(v.toDouble())
-                is Ratio-> v.toBigDecimal()
+                is Ratio -> v.toBigDecimal()
                 is Complex -> v.toBigDecimal()
                 is BigDecimal -> v
                 else -> throw IllegalArgumentException("Element must be a number type, but is $v (${v.javaClass}).")
@@ -157,11 +157,7 @@ object ExtendedEDNDecoders {
             require(subList is List<*>)
             lst.add(subList)
         }
-        return try {
-            PackedList(lst)
-        } catch (iae: IllegalArgumentException) {
-            throw EdnReaderException.EdnClassConversionError(iae)
-        }
+        return PackedList(lst)
     }
 
     private fun setToBitSet(it: Any?): Any {

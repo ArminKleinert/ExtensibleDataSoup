@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderSymbolTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:18" hostname="pc1" time="0.065">
+<testsuite name="kleinert.soap.edn.EDNReaderSymbolTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:08" hostname="pc1" time="0.021">
   <properties/>
   <testcase name="parseSymbolUTFTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.004"/>
-  <testcase name="parseSymbolWithNamespaceTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.01"/>
-  <testcase name="parseInvalidSymbolTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.013"/>
+  <testcase name="parseSymbolWithNamespaceTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.001"/>
+  <testcase name="parseInvalidSymbolTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.001"/>
   <testcase name="parseSymbolBasicTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.001"/>
-  <testcase name="parseSymbolSymbolsTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.008"/>
-  <testcase name="parseSymbolSymbolsMixTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.013"/>
+  <testcase name="parseSymbolSymbolsTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.001"/>
+  <testcase name="parseSymbolSymbolsMixTest()" classname="kleinert.soap.edn.EDNReaderSymbolTest" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

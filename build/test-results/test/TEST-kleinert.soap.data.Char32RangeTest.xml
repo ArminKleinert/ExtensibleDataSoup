@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.Char32RangeTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:14" hostname="pc1" time="0.075">
+<testsuite name="kleinert.soap.data.Char32RangeTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:05" hostname="pc1" time="0.033">
   <properties/>
-  <testcase name="getEndExclusive()" classname="kleinert.soap.data.Char32RangeTest" time="0.024"/>
-  <testcase name="contains()" classname="kleinert.soap.data.Char32RangeTest" time="0.007"/>
-  <testcase name="iterator()" classname="kleinert.soap.data.Char32RangeTest" time="0.007"/>
-  <testcase name="testEquals()" classname="kleinert.soap.data.Char32RangeTest" time="0.009"/>
-  <testcase name="isEmpty()" classname="kleinert.soap.data.Char32RangeTest" time="0.004"/>
+  <testcase name="getEndExclusive()" classname="kleinert.soap.data.Char32RangeTest" time="0.004"/>
+  <testcase name="contains()" classname="kleinert.soap.data.Char32RangeTest" time="0.002"/>
+  <testcase name="iterator()" classname="kleinert.soap.data.Char32RangeTest" time="0.004"/>
+  <testcase name="testEquals()" classname="kleinert.soap.data.Char32RangeTest" time="0.001"/>
+  <testcase name="isEmpty()" classname="kleinert.soap.data.Char32RangeTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

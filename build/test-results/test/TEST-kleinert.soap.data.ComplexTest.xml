@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.ComplexTest" tests="36" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:14" hostname="pc1" time="0.466">
+<testsuite name="kleinert.soap.data.ComplexTest" tests="36" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:06" hostname="pc1" time="0.437">
   <properties/>
-  <testcase name="valueOfString()" classname="kleinert.soap.data.ComplexTest" time="0.164"/>
-  <testcase name="valueOfStringOrNull()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="isReal()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="toFloat()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="toShort()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
-  <testcase name="testToString()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
-  <testcase name="negate()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
+  <testcase name="valueOfString()" classname="kleinert.soap.data.ComplexTest" time="0.071"/>
+  <testcase name="valueOfStringOrNull()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
+  <testcase name="isReal()" classname="kleinert.soap.data.ComplexTest" time="0.007"/>
+  <testcase name="toFloat()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
+  <testcase name="toShort()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="testToString()" classname="kleinert.soap.data.ComplexTest" time="0.001"/>
+  <testcase name="negate()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
   <testcase name="valueOfDoubleDouble()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
-  <testcase name="toByte()" classname="kleinert.soap.data.ComplexTest" time="0.006"/>
-  <testcase name="toLong()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
-  <testcase name="valueOfLongLong()" classname="kleinert.soap.data.ComplexTest" time="0.011"/>
-  <testcase name="getImag()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
-  <testcase name="getReal()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="abs()" classname="kleinert.soap.data.ComplexTest" time="0.014"/>
-  <testcase name="arg()" classname="kleinert.soap.data.ComplexTest" time="0.009"/>
-  <testcase name="chs()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
-  <testcase name="div()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
-  <testcase name="exp()" classname="kleinert.soap.data.ComplexTest" time="0.006"/>
-  <testcase name="log()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
-  <testcase name="mod()" classname="kleinert.soap.data.ComplexTest" time="0.008"/>
-  <testcase name="conj()" classname="kleinert.soap.data.ComplexTest" time="0.001"/>
-  <testcase name="plus()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="sqrt()" classname="kleinert.soap.data.ComplexTest" time="0.006"/>
-  <testcase name="minus()" classname="kleinert.soap.data.ComplexTest" time="0.007"/>
-  <testcase name="polar()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="times()" classname="kleinert.soap.data.ComplexTest" time="0.0"/>
-  <testcase name="toInt()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
-  <testcase name="unaryMinus()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
-  <testcase name="testHashCode()" classname="kleinert.soap.data.ComplexTest" time="0.001"/>
-  <testcase name="unaryPlus()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="toByte()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="toLong()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="valueOfLongLong()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="getImag()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
+  <testcase name="getReal()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
+  <testcase name="abs()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
+  <testcase name="arg()" classname="kleinert.soap.data.ComplexTest" time="0.011"/>
+  <testcase name="chs()" classname="kleinert.soap.data.ComplexTest" time="0.008"/>
+  <testcase name="div()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
+  <testcase name="exp()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
+  <testcase name="log()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
+  <testcase name="mod()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
+  <testcase name="conj()" classname="kleinert.soap.data.ComplexTest" time="0.006"/>
+  <testcase name="plus()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
+  <testcase name="sqrt()" classname="kleinert.soap.data.ComplexTest" time="0.007"/>
+  <testcase name="minus()" classname="kleinert.soap.data.ComplexTest" time="0.01"/>
+  <testcase name="polar()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="times()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="toInt()" classname="kleinert.soap.data.ComplexTest" time="0.007"/>
+  <testcase name="unaryMinus()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
+  <testcase name="testHashCode()" classname="kleinert.soap.data.ComplexTest" time="0.005"/>
+  <testcase name="unaryPlus()" classname="kleinert.soap.data.ComplexTest" time="0.006"/>
   <testcase name="testEquals()" classname="kleinert.soap.data.ComplexTest" time="0.012"/>
-  <testcase name="multInv()" classname="kleinert.soap.data.ComplexTest" time="0.011"/>
-  <testcase name="toBigDecimal()" classname="kleinert.soap.data.ComplexTest" time="0.01"/>
+  <testcase name="multInv()" classname="kleinert.soap.data.ComplexTest" time="0.001"/>
+  <testcase name="toBigDecimal()" classname="kleinert.soap.data.ComplexTest" time="0.015"/>
   <testcase name="valueOfIntInt()" classname="kleinert.soap.data.ComplexTest" time="0.001"/>
   <testcase name="toBigInteger()" classname="kleinert.soap.data.ComplexTest" time="0.003"/>
-  <testcase name="toDouble()" classname="kleinert.soap.data.ComplexTest" time="0.002"/>
+  <testcase name="toDouble()" classname="kleinert.soap.data.ComplexTest" time="0.004"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

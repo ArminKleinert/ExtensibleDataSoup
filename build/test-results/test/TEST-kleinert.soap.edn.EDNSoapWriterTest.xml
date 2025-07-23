@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNSoapWriterTest" tests="39" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:18" hostname="pc1" time="0.332">
+<testsuite name="kleinert.soap.edn.EDNSoapWriterTest" tests="39" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:08" hostname="pc1" time="0.201">
   <properties/>
-  <testcase name="encodeBigInteger()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.01"/>
-  <testcase name="encodeByteArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.008"/>
+  <testcase name="encodeBigInteger()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.006"/>
+  <testcase name="encodeByteArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.01"/>
   <testcase name="encodeDoubleArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.005"/>
-  <testcase name="encodeInstant()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.012"/>
-  <testcase name="encodeChar32()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.008"/>
-  <testcase name="encodeCustom()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.019"/>
-  <testcase name="encodeDouble()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.011"/>
-  <testcase name="encodeString()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeSymbol()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.007"/>
-  <testcase name="encodePersistentList()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.011"/>
-  <testcase name="encodeVector()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
-  <testcase name="encodeByte()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeChar()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.0"/>
-  <testcase name="encodeIObj()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.003"/>
-  <testcase name="encodeLong()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeNull()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.011"/>
-  <testcase name="encodeTrue()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.01"/>
-  <testcase name="encodeUUID()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.004"/>
+  <testcase name="encodeInstant()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.003"/>
+  <testcase name="encodeChar32()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeCustom()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.005"/>
+  <testcase name="encodeDouble()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodeString()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeSymbol()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodePersistentList()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.006"/>
+  <testcase name="encodeVector()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.006"/>
+  <testcase name="encodeByte()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeChar()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeIObj()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.009"/>
+  <testcase name="encodeLong()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.003"/>
+  <testcase name="encodeNull()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeTrue()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodeUUID()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
   <testcase name="encodeChar32AsString()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
-  <testcase name="encodeShortArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.003"/>
+  <testcase name="encodeShortArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.004"/>
   <testcase name="encodeKeyword()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeLongArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.005"/>
-  <testcase name="encodeInfinity()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.007"/>
-  <testcase name="encodeIntArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.004"/>
-  <testcase name="encodeCharSpecial()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.004"/>
-  <testcase name="encodeFloatArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.008"/>
-  <testcase name="encodeIterable()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.009"/>
-  <testcase name="encodeInt()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.003"/>
-  <testcase name="encodeMap()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.004"/>
-  <testcase name="encodeNaN()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.006"/>
-  <testcase name="encodeSet()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.017"/>
-  <testcase name="encodeSequence()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.005"/>
-  <testcase name="encodeCharCode()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeLongArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeInfinity()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodeIntArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeCharSpecial()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodeFloatArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.005"/>
+  <testcase name="encodeIterable()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeInt()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodeMap()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.003"/>
+  <testcase name="encodeNaN()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
+  <testcase name="encodeSet()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.009"/>
+  <testcase name="encodeSequence()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.008"/>
+  <testcase name="encodeCharCode()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.0"/>
+  <testcase name="encodeArray()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.004"/>
   <testcase name="encodeFalse()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeFloat()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.0"/>
-  <testcase name="encodeRatio()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.0"/>
+  <testcase name="encodeFloat()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.002"/>
+  <testcase name="encodeRatio()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
   <testcase name="encodeShort()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
-  <testcase name="encodeBigDecimal()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.0"/>
+  <testcase name="encodeBigDecimal()" classname="kleinert.soap.edn.EDNSoapWriterTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

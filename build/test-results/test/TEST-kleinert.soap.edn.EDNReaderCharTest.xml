@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderCharTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T12:20:17" hostname="pc1" time="0.042">
+<testsuite name="kleinert.soap.edn.EDNReaderCharTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:07" hostname="pc1" time="0.028">
   <properties/>
   <testcase name="parseSimpleCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.007"/>
   <testcase name="parseOctCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.002"/>
-  <testcase name="parseSymbolCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.004"/>
-  <testcase name="parseUniCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.009"/>
-  <testcase name="parseSpecialCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.005"/>
+  <testcase name="parseSymbolCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.003"/>
+  <testcase name="parseUniCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.004"/>
+  <testcase name="parseSpecialCharsTest()" classname="kleinert.soap.edn.EDNReaderCharTest" time="0.004"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
