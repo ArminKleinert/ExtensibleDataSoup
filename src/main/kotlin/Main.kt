@@ -247,7 +247,6 @@ fun testEncoder() {
 }
 
 fun main() {
-    testReader()
-    testEncoder()
-    println("\uD83D\uDE28")
+    val lst = listOf((0..99).toList(), "abc", (0..99).toList(), Keyword["kw"])
+    EDN.pprintln(lst)
 }

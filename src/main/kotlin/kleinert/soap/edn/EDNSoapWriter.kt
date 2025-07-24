@@ -59,26 +59,15 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     fun encode(obj: Any?) {
         when (obj) {
-            null -> writer.append("nil")
-            true -> writer.append("true")
-            false -> writer.append("false")
+            null -> encodeNull()
+            true -> encodeBool(true)
+            false -> encodeBool(false)
+
             is String -> encodeString(obj)
-            is Char -> encodeChar(obj)
-            is Char32 -> encodeChar32(obj)
-            is Byte, is Short, is Int, is Long, is Ratio -> encodePredefinedNumberType(obj as Number)
-            is Float -> encodeFloat(obj)
-            is Double -> encodeDouble(obj)
-            is Complex -> encodeComplex(obj)
-            is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
+            is Keyword -> if (!tryEncoder(obj)) encodeKeyword(obj)
+            is Symbol -> if (!tryEncoder(obj)) encodeSymbol(obj)
 
-            is IObj<*> -> {
-                writer.append('^')
-                encode(obj.meta)
-                writer.append(' ')
-                encode(obj.obj)
-            }
-
-            is PersistentList<*> -> if (!tryEncoder(obj)) encodePersistentList(obj)
+            is PersistentList<*> -> if (!tryEncoder(obj)) encodePersistentList(obj) // List, not vector
 
             is ByteArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
             is ShortArray -> if (!tryEncoder(obj)) encode(obj.toList()) // User-defined encoder or as vector
@@ -94,14 +83,57 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
             is Iterable<*> -> if (!tryEncoder(obj)) encodeOtherIterable(obj)
             is Sequence<*> -> if (!tryEncoder(obj)) encodeSequence(obj)
-            is UUID -> writer.append("#uuid \"").append(obj.toString()).append('"')
 
-            is Instant -> writer.append("#inst \"").append(obj.toString()).append('"')
-            is Keyword -> if (!tryEncoder(obj)) writer.append(obj.toString())
-            is Symbol -> if (!tryEncoder(obj)) writer.append(obj.toString())
+            is Char -> encodeChar(obj)
+            is Char32 -> encodeChar32(obj)
+            is Byte, is Short, is Int, is Long, is Ratio -> encodePredefinedNumberType(obj as Number)
+            is Float -> encodeFloat(obj)
+            is Double -> encodeDouble(obj)
+            is Complex -> encodeComplex(obj)
+            is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number)
+
+            is IObj<*> -> encodeIObj(obj)
+
+            is UUID -> encodeUuid(obj)
+            is Instant -> encodeInstant(obj)
+
             else -> if (!tryEncoder(obj)) writer.append(obj.toString())
         }
     }
+
+
+    private  fun encodeIObj(obj:IObj<*>):CharSequence{
+        val str = StringBuilder()
+        str.append('^')
+        encode(obj.meta)
+        str.append(' ')
+        encode(obj.obj)
+        return str
+    }
+
+    private fun encodeKeyword(obj:Keyword) {
+        writer.append(obj.toString())
+    }
+
+    private fun encodeSymbol(obj:Symbol) {
+        writer.append(obj.toString())
+    }
+
+    private fun encodeUuid(obj:UUID) {
+        writer.append("#uuid \"")
+        writer.append(obj.toString())
+        writer.append("\" ")
+    }
+
+    private fun encodeInstant(obj:Instant) {
+        writer.append("#uuid \"")
+        writer.append(obj.toString())
+        writer.append("\" ")
+    }
+
+    private fun encodeNull(){writer.append("nil")}
+
+    private fun encodeBool(b:Boolean){writer.append(if (b) "true" else "false")}
 
     private fun encodePredefinedNumberType(obj: Number) {
         when (obj) {
@@ -212,8 +244,8 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     private fun encodeSequence(obj: Sequence<*>) = obj.joinTo(
         writer,
-        separator = options.decodingSequenceSeparator,
-        limit = options.sequenceElementLimit,
+        separator = options.encodingSequenceSeparator,
+        limit = options.encoderSequenceElementLimit,
         prefix = "(",
         postfix = ")",
         transform = { encode(it);"" },
@@ -221,7 +253,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     private fun encodePersistentList(obj: PersistentList<*>) = obj.joinTo(
         writer,
-        separator = options.decodingSequenceSeparator,
+        separator = options.encodingSequenceSeparator,
         prefix = "(",
         postfix = ")",
         transform = { encode(it);"" },
@@ -229,7 +261,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     private fun encodeOtherIterable(obj: Iterable<*>) = obj.joinTo(
         writer,
-        separator = options.decodingSequenceSeparator,
+        separator = options.encodingSequenceSeparator,
         prefix = "(",
         postfix = ")",
         transform = { encode(it);"" },
@@ -237,7 +269,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     private fun encodeList(obj: List<*>) = obj.joinTo(
         writer,
-        separator = options.decodingSequenceSeparator,
+        separator = options.encodingSequenceSeparator,
         prefix = "[",
         postfix = "]",
         transform = { encode(it);"" },
@@ -245,7 +277,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     private fun encodeSet(obj: Set<*>) = obj.joinTo(
         writer,
-        separator = options.decodingSequenceSeparator,
+        separator = options.encodingSequenceSeparator,
         prefix = "#{",
         postfix = "}",
         transform = { encode(it);"" },
@@ -253,7 +285,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
     private fun encodeMap(obj: Map<*, *>) = obj.map { it }.joinTo(
         writer,
-        separator = options.decodingSequenceSeparator,
+        separator = options.encodingSequenceSeparator,
         prefix = "{",
         postfix = "}",
         transform = {

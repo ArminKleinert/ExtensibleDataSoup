@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.edn.EDNReaderDispatchTaggedUserDefTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-07-23T23:30:18" hostname="pc1" time="0.007">
-  <properties/>
-  <testcase name="parseDecoderTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedUserDefTest" time="0.003"/>
-  <testcase name="parseDecoderNameErrorTest()" classname="kleinert.soap.edn.EDNReaderDispatchTaggedUserDefTest" time="0.003"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

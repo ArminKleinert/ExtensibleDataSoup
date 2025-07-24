@@ -59,3 +59,8 @@ bin/
 
 ignore
 .idea
+build
+/ignore
+.gradle
+/build
+/.gradle
