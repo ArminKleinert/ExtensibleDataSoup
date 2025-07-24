@@ -6,6 +6,12 @@ import java.math.MathContext
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
+/**
+ * @property num
+ * @property den
+ *
+ * @author Armin Kleinert
+ */
 class Ratio private constructor(val num: Long, val den: Long) : Number(), Comparable<Number> {
     companion object {
         val ZERO: Ratio = valueOf(0, 1)
@@ -59,10 +65,13 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
 
         /**
          * Approximate rational number for a double.
+         *
+         * @param x
+         * @param epsilon
          */
-        fun estimate(xIn: Double, epsilon: Double = 1E-10): Ratio {
-            val sign = if (xIn < 0.0) -1 else 1
-            val xAbs = xIn.absoluteValue
+        fun estimate(x: Double, epsilon: Double = 1E-10): Ratio {
+            val sign = if (x < 0.0) -1 else 1
+            val xAbs = x.absoluteValue
             var leftNum = 0L
             var leftDen = 1L
             var rightNum = 1L
@@ -116,9 +125,17 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
         if (den == 0L) throw IllegalArgumentException("Ratio with 0 denominator.")
     }
 
+    /**
+     * Returns [num].
+     * @return [num].
+     */
     operator fun component1() = num
-    operator fun component2() = den
 
+    /**
+     * Returns [den].
+     * @return [den].
+     */
+    operator fun component2() = den
 
     override fun toString(): String = "$num/$den"
 
@@ -195,6 +212,12 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
         }
     }
 
+    /**
+     * Comparison with various [Number] subtypes. Works for [Byte], [Short], [Int], [Long], [Float], [Double], [BigInteger], [BigDecimal], [Ratio], and [Complex].
+     * A comparison with [Complex] numbers may through [IllegalArgumentException] if the number has an imaginary part.
+     *
+     * @throws IllegalArgumentException if the input is of an unknown type or if it is a [Complex] with an imaginary part.
+     */
     override operator fun compareTo(other: Number): Int = when (other) {
         is Byte, is Short, is Int, is Long, is Float, is Double ->
             (num.toDouble() / den.toDouble()).compareTo(other.toDouble())

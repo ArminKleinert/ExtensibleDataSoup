@@ -1,6 +1,16 @@
 package kleinert.soap.data
 
-class PackedList<T> : SimpleList<List<T>> {
+/**
+ * TODO
+ *
+ * @property size
+ * @property packedSize
+ * @property subListSize
+ * @property frozen
+ *
+ * @author Armin Kleinert
+ */
+class PackedList2D<T> : SimpleList<List<T>> {
     private var packed: MutableList<T>
 
     override val size: Int
@@ -13,6 +23,11 @@ class PackedList<T> : SimpleList<List<T>> {
 
     val frozen: Boolean
 
+    /**
+     * TODO
+     *
+     * @throws IllegalArgumentException if [m] is below 0 or if the dimensions of [packed] are not divisible by [m].
+     */
     constructor(m: Int, packed: List<T>, frozen: Boolean = true) {
         if (m < 0) throw IllegalArgumentException("Index $m is negative.")
 
@@ -26,13 +41,19 @@ class PackedList<T> : SimpleList<List<T>> {
         this.frozen = frozen
     }
 
+    /**
+     * TODO
+     *
+     * @throws IllegalArgumentException if not all sublists have the same size.
+     */
     constructor(unpacked: List<List<T>>, frozen: Boolean = true) {
         val packed = mutableListOf<T>()
         var firstSize: Int = -1
         for (l in unpacked) {
-            if (firstSize == -1) firstSize = l.size
-            require(l.size == firstSize)
-            if (l.size != firstSize) throw IllegalArgumentException("All lists must have the same size ($firstSize).")
+            if (firstSize == -1)
+                firstSize = l.size
+            if (l.size != firstSize)
+                throw IllegalArgumentException("All lists must have the same size ($firstSize).")
             packed.addAll(l)
         }
 
@@ -41,12 +62,21 @@ class PackedList<T> : SimpleList<List<T>> {
         this.frozen = frozen
     }
 
+    /**
+     * TODO
+     */
     fun unpack(): List<List<T>> =
         (0..<size).map { getUnchecked(it) }
 
+    /**
+     * TODO
+     */
     override fun getUnchecked(index: Int): List<T> =
         ArrayList(packed).subList(index * subListSize, index * subListSize + subListSize)
 
+    /**
+     * TODO
+     */
     override fun setUnchecked(index: Int, element: List<T>): List<T> {
         if (frozen)
             throw UnsupportedOperationException()
@@ -96,14 +126,23 @@ class PackedList<T> : SimpleList<List<T>> {
         return -1
     }
 
+    /**
+     * TODO
+     */
     fun flatten(): List<T> =
         packed.toList()
 
+    /**
+     * TODO
+     */
     operator fun get(i: Int, j: Int): T {
         checkBounds(i, j)
         return packed[i * subListSize + j]
     }
 
+    /**
+     * TODO
+     */
     operator fun set(i: Int, j: Int, element: T): T {
         checkBounds(i, j)
         val old = get(i, j)
@@ -111,6 +150,9 @@ class PackedList<T> : SimpleList<List<T>> {
         return old
     }
 
+    /**
+     * TODO
+     */
     private fun checkBounds(index: Int, innerIndex: Int) {
         if (isEmpty())
             throw IndexOutOfBoundsException("Index [$index, $innerIndex] is not in empty list.")

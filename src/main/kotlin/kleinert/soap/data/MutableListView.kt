@@ -1,5 +1,11 @@
 package kleinert.soap.data
 
+/**
+ * @property fromIndex
+ * @property toIndexExclusive
+ *
+ * @author Armin Kleinert
+ */
 class MutableListView<T>(val fromIndex: Int, val toIndexExclusive: Int, private val origin: MutableList<T>) :
     SimpleList<T> {
 

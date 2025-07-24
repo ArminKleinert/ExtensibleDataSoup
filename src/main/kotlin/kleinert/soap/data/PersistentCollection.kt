@@ -1,5 +1,8 @@
 package kleinert.soap.data
 
+/**
+ * @author Armin Kleinert
+ */
 class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T> {
     constructor(coll: Collection<T>) : this(if (coll is List<T>) coll.listIterator() else coll.toList().listIterator())
 
@@ -10,14 +13,33 @@ class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIte
     override fun previous(): T = inner.previous()
     override fun previousIndex(): Int = inner.previousIndex()
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun add(element: T): Unit = throw UnsupportedOperationException("Not possible on persistent iterators.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun remove() = throw UnsupportedOperationException("Not possible on persistent iterators.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun set(element: T) = throw UnsupportedOperationException("Not possible on persistent iterators.")
 }
 
 /**
- * A wrapper around a [MutableSet]
+ * A wrapper around a [MutableSet].
+ *
  * @param T The type of the elements.
+ *
+ * @property sorted
+ * @property ordered
+ *
  * @author Armin Kleinert
  */
 class PersistentSet<T> : MutableSet<T> {
@@ -46,7 +68,7 @@ class PersistentSet<T> : MutableSet<T> {
     }
 
     constructor(xs: Set<T>) {
-        this.inner = xs.minus(xs).plus(xs)
+        this.inner = xs.minus(xs).plus(xs) // Copy the set without changing its type.
         this.sorted = false
         this.ordered = false
     }
@@ -60,22 +82,63 @@ class PersistentSet<T> : MutableSet<T> {
     override val size: Int
         get() = inner.size
 
+    /**
+     * Checks whether the [inner] collection is empty.
+     */
     override fun isEmpty(): Boolean = inner.isEmpty()
-    override fun containsAll(elements: Collection<T>): Boolean = inner.containsAll(elements)
-    override fun contains(element: T): Boolean = inner.contains(element)
-    override fun iterator(): MutableIterator<T> = PersistentIterator(inner)
 
+    /**
+     * Checks whether the [inner] collection contains all elements from the input collection.
+     */
+    override fun containsAll(elements: Collection<T>): Boolean = inner.containsAll(elements)
+
+    /**
+     * Checks whether the [inner] collection contains the input.
+     */
+    override fun contains(element: T): Boolean = inner.contains(element)
+
+    /**
+     * Returns a [PersistentIterator] for this collection.
+     */
+    override fun iterator(): PersistentIterator<T> = PersistentIterator(inner)
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun add(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent sets.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun addAll(elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent sets.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun clear() = throw UnsupportedOperationException("Not possible on persistent sets.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun retainAll(elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent sets.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun removeAll(elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent sets.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun remove(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent sets.")
 
     override fun equals(other: Any?): Boolean {
@@ -91,10 +154,22 @@ class PersistentSet<T> : MutableSet<T> {
     }
 }
 
-
+/**
+ * A wrapper around a [MutableMap].
+ * @param K The type of the keys.
+ * @param V The type of the values.
+ *
+ * @property sorted
+ * @property ordered
+ *
+ * @author Armin Kleinert
+ */
 class PersistentMap<K, V> : MutableMap<K, V> {
-
     class Entry<K, V>(override val key: K, override val value: V) : MutableMap.MutableEntry<K, V> {
+        /**
+         * Throws [UnsupportedOperationException].
+         * @throws UnsupportedOperationException
+         */
         override fun setValue(newValue: V): V =
             throw UnsupportedOperationException("Not possible on persistent map entry.")
 
@@ -157,10 +232,13 @@ class PersistentMap<K, V> : MutableMap<K, V> {
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
         get() = PersistentSet(inner.entries.mapTo(mutableSetOf()) { Entry(it.key, it.value) })
+
     override val keys: MutableSet<K>
         get() = PersistentSet(inner.keys)
+
     override val size: Int
         get() = inner.size
+
     override val values: MutableCollection<V>
         get() = PersistentSet(inner.values.toSet())
 
@@ -169,9 +247,28 @@ class PersistentMap<K, V> : MutableMap<K, V> {
     override fun containsKey(key: K): Boolean = inner.containsKey(key)
     override fun isEmpty(): Boolean = inner.isEmpty()
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun clear() = throw UnsupportedOperationException("Not possible on persistent map.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun remove(key: K): V = throw UnsupportedOperationException("Not possible on persistent map.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun putAll(from: Map<out K, V>) = throw UnsupportedOperationException("Not possible on persistent map.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun put(key: K, value: V): V = throw UnsupportedOperationException("Not possible on persistent map.")
 
     override fun equals(other: Any?): Boolean {
@@ -196,6 +293,14 @@ class PersistentMap<K, V> : MutableMap<K, V> {
     }
 }
 
+/**
+ * A wrapper around a [MutableList]. This class is distinct from [PersistentVector] only in name.
+ * [kleinert.soap.edn.EDN] makes a distinction between this and [PersistentVector].
+ *
+ * @param T The type of the elements.
+ *
+ * @author Armin Kleinert
+ */
 class PersistentList<T> : MutableList<T> {
     companion object {
         fun <T> of(vararg elements: T): PersistentList<T> = PersistentList(elements.toList())
@@ -219,32 +324,77 @@ class PersistentList<T> : MutableList<T> {
     override val size: Int
         get() = inner.size
 
-    override fun clear() = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
+    override fun clear() = throw UnsupportedOperationException("Not possible on persistent list.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun addAll(elements: Collection<T>): Boolean =
-        throw UnsupportedOperationException("Not possible on persistent map.")
+        throw UnsupportedOperationException("Not possible on persistent list.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun addAll(index: Int, elements: Collection<T>): Boolean =
-        throw UnsupportedOperationException("Not possible on persistent map.")
+        throw UnsupportedOperationException("Not possible on persistent list.")
 
-    override fun add(index: Int, element: T) = throw UnsupportedOperationException("Not possible on persistent map.")
-    override fun add(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
+    override fun add(index: Int, element: T) = throw UnsupportedOperationException("Not possible on persistent list.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
+    override fun add(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent list.")
     override fun get(index: Int): T = inner[index]
     override fun isEmpty(): Boolean = inner.isEmpty()
-    override fun iterator(): MutableIterator<T> = inner.toMutableList().iterator()
-    override fun listIterator(): MutableListIterator<T> = inner.toMutableList().listIterator()
-    override fun listIterator(index: Int): MutableListIterator<T> = inner.toMutableList().listIterator(index)
-    override fun removeAt(index: Int): T = throw UnsupportedOperationException("Not possible on persistent map.")
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
-        inner.toMutableList().subList(fromIndex, toIndex)
+    override fun iterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
+    override fun listIterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
+    override fun listIterator(index: Int): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator(index))
 
-    override fun set(index: Int, element: T): T = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
+    override fun removeAt(index: Int): T = throw UnsupportedOperationException("Not possible on persistent list.")
+
+    override fun subList(fromIndex: Int, toIndex: Int): PersistentList<T> =
+        PersistentList(inner.toMutableList().subList(fromIndex, toIndex))
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
+    override fun set(index: Int, element: T): T = throw UnsupportedOperationException("Not possible on persistent list.")
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun retainAll(elements: Collection<T>): Boolean =
-        throw UnsupportedOperationException("Not possible on persistent map.")
+        throw UnsupportedOperationException("Not possible on persistent list.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun removeAll(elements: Collection<T>): Boolean =
-        throw UnsupportedOperationException("Not possible on persistent map.")
+        throw UnsupportedOperationException("Not possible on persistent list.")
 
-    override fun remove(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
+    override fun remove(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent list.")
     override fun lastIndexOf(element: T): Int = inner.lastIndexOf(element)
     override fun indexOf(element: T): Int = inner.indexOf(element)
     override fun containsAll(elements: Collection<T>): Boolean = inner.containsAll(elements)
@@ -263,6 +413,14 @@ class PersistentList<T> : MutableList<T> {
     }
 }
 
+/**
+ * A wrapper around a [MutableList]. This class is distinct from [PersistentList] only in name.
+ * [kleinert.soap.edn.EDN] makes a distinction between this and [PersistentList].
+ *
+ * @param T The type of the elements.
+ *
+ * @author Armin Kleinert
+ */
 class PersistentVector<T> : MutableList<T> {
     companion object {
         fun <T> of(vararg elements: T): PersistentVector<T> = PersistentVector(elements.toList())
@@ -288,31 +446,72 @@ class PersistentVector<T> : MutableList<T> {
     override val size: Int
         get() = inner.size
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun clear() = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun addAll(elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent map.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun addAll(index: Int, elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent map.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun add(index: Int, element: T) = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun add(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent map.")
     override fun get(index: Int): T = inner[index]
     override fun isEmpty(): Boolean = inner.isEmpty()
-    override fun iterator(): MutableIterator<T> = inner.toMutableList().iterator()
-    override fun listIterator(): MutableListIterator<T> = inner.toMutableList().listIterator()
-    override fun listIterator(index: Int): MutableListIterator<T> = inner.toMutableList().listIterator(index)
+    override fun iterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
+    override fun listIterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
+    override fun listIterator(index: Int): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator(index))
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun removeAt(index: Int): T = throw UnsupportedOperationException("Not possible on persistent map.")
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
-        inner.toMutableList().subList(fromIndex, toIndex)
 
+    override fun subList(fromIndex: Int, toIndex: Int): PersistentVector<T> =
+        PersistentVector(inner.toMutableList().subList(fromIndex, toIndex))
+
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun set(index: Int, element: T): T = throw UnsupportedOperationException("Not possible on persistent map.")
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun retainAll(elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent map.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun removeAll(elements: Collection<T>): Boolean =
         throw UnsupportedOperationException("Not possible on persistent map.")
 
+    /**
+     * Throws [UnsupportedOperationException].
+     * @throws UnsupportedOperationException
+     */
     override fun remove(element: T): Boolean = throw UnsupportedOperationException("Not possible on persistent map.")
     override fun lastIndexOf(element: T): Int = inner.lastIndexOf(element)
     override fun indexOf(element: T): Int = inner.indexOf(element)
@@ -331,53 +530,3 @@ class PersistentVector<T> : MutableList<T> {
         return inner.toString()
     }
 }
-
-//    fun defaultAdd(a: Number, b: Number): Number {
-//        return when (a) {
-//            is Double -> {
-//                when (b) {
-//                    is Double -> BigDecimal.valueOf(a) + BigDecimal.valueOf(b)
-//                    is BigDecimal -> BigDecimal.valueOf(a) + b
-//                    is Ratio -> BigDecimal.valueOf(a) + b.toBigDecimal()
-//                    is Long -> a + b
-//                    is BigInteger -> BigDecimal.valueOf(a) + BigDecimal(b)
-//                    else -> throw IllegalArgumentException()
-//                }
-//            }
-//
-//            is BigInteger -> {
-//                when (b) {
-//                    is Double -> BigDecimal(a) + BigDecimal.valueOf(b)
-//                    is BigDecimal -> BigDecimal(a) + b
-//                    is Ratio -> BigDecimal(a) + b.toBigDecimal()
-//                    is Long -> a + BigInteger.valueOf(b)
-//                    is BigInteger -> a + b
-//                    else -> throw IllegalArgumentException()
-//                }
-//            }
-//
-//            is BigDecimal -> {
-//                when (b) {
-//                    is Double -> a + BigDecimal.valueOf(b)
-//                    is BigDecimal -> a + b
-//                    is Ratio -> a + b.toBigDecimal()
-//                    is Long -> a + BigDecimal.valueOf(b)
-//                    is BigInteger -> a + BigDecimal(b)
-//                    else -> throw IllegalArgumentException()
-//                }
-//            }
-//
-//            is Ratio -> {
-//                when (b) {
-//                    is Double -> a.toBigDecimal() + BigDecimal.valueOf(b)
-//                    is BigDecimal -> a.toBigDecimal() + b
-//                    is Ratio -> a + b
-//                    is Long -> a + Ratio.of(b)
-//                    is BigInteger -> a + Ratio.of(b)
-//                    else -> throw IllegalArgumentException()
-//                }
-//            }
-//
-//            else -> 2
-//        }
-//    }

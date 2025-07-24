@@ -44,7 +44,7 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
          * Creates a new [Keyword]. Unlike [parse], this function performs no additional format checking.
          * @return A new [Keyword] from the input [Symbol].
          */
-        fun keyword(s: Symbol): Keyword {
+        private fun keyword(s: Symbol): Keyword {
             val k = Keyword(s)
             val index = definedKeywordList.size
             definedKeywords[k.toString()] = index

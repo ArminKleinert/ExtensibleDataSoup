@@ -1,13 +1,9 @@
 package kleinert.soap.edn
 
-import kleinert.soap.edn.ExtendedEDNDecoders.arrayDecoders
-import kleinert.soap.edn.ExtendedEDNDecoders.listDecoders
-import kleinert.soap.edn.ExtendedEDNDecoders.prettyDecoders
 import kleinert.soap.data.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -150,14 +146,14 @@ object ExtendedEDNDecoders {
         return arrays.toTypedArray()
     }
 
-    private fun packed2dList(it: Any?): PackedList<Any?> {
+    private fun packed2dList(it: Any?): PackedList2D<Any?> {
         require(it is List<*>)
         val lst = mutableListOf<List<Any?>>()
         for (subList in it) {
             require(subList is List<*>)
             lst.add(subList)
         }
-        return PackedList(lst)
+        return PackedList2D(lst)
     }
 
     private fun setToBitSet(it: Any?): Any {
@@ -231,8 +227,8 @@ data class EDNSoapOptions(
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
     val decodingSequenceSeparator: String = ", ",
-    val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList(it) },
-    val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector(it) },
+    val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList.wrap(it) },
+    val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector.wrap(it) },
     val setToPersistentSetConverter: (LinkedHashSet<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
     val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
     val allowComplexNumberLiterals: Boolean = false,
@@ -243,7 +239,8 @@ data class EDNSoapOptions(
         val extendedOptions: EDNSoapOptions
             get() = extendedReaderOptions(mapOf())
 
-        val allDecoders = arrayDecoders + listDecoders + prettyDecoders
+        val allDecoders = ExtendedEDNDecoders.arrayDecoders + ExtendedEDNDecoders.listDecoders +
+                ExtendedEDNDecoders.prettyDecoders + ExtendedEDNDecoders.base64Decoders
 
         val defaultOptions: EDNSoapOptions
             get() = EDNSoapOptions()

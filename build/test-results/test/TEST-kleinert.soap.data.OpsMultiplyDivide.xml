@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.OpsMultiplyDivide" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:07" hostname="pc1" time="0.091">
+<testsuite name="kleinert.soap.data.OpsMultiplyDivide" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-07-23T23:30:17" hostname="pc1" time="0.018">
   <properties/>
-  <testcase name="multiplyDivideComplexFail()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.003"/>
-  <testcase name="multiplyDivideFloat()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.004"/>
-  <testcase name="multiplyDivideRatio()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.006"/>
+  <testcase name="multiplyDivideComplexFail()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
+  <testcase name="multiplyDivideFloat()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
+  <testcase name="multiplyDivideRatio()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
   <testcase name="multiplyDivideShort()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
-  <testcase name="multiplyDivideByte()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.004"/>
-  <testcase name="multiplyDivideLong()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.002"/>
+  <testcase name="multiplyDivideByte()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
+  <testcase name="multiplyDivideLong()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.0"/>
   <testcase name="multiplyDivideInt()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
-  <testcase name="multiplyDivideComplex()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
+  <testcase name="multiplyDivideComplex()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.0"/>
   <testcase name="multiplyDivideBigInt()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
-  <testcase name="multiplyDivideDouble()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.001"/>
-  <testcase name="multiplyDivideBigDecimal()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.004"/>
+  <testcase name="multiplyDivideDouble()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.0"/>
+  <testcase name="multiplyDivideBigDecimal()" classname="kleinert.soap.data.OpsMultiplyDivide" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

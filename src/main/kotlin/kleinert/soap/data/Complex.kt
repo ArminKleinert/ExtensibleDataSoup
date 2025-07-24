@@ -180,7 +180,7 @@ class Complex private constructor(val real: Double, val imag: Double = 0.0, val 
     }
 
     fun sqrt(): Complex {
-        val r = kotlin.math.sqrt(this.mod())
+        val r = sqrt(this.mod())
         val theta = arg() / 2
         return Complex(r * cos(theta), r * sin(theta))
     }

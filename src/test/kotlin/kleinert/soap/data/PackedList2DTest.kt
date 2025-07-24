@@ -3,11 +3,11 @@ package kleinert.soap.data
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class PackedListTest {
+class PackedList2DTest {
     @Test
     fun testEmptyPacked() {
         run {
-            val lst = PackedList<Int>(0, listOf())
+            val lst = PackedList2D<Int>(0, listOf())
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(lst.isEmpty())
             Assertions.assertEquals(listOf<List<Int>>(), lst)
@@ -28,7 +28,7 @@ class PackedListTest {
     @Test
     fun testEmptyUnpacked() {
         run {
-            val lst = PackedList<Int>(listOf(listOf()))
+            val lst = PackedList2D<Int>(listOf(listOf()))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(lst.isEmpty())
             Assertions.assertEquals(listOf<List<Int>>(), lst)
@@ -49,37 +49,37 @@ class PackedListTest {
     @Test
     fun testIndexOutOfBoundsCases() {
         run {
-            val lst = PackedList<Int>(0, listOf())
+            val lst = PackedList2D<Int>(0, listOf())
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2) }
         }
         run {
-            val lst = PackedList<Int>(listOf(listOf()))
+            val lst = PackedList2D<Int>(listOf(listOf()))
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2) }
         }
         run {
-            val lst = PackedList<Int>(listOf(listOf()), frozen = false)
+            val lst = PackedList2D<Int>(listOf(listOf()), frozen = false)
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0] = listOf(1) }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 0] = 0 }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2)[0] = listOf(6) }
         }
         run {
-            val lst = PackedList(1, listOf(55))
+            val lst = PackedList2D(1, listOf(55))
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[1] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[1, 0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 1] }
         }
         run {
-            val lst = PackedList(listOf(listOf(55)))
+            val lst = PackedList2D(listOf(listOf(55)))
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[1] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[1, 0] }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 1] }
         }
         run {
-            val lst = PackedList(listOf(listOf(55)), frozen = false)
+            val lst = PackedList2D(listOf(listOf(55)), frozen = false)
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2)[0] = listOf(6) }
         }
     }
@@ -87,7 +87,7 @@ class PackedListTest {
     @Test
     fun testSingletonPacked() {
         run {
-            val lst = PackedList(1, listOf(55))
+            val lst = PackedList2D(1, listOf(55))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(55)), lst)
@@ -110,7 +110,7 @@ class PackedListTest {
     @Test
     fun testSingletonUnpacked() {
         run {
-            val lst = PackedList(listOf(listOf(55)))
+            val lst = PackedList2D(listOf(listOf(55)))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(55)), lst)
@@ -132,7 +132,7 @@ class PackedListTest {
     @Test
     fun testSimplePacked() {
         run {
-            val lst = PackedList(2, listOf(1, 2, 3, 4))
+            val lst = PackedList2D(2, listOf(1, 2, 3, 4))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(1, 2), listOf(3, 4)), lst)
@@ -153,7 +153,7 @@ class PackedListTest {
     @Test
     fun testSimpleUnpacked() {
         run {
-            val lst = PackedList(listOf(listOf(1, 2), listOf(3, 4)))
+            val lst = PackedList2D(listOf(listOf(1, 2), listOf(3, 4)))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(1, 2), listOf(3, 4)), lst)
@@ -173,7 +173,7 @@ class PackedListTest {
     @Test
     fun test3x2Packed() {
         run {
-            val lst = PackedList(3, listOf(1, 2, 3, 4, 5, 6))
+            val lst = PackedList2D(3, listOf(1, 2, 3, 4, 5, 6))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)), lst)
@@ -194,7 +194,7 @@ class PackedListTest {
     @Test
     fun test3x2Unpacked() {
         run {
-            val lst = PackedList(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)))
+            val lst = PackedList2D(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)))
             Assertions.assertTrue(lst.frozen)
             Assertions.assertTrue(!lst.isEmpty())
             Assertions.assertEquals(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)), lst)
@@ -214,14 +214,14 @@ class PackedListTest {
     @Test
     fun textFrozen() {
         run {
-            val lst = PackedList<Int>(listOf(listOf()), frozen = false)
+            val lst = PackedList2D<Int>(listOf(listOf()), frozen = false)
             Assertions.assertFalse(lst.frozen)
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0] = listOf(1) }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst[0, 0] = 0 }
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2)[0] = listOf(6) }
         }
         run {
-            val lst = PackedList(listOf(listOf(55)), frozen = false)
+            val lst = PackedList2D(listOf(listOf(55)), frozen = false)
             Assertions.assertFalse(lst.frozen)
 
             lst[0] = listOf(1)
@@ -233,7 +233,7 @@ class PackedListTest {
             Assertions.assertThrows(IndexOutOfBoundsException::class.java) { lst.subList(1, 2)[0] = listOf(6) }
         }
         run {
-            val lst = PackedList(listOf(listOf(1, 2), listOf(3, 4)), frozen = false)
+            val lst = PackedList2D(listOf(listOf(1, 2), listOf(3, 4)), frozen = false)
             Assertions.assertFalse(lst.frozen)
 
             lst[0] = listOf(3, 0)
@@ -246,7 +246,7 @@ class PackedListTest {
             Assertions.assertEquals(listOf(listOf(5, 0), listOf(6, 5)), lst)
         }
         run {
-            val lst = PackedList(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)), frozen = false)
+            val lst = PackedList2D(listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)), frozen = false)
             Assertions.assertFalse(lst.frozen)
 
             lst[0] = listOf(3, 0)

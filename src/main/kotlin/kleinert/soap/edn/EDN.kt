@@ -4,6 +4,11 @@ import java.io.File
 import java.io.InputStream
 import java.io.Reader
 
+/**
+ * TODO
+ *
+ * @author Armin Kleinert
+ */
 class EDN {
     companion object {
         val defaultOptions = EDNSoapOptions.defaultOptions
@@ -29,21 +34,39 @@ class EDN {
             return cpi1.use { cpi -> EDNSoapReader.read(cpi, options) }
         }
 
-        fun pprint(string: Any?, file: File, options: EDNSoapOptions = defaultOptions) =
-            file.writer(Charsets.UTF_8).use { pprint(string, it, options) }
+        fun pprint(obj: Any?, file: File, options: EDNSoapOptions = defaultOptions) =
+            file.writer(Charsets.UTF_8).use {
+                try {
+                    pprint(obj, it, options)
+                } catch (ex: Exception) {
+                    throw EdnWriterException(cause = ex)
+                }
+            }
 
-        fun pprint(string: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
-            if (writer == null) EDNSoapWriter.pprint(string, options, System.out.writer())
-            else EDNSoapWriter.pprint(string, options, writer)
+        fun pprint(obj: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
+            try {
+                if (writer == null) EDNSoapWriter.pprint(obj, options, System.out.writer())
+                else EDNSoapWriter.pprint(obj, options, writer)
+            } catch (ex: Exception) {
+                throw EdnWriterException(cause = ex)
+            }
         }
 
-        fun pprintln(string: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
-            if (writer == null) EDNSoapWriter.pprintln(string, options, System.out.writer())
-            else EDNSoapWriter.pprintln(string, options, writer)
+        fun pprintln(obj: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
+            try {
+                if (writer == null) EDNSoapWriter.pprintln(obj, options, System.out.writer())
+                else EDNSoapWriter.pprintln(obj, options, writer)
+            } catch (ex: Exception) {
+                throw EdnWriterException(cause = ex)
+            }
         }
 
-        fun pprintToString(string: Any?, options: EDNSoapOptions = defaultOptions): String {
-            return EDNSoapWriter.pprintToString(string, options)
+        fun pprintToString(obj: Any?, options: EDNSoapOptions = defaultOptions): String {
+            try {
+                return EDNSoapWriter.pprintToString(obj, options)
+            } catch (ex: Exception) {
+                throw EdnWriterException(cause = ex)
+            }
         }
     }
 }

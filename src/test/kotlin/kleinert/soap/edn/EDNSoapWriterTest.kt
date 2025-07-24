@@ -12,6 +12,14 @@ class EDNSoapWriterTest {
     @Test
     fun encodeNull() {
         Assertions.assertEquals("nil", EDN.pprintToString(null))
+
+        val appendable = StringBuilder()
+        EDN.pprint(null, appendable)
+        Assertions.assertEquals("nil", appendable.toString())
+
+        val appendable2 = StringBuilder()
+        EDN.pprintln(null, appendable2)
+        Assertions.assertEquals("nil\n", appendable2.toString())
     }
 
     @Test

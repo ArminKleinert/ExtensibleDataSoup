@@ -8,4 +8,4 @@ open class EdnReaderException(
         EdnReaderException(lineIndex, textIndex, text, cause)
 }
 
-class EdnWriterException(text: String) : Exception(text)
+class EdnWriterException(text: String?=null, cause: Throwable? = null,) : Exception(text,cause)

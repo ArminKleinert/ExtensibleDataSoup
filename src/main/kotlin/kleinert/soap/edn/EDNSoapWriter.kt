@@ -7,8 +7,12 @@ import java.math.BigInteger
 import java.time.Instant
 import java.util.*
 
+/**
+ * TODO
+ *
+ * @author Armin Kleinert
+ */
 class EDNSoapWriter private constructor(private val options: EDNSoapOptions, private val writer: Appendable) {
-
     companion object {
         fun pprintToString(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): String {
             val writer: StringBuilder = StringBuilder()

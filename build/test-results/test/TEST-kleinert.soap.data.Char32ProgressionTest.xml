@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="kleinert.soap.data.Char32ProgressionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2025-07-23T20:45:05" hostname="pc1" time="0.092">
+<testsuite name="kleinert.soap.data.Char32ProgressionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2025-07-23T23:30:17" hostname="pc1" time="0.048">
   <properties/>
-  <testcase name="getEndInclusive()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.007"/>
-  <testcase name="getLast()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.002"/>
-  <testcase name="getStep()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.002"/>
-  <testcase name="iterator()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.017"/>
-  <testcase name="testEquals()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.01"/>
-  <testcase name="getFirst()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.003"/>
-  <testcase name="getStart()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.002"/>
-  <testcase name="isEmpty()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.01"/>
+  <testcase name="getEndInclusive()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.023"/>
+  <testcase name="getLast()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.001"/>
+  <testcase name="getStep()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.001"/>
+  <testcase name="iterator()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.005"/>
+  <testcase name="testEquals()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.002"/>
+  <testcase name="getFirst()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.001"/>
+  <testcase name="getStart()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.001"/>
+  <testcase name="isEmpty()" classname="kleinert.soap.data.Char32ProgressionTest" time="0.003"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
