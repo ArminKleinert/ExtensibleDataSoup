@@ -243,7 +243,8 @@ data class EDNSoapOptions(
     val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
     val allowComplexNumberLiterals: Boolean = false,
     val allowUTFSymbols: Boolean = false,
-    val encoderSequenceElementLimit: Int = 10000,
+    val encoderSequenceElementLimit: Int = 1000,
+    val encoderCollectionElementLimit: Int = 10000,
     val encoderMaxColumn: Int = 80,
     val encoderLineIndent: String = "  ",
 ) {

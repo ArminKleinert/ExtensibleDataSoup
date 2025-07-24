@@ -2,82 +2,82 @@ package kleinert.soap.data
 
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 
 class PersistentMapTest {
 
     @Test
     fun getSorted() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun getOrdered() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun getEntries() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun getKeys() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun getSize() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun getValues() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun get() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun containsValue() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun containsKey() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun isEmpty() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun clear() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun remove() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun putAll() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun put() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun testEquals() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 }

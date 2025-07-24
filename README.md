@@ -36,6 +36,8 @@ An EDN library for Kotlin.
 
 ## Not implemented
 
+☐ The pretty printer isn't printing so pretty yet.
+
 ☐ `@`, `'`, `~` and backtick prefixes, `#` prefix for lists.
 
 - Why not? I don't see a use for them in this context.

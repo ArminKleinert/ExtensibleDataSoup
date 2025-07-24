@@ -2,104 +2,104 @@ package kleinert.soap.data
 
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 
 class PersistentVectorTest {
 
     @Test
     fun getSize() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun clear() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun addAll() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
 
     @Test
     fun add() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
 
     @Test
     fun get() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun isEmpty() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     operator fun iterator() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun listIterator() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun removeAt() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun subList() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun set() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun retainAll() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun removeAll() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun remove() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun lastIndexOf() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun indexOf() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun containsAll() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun contains() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 
     @Test
     fun testEquals() {
-        TODO()
+        Assertions.assertTrue(false)
     }
 }
