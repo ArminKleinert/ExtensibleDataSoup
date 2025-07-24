@@ -7,6 +7,11 @@ import java.util.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+/**
+ * TODO
+ *
+ * @author Armin Kleinert
+ */
 object ExtendedEDNDecoders {
     private fun ensureAllIntegral(iterable: Iterable<*>): Boolean {
         for (elem in iterable)
@@ -217,6 +222,11 @@ object ExtendedEDNDecoders {
         )
 }
 
+/**
+ * TODO
+ *
+ * @author Armin Kleinert
+ */
 data class EDNSoapOptions(
     val allowSchemeUTF32Codes: Boolean = false,
     val allowDispatchChars: Boolean = false,
