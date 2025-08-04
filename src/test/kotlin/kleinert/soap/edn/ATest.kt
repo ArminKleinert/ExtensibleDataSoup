@@ -27,9 +27,10 @@ class ATest {
         )
 
         data class Dice(val sides: Int)
-        val encoder: (Any)->Pair<String,Any?>? = {"dice" to listOf((it as Dice).sides) }
-        val options = EDN.defaultOptions.copy(ednClassEncoders=listOf(Dice::class.java to encoder))
-        EDN.pprintln(Dice(6), options=options)
+
+        val encoder: (Any) -> Pair<String, Any?>? = { "dice" to listOf((it as Dice).sides) }
+        val options = EDN.defaultOptions.copy(ednClassEncoders = listOf(Dice::class.java to encoder))
+        EDN.pprintln(Dice(6), options = options)
 
         EDN.pprintln((0..100))
     }

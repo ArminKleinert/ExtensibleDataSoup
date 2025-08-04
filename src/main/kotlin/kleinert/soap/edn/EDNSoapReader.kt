@@ -45,8 +45,8 @@ class EDNSoapReader private constructor(
     }
 
     private fun readString(): Any? {
-        if (!cpi.hasNext())
-            throw EdnReaderException(cpi.lineIdx, cpi.textIndex, "Empty input string.")
+//        if (!cpi.hasNext())
+//            throw EdnReaderException(cpi.lineIdx, cpi.textIndex, "Empty input string.")
 
         val data = readForm(0)
         if ((data as Collection<*>).size != 1)

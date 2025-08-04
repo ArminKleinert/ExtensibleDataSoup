@@ -16,28 +16,28 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
     companion object {
         val ZERO: Ratio = valueOf(0, 1)
 
-        fun valueOf(numeratorInput: Long, denominatorInput: Long = 1L): Ratio {
-            var numerator = numeratorInput
-            var denominator = denominatorInput
+        fun valueOf(numerator: Long, denominator: Long = 1L): Ratio {
+            var numerator1 = numerator
+            var denominator1 = denominator
 
-            if (denominator == 0L)
-                throw NumberFormatException("kleinert.soap.Ratio with 0 denominator.")
+            if (denominator1 == 0L)
+                throw IllegalArgumentException("Ratio with 0 denominator.")
 
-            if (denominator < 0L) {
+            if (denominator1 < 0L) {
                 // Convert `a/-b` to `-a/b` or `-a/-b` to `a/b`.
-                numerator = -numerator
-                denominator = -denominator
+                numerator1 = -numerator1
+                denominator1 = -denominator1
             }
 
             // reduce fraction
-            if (denominator != 1L) {
-                require(denominator > 1)
-                val g = gcd(numerator.absoluteValue, denominator)
-                numerator /= g
-                denominator /= g
+            if (denominator1 != 1L) {
+                require(denominator1 > 1)
+                val g = gcd(numerator1.absoluteValue, denominator1)
+                numerator1 /= g
+                denominator1 /= g
             }
 
-            return Ratio(numerator, denominator)
+            return Ratio(numerator1, denominator1)
         }
 
         fun valueOf(numerator: Int, denominator: Int = 1): Ratio =
@@ -59,6 +59,7 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
             return valueOf(num, den)
         }
 
+        @Throws(NumberFormatException::class)
         fun valueOf(s: String): Ratio {
             return valueOfOrNull(s) ?: throw NumberFormatException("Illegal format for rational number $s.")
         }
@@ -218,6 +219,7 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
      *
      * @throws IllegalArgumentException if the input is of an unknown type or if it is a [Complex] with an imaginary part.
      */
+    @Throws(IllegalArgumentException::class)
     override operator fun compareTo(other: Number): Int = when (other) {
         is Byte, is Short, is Int, is Long, is Float, is Double ->
             (num.toDouble() / den.toDouble()).compareTo(other.toDouble())

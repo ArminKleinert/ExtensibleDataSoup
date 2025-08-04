@@ -9,7 +9,6 @@ import java.util.function.IntConsumer
 import java.util.stream.IntStream
 import kotlin.math.min
 
-
 internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
     private var memoryIndex = -1
     private var memory: IntArray

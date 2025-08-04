@@ -266,7 +266,7 @@ class Complex private constructor(val real: Double, val imag: Double = 0.0, val 
     override fun toString(): String {
         val sb = StringBuilder()
 
-        sb.append("%+f".format(real).trimEnd('0').removeSuffix("."))
+        sb.append("%f".format(real).trimEnd('0').removeSuffix("."))
 
         sb.append("%+f".format(imag).trimEnd('0').removeSuffix("."))
         sb.append('i')

@@ -11,7 +11,6 @@ class ComplexTest {
     private val two = Complex.valueOf(2)
     private val oneAndOneI = Complex.valueOf(1, 1)
 
-
     @Test
     fun valueOfIntInt() {
         val r1 = Complex.valueOf(3, 3)
@@ -269,7 +268,7 @@ class ComplexTest {
         Assertions.assertEquals(4.0, c6.real)
         Assertions.assertEquals(4.0, c6.imag)
 
-        val c7= Complex.I * Complex.I * Complex.I
+        val c7 = Complex.I * Complex.I * Complex.I
         Assertions.assertEquals(-0.0, c7.real)
         Assertions.assertEquals(-1.0, c7.imag)
 
