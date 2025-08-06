@@ -1,7 +1,8 @@
 package kleinert.soap.data
 
 /**
- * TODO
+ * A packed abstraction for a [List] of [List]s. All sublists have the same size.
+ * Traversal, reading and setting of elements in the sublists is possible, but adding and removing elements is not.
  *
  * @property size
  * @property packedSize
@@ -15,6 +16,9 @@ class PackedList2D<T> : SimpleList<List<T>> {
 
     override val size: Int
 
+    /**
+     * Number of singular elements in the packed list.
+     */
     val packedSize: Int
         get() = packed.size
 
@@ -24,7 +28,11 @@ class PackedList2D<T> : SimpleList<List<T>> {
     val frozen: Boolean
 
     /**
-     * TODO
+     * Constructs a [PackedList2D] from a prepacked list.
+     *
+     * @param m The size of each sublist.
+     * @param packed The packed list.
+     * @param frozen If true, the [PackedList2D] will be immutable.
      *
      * @throws IllegalArgumentException if [m] is below 0 or if the dimensions of [packed] are not divisible by [m].
      */
@@ -34,7 +42,7 @@ class PackedList2D<T> : SimpleList<List<T>> {
         if (m == 0 && packed.isNotEmpty())
             throw IllegalArgumentException("With m=$m, the packed List must be empty.")
         else if (m != 0 && packed.size % m != 0)
-            throw IllegalArgumentException("Invalid size of packed list. Must be divisble by $m but is ${packed.size}.")
+            throw IllegalArgumentException("Invalid size of packed list. Must be divisible by $m (m) but is ${packed.size}.")
 
         size = m
         this.packed = packed.toMutableList()
@@ -42,7 +50,10 @@ class PackedList2D<T> : SimpleList<List<T>> {
     }
 
     /**
-     * TODO
+     * Creates a [PackedList2D] from an unpacked list.
+     *
+     * @param unpacked The input list.
+     * @param frozen If true, the result will be immutable.
      *
      * @throws IllegalArgumentException if not all sublists have the same size.
      */
@@ -63,19 +74,22 @@ class PackedList2D<T> : SimpleList<List<T>> {
     }
 
     /**
-     * TODO
+     * @return An unpacked list of the sublists of this packed list.
      */
     fun unpack(): List<List<T>> =
         (0..<size).map { getUnchecked(it) }
 
     /**
-     * TODO
+     * Get a sub-list.
      */
     override fun getUnchecked(index: Int): List<T> =
         ArrayList(packed).subList(index * subListSize, index * subListSize + subListSize)
 
     /**
-     * TODO
+     * Set a sub-list.
+     *
+     * @throws UnsupportedOperationException if the [PackedList2D] is immutable.
+     * @throws IllegalArgumentException if [element].size != [subListSize].
      */
     override fun setUnchecked(index: Int, element: List<T>): List<T> {
         if (frozen)
@@ -127,13 +141,18 @@ class PackedList2D<T> : SimpleList<List<T>> {
     }
 
     /**
-     * TODO
+     * Returns a copy of the underlying packed list.
      */
     fun flatten(): List<T> =
         packed.toList()
 
     /**
-     * TODO
+     * Get the element at index [j] in sub-list [i]. Both [i] and [j] are zero-based.
+     *
+     * @param i Index of the sub-list. Constraint: 0<=[i]<[size].
+     * @param j The index within the sub-list. Constraint: 0<=[j]<[subListSize].
+     *
+     * @throws [IndexOutOfBoundsException] if [i] or [j] is invalid.
      */
     operator fun get(i: Int, j: Int): T {
         checkBounds(i, j)
@@ -141,7 +160,13 @@ class PackedList2D<T> : SimpleList<List<T>> {
     }
 
     /**
-     * TODO
+     * Set the element at index [j] in sub-list [i]. Both [i] and [j] are zero-based.
+     *
+     * @param i Index of the sub-list. Constraint: 0<=[i]<[size].
+     * @param j The index within the sub-list. Constraint: 0<=[j]<[subListSize].
+     * @param element
+     *
+     * @throws [IndexOutOfBoundsException] if [i] or [j] is invalid.
      */
     operator fun set(i: Int, j: Int, element: T): T {
         checkBounds(i, j)
@@ -150,9 +175,6 @@ class PackedList2D<T> : SimpleList<List<T>> {
         return old
     }
 
-    /**
-     * TODO
-     */
     private fun checkBounds(index: Int, innerIndex: Int) {
         if (isEmpty())
             throw IndexOutOfBoundsException("Index [$index, $innerIndex] is not in empty list.")

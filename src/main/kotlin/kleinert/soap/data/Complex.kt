@@ -164,6 +164,9 @@ class Complex private constructor(val real: Double, val imag: Double = 0.0, val 
         return sqrt(this.real * this.real + this.imag * this.imag)
     }
 
+    /**
+     * @return An approximation of e^x where x is this number.
+     */
     fun exp(): Complex {
         return Complex(
             exp(this.real) * cos(this.imag),
@@ -171,10 +174,16 @@ class Complex private constructor(val real: Double, val imag: Double = 0.0, val 
         )
     }
 
+    /**
+     * @return The natural logarithm of this number.
+     */
     fun log(): Complex {
         return Complex(ln(this.mod()), this.arg())
     }
 
+    /**
+     * @return The `arg` of this number, which is [atan2]\([imag], [real]) for a [Complex] number a+bi.
+     */
     fun arg(): Double {
         return atan2(this.imag, this.real)
     }

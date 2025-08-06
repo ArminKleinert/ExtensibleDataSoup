@@ -16,6 +16,9 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
     companion object {
         val ZERO: Ratio = valueOf(0, 1)
 
+        /**
+         * @throws [IllegalArgumentException] if the [denominator] is zero.
+         */
         fun valueOf(numerator: Long, denominator: Long = 1L): Ratio {
             var numerator1 = numerator
             var denominator1 = denominator
@@ -140,32 +143,69 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
 
     override fun toString(): String = "$num/$den"
 
+    /**
+     * @return [num]/[den], rounded down to a Byte.
+     */
     override fun toByte(): Byte = toLong().toByte()
+    /**
+     * @return [num]/[den], rounded down to a Short.
+     */
     override fun toShort(): Short = toLong().toShort()
+    /**
+     * @return [num]/[den], rounded down to an Int.
+     */
     override fun toInt(): Int = toLong().toInt()
+    /**
+     * @return [num]/[den], rounded down to a Long.
+     */
     override fun toLong(): Long = num / den
+    /**
+     * @return [num]/[den] as a Float. Rounding errors are to be expected.
+     */
     override fun toFloat(): Float = toDouble().toFloat()
+    /**
+     * @return [num]/[den] as a Float. Rounding errors are to be expected.
+     */
     override fun toDouble(): Double = num.toDouble() / den.toDouble()
 
+    /**
+     * @return [num]/[den] as a [BigDecimal]. Rounding errors are to be expected.
+     */
     fun toBigDecimal(mc: MathContext? = MathContext.UNLIMITED): BigDecimal =
         BigDecimal(num, mc).divide(BigDecimal(den, mc))
 
+    /**
+     * @return [num]/[den], rounded down as a [BigInteger].
+     */
     fun toBigInteger(): BigInteger = BigInteger.valueOf(num).divide(BigInteger.valueOf(den))
 
     fun mediant(s: Ratio): Ratio {
         return valueOf(num + s.num, den + s.den)
     }
 
-    // return |a|
+    /**
+     * @return |[num]|
+     */
     fun abs(): Ratio = if (num >= 0) this else negate()
 
     // return (b, a)
+    /**
+     * @return [den]/[num] as a [Ratio].
+     */
     fun reciprocal() = valueOf(den, num)
 
+    /**
+     * Negates the number.
+     */
     fun negate(): Ratio = valueOf(-num, den)
+    /**
+     * Negates the number.
+     */
     operator fun unaryMinus() = negate()
 
-    // return a + b, staving off overflow
+    /**
+     * @return The sum of this number and [b], staving off overflow.
+     */
     operator fun plus(b: Ratio): Ratio {
         val a: Ratio = this
 
@@ -184,15 +224,23 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
         return valueOf(s.num * f, s.den)
     }
 
+    /**
+     * @return Subtract [b] from this number. Equivalent to adding (-[b]).
+     */
     operator fun minus(b: Ratio): Ratio =
         this.plus(b.negate())
 
+    /**
+     * @return this number multiplied with [b].
+     */
     operator fun times(b: Ratio): Ratio {
         val c = valueOf(this.num, b.den)
         val d = valueOf(b.num, this.den)
         return valueOf(c.num * d.num, c.den * d.den)
     }
-
+    /**
+     * @return this number divided by [b].
+     */
     operator fun div(b: Ratio): Ratio =
         this.times(b.reciprocal())
 

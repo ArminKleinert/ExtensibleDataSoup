@@ -15,6 +15,21 @@ object EDN {
 
     /**
      * Parse EDN from a string.
+     *
+     * Possible options:
+     *  [EDNSoapOptions.allowComplexNumberLiterals]
+     *  [EDNSoapOptions.allowDispatchChars]
+     *  [EDNSoapOptions.allowMoreEncoderDecoderNames]
+     *  [EDNSoapOptions.allowNumericSuffixes]
+     *  [EDNSoapOptions.allowSchemeUTF32Codes]
+     *  [EDNSoapOptions.allowUTFSymbols]
+     *  [EDNSoapOptions.ednClassDecoders]
+     *  [EDNSoapOptions.encoderCollectionElementLimit]
+     *  [EDNSoapOptions.listToPersistentListConverter]
+     *  [EDNSoapOptions.listToPersistentVectorConverter]
+     *  [EDNSoapOptions.mapToPersistentMapConverter]
+     *  [EDNSoapOptions.moreNumberPrefixes]
+     *  [EDNSoapOptions.setToPersistentSetConverter]
      */
     fun read(s: String, options: EDNSoapOptions = defaultOptions): Any? {
         val cpi1 = CodePointIterator(s.codePoints())
@@ -50,6 +65,26 @@ object EDN {
         }
     }
 
+    /**
+     * Encodes an object into a pretty string and writes it to some writer.
+     * For writing to a string, the user can pass a [StringBuilder] or use [pprintToString] instead.
+     * The writer is assumed to use UTF-8 encoding.
+     *
+     * Possible options:
+     *   [EDNSoapOptions.allowComplexNumberLiterals]
+     *   [EDNSoapOptions.allowDispatchChars]
+     *   [EDNSoapOptions.allowMoreEncoderDecoderNames]
+     *   [EDNSoapOptions.allowNumericSuffixes]
+     *   [EDNSoapOptions.ednClassEncoders]
+     *   [EDNSoapOptions.encoderCollectionElementLimit]
+     *   [EDNSoapOptions.encoderLineIndent]
+     *   [EDNSoapOptions.encoderMaxColumn]
+     *   [EDNSoapOptions.encoderSequenceElementLimit]
+     *   [EDNSoapOptions.encodingSequenceSeparator]
+     *   [EDNSoapOptions.moreNumberPrefixes]
+     *
+     * If [writer] is null, uses [System.out].
+     */
     fun pprint(obj: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
         try {
             if (writer == null) EDNSoapWriter.pprint(obj, options, System.out.writer())
@@ -59,6 +94,9 @@ object EDN {
         }
     }
 
+    /**
+     * Same as [pprint], but appends a linebreak.
+     */
     fun pprintln(obj: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
         try {
             if (writer == null) EDNSoapWriter.pprintln(obj, options, System.out.writer())
@@ -68,6 +106,10 @@ object EDN {
         }
     }
 
+    /**
+     * Encodes an object into a pretty string.
+     * @see pprint
+     */
     fun pprintToString(obj: Any?, options: EDNSoapOptions = defaultOptions): String {
         try {
             return EDNSoapWriter.pprintToString(obj, options)

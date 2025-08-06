@@ -223,7 +223,26 @@ object ExtendedEDNDecoders {
 }
 
 /**
- * TODO
+ * Options for [EDN.pprint] and [EDN.read].
+ *
+ * @param allowComplexNumberLiterals Allows [Complex] literals to be read. They must have the form "([+\\-]?\\d+(.\\d)?+i)|([+\\-]?\\d+(.\\d+)?[+\\-](\\d+(.\\d+)?)?i)". [Complex.toString] should be sensible enough to allow printing without this option.
+ * @param allowDispatchChars Allow reading and writing of character literals with a '#' as a prefix. The char is read as a [Char32]. For [EDN.pprint], the [Char32] is printed as a string literal without this option.
+ * @param allowMoreEncoderDecoderNames By default, the names of decoders for [EDN.read] and encoders for [EDN.pprint] must be valid [Symbol] strings with a namespace. With this option, the namespace is optional.
+ * @param allowNumericSuffixes Allow numeric suffixes to specify the number type. "_i8" means [Byte], "_i16" means [Short], "_i32" means [Int]. "_i64" and "L" specify [Long], but all numbers which aren't [BigInteger], [BigDecimal], or [Double], are considered to be [Long] by default.
+ * @param allowSchemeUTF32Codes Option for [EDN.read] only. Allow [Char32] literals of the form "\\xXXXXXXXX" where X is a hexadecimal digit.
+ * @param allowUTFSymbols For [EDN.read] only. By the EDN specification, [Symbol] names and namespaces can only contain 16-bit chars. This option allows the usage of the full unicode spectrum.
+ * @param ednClassDecoders Option for [EDN.read] only.
+ * @param ednClassEncoders For [EDN.pprint] only.
+ * @param encoderCollectionElementLimit Only for [EDN.pprint]. Print a maximum of this many elements for collections (Lists, Vectors, Maps, Sets, etc.) before truncating with "...".
+ * @param encoderLineIndent For [EDN.pprint] only.
+ * @param encoderMaxColumn For [EDN.pprint] only.
+ * @param encoderSequenceElementLimit Only for [EDN.pprint]. Print a maximum of this many elements for [Sequence]s before truncating with "...".
+ * @param encodingSequenceSeparator Only for [EDN.pprint]. Specifies the separator between elements in printed [Collection] and [Sequence] objects. The default is ", ", but " " is also a good choice.
+ * @param listToPersistentListConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [PersistentList]. This function is used when reading lists, but not vectors.
+ * @param listToPersistentVectorConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [PersistentVector]. This function is used when reading vectors, but not lists.
+ * @param mapToPersistentMapConverter Option for [EDN.read] only. By default, Maps are ordered (for example, [LinkedHashMap]). This function allows the user to convert it to another [Map] type. The default is the construction of a [PersistentMap].
+ * @param moreNumberPrefixes Option for [EDN.read] only. Allows more prefixes for integral numbers with different bases: "0o" for octal, "0b" for binary.
+ * @param setToPersistentSetConverter Option for [EDN.read] only. By default, Sets are ordered (for example, [LinkedHashSet]). The user might want unordered Sets. This options allows user-defined conversion. The default is the construction of a [PersistentSet].
  *
  * @author Armin Kleinert
  */
@@ -239,8 +258,8 @@ data class EDNSoapOptions(
     val encodingSequenceSeparator: String = ", ",
     val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList.wrap(it) },
     val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector.wrap(it) },
-    val setToPersistentSetConverter: (LinkedHashSet<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
-    val mapToPersistentMapConverter: (LinkedHashMap<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
+    val setToPersistentSetConverter: (Set<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
+    val mapToPersistentMapConverter: (Map<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
     val allowComplexNumberLiterals: Boolean = false,
     val allowUTFSymbols: Boolean = false,
     val encoderSequenceElementLimit: Int = 1000,

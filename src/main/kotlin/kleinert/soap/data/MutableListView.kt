@@ -1,12 +1,20 @@
 package kleinert.soap.data
 
 /**
- * @property fromIndex
- * @property toIndexExclusive
+ * A generalized mutable sub-list. Supports traversing, reading, and setting elements, but not removal or addition of elements.
+ * This implementation does not check for modifications on the source list.
+ *
+ * @property fromIndex Start index in the origin list, inclusive.
+ * @property toIndexExclusive End index in the origin list, exclusive.
+ * Constraint: 0 < [fromIndex] <= [toIndexExclusive]
  *
  * @author Armin Kleinert
  */
-class MutableListView<T>(val fromIndex: Int, val toIndexExclusive: Int, private val origin: MutableList<T>) :
+class MutableListView<T>(
+    private val fromIndex: Int,
+    private val toIndexExclusive: Int,
+    private val origin: MutableList<T>
+) :
     SimpleList<T> {
 
     override val size: Int = toIndexExclusive - fromIndex
@@ -32,9 +40,12 @@ class MutableListView<T>(val fromIndex: Int, val toIndexExclusive: Int, private 
         return MutableListView(fromIndex + this.fromIndex, toIndex + this.fromIndex, origin)
     }
 
-    override fun toString(): String = joinToString(", ", prefix = "[", postfix = "]")
+    override fun toString(): String =
+        joinToString(", ", prefix = "[", postfix = "]")
 
-    override fun equals(other: Any?): Boolean = commonEquals(other)
+    override fun equals(other: Any?): Boolean =
+        commonEquals(other)
+
     override fun hashCode(): Int {
         var result = fromIndex
         result = 31 * result + toIndexExclusive
