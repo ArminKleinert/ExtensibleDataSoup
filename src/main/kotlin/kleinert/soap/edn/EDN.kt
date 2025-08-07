@@ -17,19 +17,29 @@ object EDN {
      * Parse EDN from a string.
      *
      * Possible options:
-     *  [EDNSoapOptions.allowComplexNumberLiterals]
-     *  [EDNSoapOptions.allowDispatchChars]
-     *  [EDNSoapOptions.allowMoreEncoderDecoderNames]
-     *  [EDNSoapOptions.allowNumericSuffixes]
-     *  [EDNSoapOptions.allowSchemeUTF32Codes]
-     *  [EDNSoapOptions.allowUTFSymbols]
-     *  [EDNSoapOptions.ednClassDecoders]
-     *  [EDNSoapOptions.encoderCollectionElementLimit]
-     *  [EDNSoapOptions.listToPersistentListConverter]
-     *  [EDNSoapOptions.listToPersistentVectorConverter]
-     *  [EDNSoapOptions.mapToPersistentMapConverter]
-     *  [EDNSoapOptions.moreNumberPrefixes]
-     *  [EDNSoapOptions.setToPersistentSetConverter]
+     *  - [EDNSoapOptions.allowComplexNumberLiterals]
+     *  - [EDNSoapOptions.allowDispatchChars]
+     *  - [EDNSoapOptions.allowMoreEncoderDecoderNames]
+     *  - [EDNSoapOptions.allowNumericSuffixes]
+     *  - [EDNSoapOptions.allowSchemeUTF32Codes]
+     *  - [EDNSoapOptions.allowUTFSymbols]
+     *  - [EDNSoapOptions.ednClassDecoders]
+     *  - [EDNSoapOptions.encoderCollectionElementLimit]
+     *  - [EDNSoapOptions.listToPersistentListConverter]
+     *  - [EDNSoapOptions.listToPersistentVectorConverter]
+     *  - [EDNSoapOptions.mapToPersistentMapConverter]
+     *  - [EDNSoapOptions.moreNumberPrefixes]
+     *  - [EDNSoapOptions.setToPersistentSetConverter]
+     *
+     * Using tagged objects, users can define their own tagged objects.
+     * ```
+     *     val decoders = mapOf("my/range" to { elem: Any? ->
+     *         require(elem is List<*> && elem.size == 2 && elem[0] is Number && elem[1] is Number)
+     *         ((elem[0] as Number).toLong()) .. (elem[1] as Number).toLong())
+     *     })
+     *     val options = EDN.defaultOptions.copy(ednClassDecoders = decoders)
+     *     println(EDN.read("#my/range (0 9)", options)) // Returns the range 0..9
+     * ```
      */
     fun read(s: String, options: EDNSoapOptions = defaultOptions): Any? {
         val cpi1 = CodePointIterator(s.codePoints())
@@ -117,4 +127,13 @@ object EDN {
             throw EdnWriterException(cause = ex)
         }
     }
+}
+
+fun main() {
+    val decoders = mapOf("my/range" to { elem: Any? ->
+        require(elem is List<*> && elem.size == 2 && elem[0] is Number && elem[1] is Number)
+        (elem[0] as Number).toLong()..(elem[1] as Number).toLong()
+    })
+    val options = EDN.defaultOptions.copy(ednClassDecoders = decoders)
+    println(EDN.read("#my/range (0 9)", options))
 }

@@ -26,3 +26,12 @@ kotlin {
 application {
     mainClass.set("MainKt")
 }
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(buildDir.resolve("dokka"))
+    dokkaSourceSets {
+        configureEach {
+            samples.from("$projectDir/src/samples/kotlin/samples/samples.kt")
+        }
+    }
+}

@@ -231,8 +231,8 @@ object ExtendedEDNDecoders {
  * @param allowNumericSuffixes Allow numeric suffixes to specify the number type. "_i8" means [Byte], "_i16" means [Short], "_i32" means [Int]. "_i64" and "L" specify [Long], but all numbers which aren't [BigInteger], [BigDecimal], or [Double], are considered to be [Long] by default.
  * @param allowSchemeUTF32Codes Option for [EDN.read] only. Allow [Char32] literals of the form "\\xXXXXXXXX" where X is a hexadecimal digit.
  * @param allowUTFSymbols For [EDN.read] only. By the EDN specification, [Symbol] names and namespaces can only contain 16-bit chars. This option allows the usage of the full unicode spectrum.
- * @param ednClassDecoders Option for [EDN.read] only.
- * @param ednClassEncoders For [EDN.pprint] only.
+ * @param ednClassDecoders Option for [EDN.read] only. This Map contains string keys and `(Any?)->Any?` functions as values. These can be used to create more complex objects from EDN-objects. See examples at [EDN.read].
+ * @param ednClassEncoders For [EDN.pprint] only. A list of Pairs of [Class] objects and functions which convert objects into tagged EDN objects. See examples at [EDN.pprint].
  * @param encoderCollectionElementLimit Only for [EDN.pprint]. Print a maximum of this many elements for collections (Lists, Vectors, Maps, Sets, etc.) before truncating with "...".
  * @param encoderLineIndent For [EDN.pprint] only.
  * @param encoderMaxColumn For [EDN.pprint] only.
