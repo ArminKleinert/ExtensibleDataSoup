@@ -232,6 +232,7 @@ object ExtendedEDNDecoders {
  * @param mapToPersistentMapConverter Option for [EDN.read] only. By default, Maps are ordered (for example, [LinkedHashMap]). This function allows the user to convert it to another [Map] type. The default is the construction of a [PersistentMap].
  * @param moreNumberPrefixes Option for [EDN.read] only. Allows more prefixes for integral numbers with different bases: "0o" for octal, "0b" for binary.
  * @param setToPersistentSetConverter Option for [EDN.read] only. By default, Sets are ordered (for example, [LinkedHashSet]). The user might want unordered Sets. This options allows user-defined conversion. The default is the construction of a [PersistentSet].
+ * @param encoderPrettyPrint Option for [EDN.pprint]. If true, pretty printing is done. Otherwise, it is not.
  *
  * @author Armin Kleinert
  */
@@ -255,6 +256,7 @@ data class EDNSoapOptions(
     val encoderCollectionElementLimit: Int = 10000,
     val encoderMaxColumn: Int = 80,
     val encoderLineIndent: String = "  ",
+    val encoderPrettyPrint: Boolean = true,
 ) {
     companion object {
         val extendedOptions: EDNSoapOptions

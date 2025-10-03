@@ -125,23 +125,58 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
         formatCollectionTo(obj.toList(), "(", ")", writer, indent)
     }
 
+    private fun join(elements:Iterable<*>,
+                     buffer:Appendable,
+                     separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", indent:Int=0): Appendable {
+        buffer.append(prefix)
+        var count = 0
+        for (element in elements) {
+            if (++count > 1) buffer.append(separator)
+            if (limit < 0 || count <= limit) {
+                if (element is Map.Entry<*,*>) {
+                    encode(element.key, buffer, indent + 1)
+                    buffer.append(' ')
+                    encode(element.value, buffer, indent + 1)
+                }
+                else {
+                    encode(element, buffer, indent + 1)
+                }
+            } else break
+        }
+        if (limit in 0..<count) buffer.append(truncated)
+        buffer.append(postfix)
+        return buffer
+    }
+
     private fun formatCollectionTo(
         elements: List<*>, open: String, close: String, writer: Appendable, indent: Int, isMap: Boolean = false
     ) {
-        // Try inline first (dry-run)
+//        val tmp = StringBuilder()
+//        join(
+//            if (isMap) (elements as Map<*,*>).entries else elements,
+//            tmp,
+//            separator = options.encodingSequenceSeparator,
+//            prefix = open,
+//            postfix = close,
+//            limit = options.encoderCollectionElementLimit,
+//            truncated = "...",
+//            indent = indent+1,
+//        )
+
+                // Try inline first (dry-run)
         val tmp = StringBuilder()
         tmp.append(open)
         if (isMap) {
             for ((i, entry) in elements.withIndex()) {
                 val e = entry as Map.Entry<*, *>
-                encode(e.key, tmp, indent + 2)
+                encode(e.key, tmp, indent + 1)
                 tmp.append(' ')
-                encode(e.value, tmp, indent + 2)
+                encode(e.value, tmp, indent + 1)
                 if (i != elements.lastIndex) tmp.append(options.encodingSequenceSeparator)
             }
         } else {
             for ((i, e) in elements.withIndex()) {
-                encode(e, tmp, indent + 2)
+                encode(e, tmp, indent + 1)
                 if (i != elements.lastIndex) tmp.append(options.encodingSequenceSeparator)
             }
         }
@@ -154,8 +189,8 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
 
         // Multi-line formatting
         writer.append(open).append("\n")
-        val childIndent = indent + 2
-        val pad = " ".repeat(childIndent)
+        val childIndent = indent + 1
+        val pad = options.encoderLineIndent.repeat(childIndent)
         if (isMap) {
             for ((i, entry) in elements.withIndex()) {
                 val e = entry as Map.Entry<*, *>
@@ -172,7 +207,7 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
                 if (i != elements.lastIndex) writer.append(options.encodingSequenceSeparator).append("\n")
             }
         }
-        writer.append("\n").append(" ".repeat(indent)).append(close)
+        writer.append("\n").append(options.encoderLineIndent.repeat(indent)).append(close)
     }
 
     @Suppress("NOTHING_TO_INLINE")
