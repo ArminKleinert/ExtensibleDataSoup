@@ -151,16 +151,6 @@ object ExtendedEDNDecoders {
         return arrays.toTypedArray()
     }
 
-    private fun packed2dList(it: Any?): PackedList2D<Any?> {
-        require(it is List<*>)
-        val lst = mutableListOf<List<Any?>>()
-        for (subList in it) {
-            require(subList is List<*>)
-            lst.add(subList)
-        }
-        return PackedList2D(lst)
-    }
-
     private fun setToBitSet(it: Any?): Any {
         requireType<Set<*>>(it, "Set")
         require(it is Set<*>)
@@ -206,7 +196,6 @@ object ExtendedEDNDecoders {
     val listDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
             "bitset" to ExtendedEDNDecoders::setToBitSet,
-            "packed2D" to ExtendedEDNDecoders::packed2dList,
         )
 
     val prettyDecoders: Map<String, (Any?) -> Any?>
@@ -250,7 +239,7 @@ data class EDNSoapOptions(
     val allowSchemeUTF32Codes: Boolean = false,
     val allowDispatchChars: Boolean = false,
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
-    val ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(),
+    val ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String?, *>?>> = listOf(),
     val moreNumberPrefixes: Boolean = false,
     //val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,

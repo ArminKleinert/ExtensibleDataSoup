@@ -223,12 +223,24 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
         // multiply back in
         return valueOf(s.num * f, s.den)
     }
+    operator fun plus(b: Int): Ratio {
+        val s = b * den
+        return valueOf(num+s, den)
+    }
+    operator fun plus(b: Long): Ratio {
+        val s = b * den
+        return valueOf(num+s, den)
+    }
 
     /**
      * @return Subtract [b] from this number. Equivalent to adding (-[b]).
      */
     operator fun minus(b: Ratio): Ratio =
         this.plus(b.negate())
+    operator fun minus(b: Int): Ratio =
+        this.plus(-b)
+    operator fun minus(b: Long): Ratio =
+        this.plus(-b)
 
     /**
      * @return this number multiplied with [b].
@@ -237,6 +249,12 @@ class Ratio private constructor(val num: Long, val den: Long) : Number(), Compar
         val c = valueOf(this.num, b.den)
         val d = valueOf(b.num, this.den)
         return valueOf(c.num * d.num, c.den * d.den)
+    }
+    operator fun times(b: Int): Ratio {
+        return valueOf(num*b, den)
+    }
+    operator fun times(b:Long): Ratio {
+        return valueOf(num*b, den)
     }
     /**
      * @return this number divided by [b].

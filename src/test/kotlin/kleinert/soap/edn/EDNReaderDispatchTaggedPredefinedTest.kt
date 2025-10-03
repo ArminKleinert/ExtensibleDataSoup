@@ -2,7 +2,6 @@ package kleinert.soap.edn
 
 import kleinert.soap.edn.EdnReaderException.EdnClassConversionError
 import kleinert.soap.data.Keyword
-import kleinert.soap.data.PackedList2D
 import kleinert.soap.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -120,21 +119,6 @@ class EDNReaderDispatchTaggedPredefinedTest {
         Assertions.assertArrayEquals(
             arrayOf<Array<Any?>>(arrayOf(1L), arrayOf(2L, 3L), arrayOf(4L, 5L, 6L)),
             parse("#array2d [[1] [2 3] [4 5 6]]") as Array<*>
-        )
-    }
-
-    @Test
-    fun parsePackedListDecodeTest() {
-        Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#packed2D 1") }
-        Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#packed2D [a b]") }
-
-        Assertions.assertEquals(
-            PackedList2D(listOf<List<Any?>>()),
-            parse("#packed2D []")
-        )
-        Assertions.assertEquals(
-            PackedList2D(listOf(listOf(1L, 2L), listOf(3L, 4L))),
-            parse("#packed2D [[1 2] [3 4]]")
         )
     }
 }
