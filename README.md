@@ -149,7 +149,6 @@ I included some non-standard features. All of these can be turned off (see examp
 
 | Option                            | Description                                                                  | Default                  |
 |:----------------------------------|:-----------------------------------------------------------------------------|:-------------------------|
-| `allowComplexNumberLiterals`      | Allow complex number literals.                                               | `false`                  |
 | `allowSchemeUTF32Codes`           | Allow scheme UTF-32 char codes (`\\xXXXXXXXX`).                              | `false`                  |
 | `allowDispatchChars`              | Allow dispatch UTF-32chars (`#\uXXXXXXXX`).                                  | `false`                  |
 | `allowNumericSuffixes`            | Enable `_i8`, `_16`, `_i32`, `_64`, and `L` suffixes for integral numbers.   | `false`                  |
@@ -172,11 +171,6 @@ I included some non-standard features. All of these can be turned off (see examp
 - `_i16` (`Short`)
 - `_i32` (`Int`)
 - `_i64` and `L` (`Long`)
-
-☑ Complex numbers (Option: `allowComplexNumberLiterals`)
-
-- Format: `([+\-]?\d+(.\d)?+i)|([+\-]?\d+(.\d+)?[+\-](\d+(.\d+)?)?i)`
-- Eg. `1+1i`, `0i`, `1.2i`, `+0.1-0i`
 
 ☑ Scheme-style char literals. These return strings, not chars. (Option: `allowDispatchChars`)
 
