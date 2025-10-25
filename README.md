@@ -1,4 +1,4 @@
-# ExtensibleDataSoap
+# ExtensibleDataSoup
 
 An EDN library for Kotlin.
 
@@ -21,7 +21,7 @@ An EDN library for Kotlin.
 - Signed values.
 - `N` and `M` suffixes.
 - Base prefix `0` for base 8 and `0x` for base 16.
-- `kleinert.soap.Ratio` type.
+- `kleinert.edn.data.Ratio` type.
 
 ☑ Symbolic values `##NaN`, `##INF` and `##-INF`  
 ☑ Built-in tagged elements `#uuid` and `#inst`  
@@ -45,7 +45,7 @@ An EDN library for Kotlin.
 ## Examples
 
 ```kotlin
-import kleinert.soap.edn.EDN
+import kleinert.edn.data.EDN
 
 println(EDN.read("symbol")) // Symbol without namespace
 println(EDN.read("namespace/symbol")) // Symbol
@@ -77,16 +77,16 @@ println(EDN.read("^:a abc")) // Meta
 ```
 
 ```kotlin
-import kleinert.soap.data.Keyword
-import kleinert.soap.data.Char32
-import kleinert.soap.data.PersistentList
-import kleinert.soap.data.PersistentVector
-import kleinert.soap.data.PersistentSet
-import kleinert.soap.data.PersistentMap
-import kleinert.soap.data.IObj
-import kleinert.soap.data.Ratio
-import kleinert.soap.data.Symbol
-import kleinert.soap.edn.EDN
+import kleinert.edn.data.Keyword
+import kleinert.edn.data.Char32
+import kleinert.edn.data.PersistentList
+import kleinert.edn.data.PersistentVector
+import kleinert.edn.data.PersistentSet
+import kleinert.edn.data.PersistentMap
+import kleinert.edn.data.IObj
+import kleinert.edn.data.Ratio
+import kleinert.edn.data.Symbol
+import kleinert.edn.edn.EDN
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
