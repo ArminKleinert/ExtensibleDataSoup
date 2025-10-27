@@ -8,10 +8,6 @@ import java.math.BigInteger
 import java.time.Instant
 import java.util.*
 
-fun main() {
-
-}
-
 class EDNSoapWriter private constructor(private val options: EDNSoapOptions, private val writer: Appendable) {
     companion object {
         fun pprintToString(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): String {
