@@ -1,12 +1,10 @@
 package kleinert.edn.reader
 
 import kleinert.edn.EDN
-import kleinert.edn.EDNSoapOptions
+import kleinert.edn.EDNSoupOptions
 import kleinert.edn.ExtendedEDNDecoders
 import kleinert.edn.data.Keyword
-import kleinert.edn.data.PersistentList
 import kleinert.edn.data.Symbol
-import kleinert.edn.reader.EdnReaderException
 import kleinert.edn.reader.EdnReaderException.EdnClassConversionError
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -16,7 +14,7 @@ class EDNReaderDispatchTaggedPredefinedTest {
     private fun parse(s: String) =
         EDN.read(
             s,
-            EDNSoapOptions.defaultOptions.copy(
+            EDNSoupOptions.defaultOptions.copy(
                 allowMoreEncoderDecoderNames = true,
                 ednClassDecoders = ExtendedEDNDecoders.arrayDecoders + ExtendedEDNDecoders.listDecoders + ExtendedEDNDecoders.prettyDecoders
             )

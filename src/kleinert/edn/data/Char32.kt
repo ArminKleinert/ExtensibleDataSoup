@@ -211,7 +211,6 @@ internal constructor
             override fun hasNext(): Boolean = hasNext
 
             override fun nextChar32(): Char32 {
-                IntProgression
                 val value = next
                 if (value == finalElement) {
                     if (!hasNext) throw NoSuchElementException()

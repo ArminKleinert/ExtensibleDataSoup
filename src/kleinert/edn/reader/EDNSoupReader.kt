@@ -1,8 +1,7 @@
 package kleinert.edn.reader
 
-import kleinert.edn.EDNSoapOptions
+import kleinert.edn.EDNSoupOptions
 import kleinert.edn.data.*
-import kleinert.edn.reader.CodePointIterator
 import java.time.Instant
 import java.time.format.DateTimeParseException
 import java.util.*
@@ -13,15 +12,15 @@ import kotlin.collections.LinkedHashMap
  *
  * @author Armin Kleinert
  */
-class EDNSoapReader private constructor(
-    private val options: EDNSoapOptions = EDNSoapOptions.extendedOptions, private val cpi: CodePointIterator
+class EDNSoupReader private constructor(
+    private val options: EDNSoupOptions = EDNSoupOptions.extendedOptions, private val cpi: CodePointIterator
 ) {
     companion object {
         private val NOTHING = object {}
 
         @Throws(EdnReaderException::class)
-        internal fun read(cpi: CodePointIterator, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): Any? =
-            EDNSoapReader(options, cpi).readString()
+        internal fun read(cpi: CodePointIterator, options: EDNSoupOptions = EDNSoupOptions.defaultOptions): Any? =
+            EDNSoupReader(options, cpi).readString()
     }
 
     init {

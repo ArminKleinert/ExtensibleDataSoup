@@ -13,22 +13,6 @@ class PersistentListTest {
         Assertions.assertEquals(5, PersistentList.of(1, 2, 3, 4, 5).size)
     }
 
-    @Test
-    fun clear() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of(1).clear() }
-    }
-
-    @Test
-    fun addAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of(1).addAll(listOf(2, 3)) }
-    }
-
-
-    @Test
-    fun add() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of(1).add(2) }
-    }
-
 
     @Test
     fun get() {
@@ -57,46 +41,8 @@ class PersistentListTest {
     }
 
     @Test
-    fun removeAt() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of<Int>().removeAt(0) }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of(1, 2, 3).removeAt(1) }
-    }
-
-    @Test
     fun subList() {
         Assertions.assertEquals(listOf(2, 3), PersistentList.of(1, 2, 3).subList(1, 3))
-    }
-
-    @Test
-    fun set() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of<Int>().set(0, 5) }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of(1, 2, 3).set(1, 9) }
-    }
-
-    @Test
-    fun retainAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentList.of<Int>().retainAll(listOf())
-        }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentList.of(1, 2, 3).retainAll(listOf())
-        }
-    }
-
-    @Test
-    fun removeAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentList.of<Int>().removeAll(listOf())
-        }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentList.of(1, 2, 3).removeAll(listOf())
-        }
-    }
-
-    @Test
-    fun remove() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of<Int>().remove(1) }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentList.of(1, 2, 3).remove(1) }
     }
 
     @Test

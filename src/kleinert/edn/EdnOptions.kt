@@ -1,7 +1,7 @@
 package kleinert.edn
 
 import kleinert.edn.data.*
-import kleinert.edn.pprint.EDNSoapWriter
+import kleinert.edn.pprint.EDNSoupWriter
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -200,7 +200,7 @@ object ExtendedEDNDecoders {
 
     val prettyDecoders: Map<String, (Any?) -> Any?>
         get() = mapOf(
-            "pretty" to { EDNSoapWriter.pprintToString(it) },
+            "pretty" to { EDNSoupWriter.pprintToString(it) },
         )
 
     val base64Decoders: Map<String, (Any?) -> Any?>
@@ -235,7 +235,7 @@ object ExtendedEDNDecoders {
  *
  * @author Armin Kleinert
  */
-data class EDNSoapOptions(
+data class EDNSoupOptions(
     val allowSchemeUTF32Codes: Boolean = false,
     val allowDispatchChars: Boolean = false,
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
@@ -249,7 +249,6 @@ data class EDNSoapOptions(
     val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector.wrap(it) },
     val setToPersistentSetConverter: (Set<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
     val mapToPersistentMapConverter: (Map<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
-    val allowComplexNumberLiterals: Boolean = false,
     val allowUTFSymbols: Boolean = false,
     val encoderSequenceElementLimit: Int = 1000,
     val encoderCollectionElementLimit: Int = 10000,
@@ -258,17 +257,17 @@ data class EDNSoapOptions(
     val encoderPrettyPrint: Boolean = true,
 ) {
     companion object {
-        val extendedOptions: EDNSoapOptions
+        val extendedOptions: EDNSoupOptions
             get() = extendedReaderOptions(mapOf())
 
         val allDecoders = ExtendedEDNDecoders.arrayDecoders + ExtendedEDNDecoders.listDecoders +
                 ExtendedEDNDecoders.prettyDecoders + ExtendedEDNDecoders.base64Decoders
 
-        val defaultOptions: EDNSoapOptions
-            get() = EDNSoapOptions()
+        val defaultOptions: EDNSoupOptions
+            get() = EDNSoupOptions()
 
         private fun extendedReaderOptions(ednClassDecoder: Map<String, (Any?) -> Any?>) =
-            EDNSoapOptions(
+            EDNSoupOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,
                 moreNumberPrefixes = true,
@@ -281,7 +280,7 @@ data class EDNSoapOptions(
             )
 
         private fun extendedWriterOptions(ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>>) =
-            EDNSoapOptions(
+            EDNSoupOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,
                 moreNumberPrefixes = true,

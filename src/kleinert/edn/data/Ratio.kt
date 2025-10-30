@@ -231,7 +231,7 @@ data class Ratio (val num: Long, val den: Long) : Number(), Comparable<Ratio> {
         this.plus(-b)
 
     /**
-     * @return this number multiplied with [b].
+     * @return This number multiplied with [b].
      */
     operator fun times(b: Ratio): Ratio {
         val c = valueOf(this.num, b.den)
@@ -245,10 +245,18 @@ data class Ratio (val num: Long, val den: Long) : Number(), Comparable<Ratio> {
         return valueOf(num*b, den)
     }
     /**
-     * @return this number divided by [b].
+     * @return This number divided by [b].
      */
     operator fun div(b: Ratio): Ratio =
         this.times(b.reciprocal())
+
+    /**
+     * @return An inclusive range between this and [other].
+     */
+    operator fun rangeTo(other:Ratio) = object : ClosedRange<Ratio> {
+        override val start: Ratio = this@Ratio
+        override val endInclusive: Ratio = other
+    }
 
     /**
      * Comparison with various [Number] subtypes. Works for [Byte], [Short], [Int], [Long], [Float], [Double], [BigInteger], [BigDecimal], and [Ratio].
@@ -261,4 +269,6 @@ data class Ratio (val num: Long, val den: Long) : Number(), Comparable<Ratio> {
         if (lhs < rhs) return -1
          if (lhs > rhs) return +1
         return 0}
+
+
 }

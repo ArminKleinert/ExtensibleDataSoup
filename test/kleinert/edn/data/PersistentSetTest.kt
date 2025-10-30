@@ -60,47 +60,6 @@ class PersistentSetTest {
     }
 
     @Test
-    fun add() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentSet.of(1).add(2) }
-    }
-
-    @Test
-    fun addAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentSet.of(1).addAll(listOf(2, 3)) }
-    }
-
-    @Test
-    fun clear() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentSet.of(1).clear() }
-    }
-
-    @Test
-    fun retainAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentSet.of<Int>().retainAll(listOf())
-        }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentSet.of(1, 2, 3).retainAll(listOf())
-        }
-    }
-
-    @Test
-    fun removeAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentSet.of<Int>().removeAll(listOf())
-        }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentSet.of(1, 2, 3).removeAll(listOf())
-        }
-    }
-
-    @Test
-    fun remove() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentSet.of<Int>().remove(1) }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentSet.of(1, 2, 3).remove(1) }
-    }
-
-    @Test
     fun testEquals() {
         val pset = PersistentSet.of(1, 2, 3)
         Assertions.assertTrue(pset.equals(pset))

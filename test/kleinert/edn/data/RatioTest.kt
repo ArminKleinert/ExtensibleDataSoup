@@ -317,23 +317,47 @@ class RatioTest {
         run {
             val ratio = Ratio.valueOf(3, 2)
             Assertions.assertEquals(Ratio.valueOf(3, 2), ratio)
-            Assertions.assertNotEquals(ratio, 1.toByte())
-            Assertions.assertNotEquals(ratio, 1.toShort())
-            Assertions.assertNotEquals(ratio, 1)
-            Assertions.assertNotEquals(ratio, 1L)
-            Assertions.assertNotEquals(ratio, BigInteger.ONE)
         }
         run {
             val ratio = Ratio.valueOf(-3, 2)
             Assertions.assertEquals(Ratio.valueOf(-3, 2), ratio)
-            Assertions.assertNotEquals(ratio, (-1).toByte())
-            Assertions.assertNotEquals(ratio, (-1).toShort())
-            Assertions.assertNotEquals(ratio, -1)
-            Assertions.assertNotEquals(ratio, -1L)
-            Assertions.assertNotEquals(ratio, BigInteger.ONE.negate())
-            Assertions.assertNotEquals(ratio, (-1.5).toFloat())
-            Assertions.assertNotEquals(ratio, -1.5)
-            Assertions.assertNotEquals(ratio, BigDecimal.valueOf(1.5).negate())
+        }
+    }
+
+    @Test
+    fun rangeTo() {
+        run {
+            val range = Ratio(0,1) .. Ratio(9,1)
+            Assertions.assertTrue { Ratio(-1,Long.MAX_VALUE) !in range }
+            Assertions.assertTrue { Ratio(-1,1) !in range }
+            Assertions.assertTrue { zero in range }
+            Assertions.assertTrue { one in range }
+            Assertions.assertTrue { oneAndHalf in range }
+            Assertions.assertTrue { Ratio(9,1) in range }
+            Assertions.assertTrue { Ratio(18,2) in range }
+            Assertions.assertTrue { Ratio(10,1) !in range }
+        }
+        run {
+            val range = Ratio(0,1) .. Ratio(0,1)
+            Assertions.assertTrue { Ratio(-1,Long.MAX_VALUE) !in range }
+            Assertions.assertTrue { Ratio(-1,1) !in range }
+            Assertions.assertTrue { zero in range }
+            Assertions.assertTrue { one !in range }
+            Assertions.assertTrue { oneAndHalf !in range }
+            Assertions.assertTrue { Ratio(9,1) !in range }
+            Assertions.assertTrue { Ratio(18,2) !in range }
+            Assertions.assertTrue { Ratio(10,1) !in range }
+        }
+        run {
+            val range = Ratio(0,1) .. Ratio(-1,1)
+            Assertions.assertTrue { Ratio(-1,Long.MAX_VALUE) !in range }
+            Assertions.assertTrue { Ratio(-1,1) !in range }
+            Assertions.assertTrue { zero !in range }
+            Assertions.assertTrue { one !in range }
+            Assertions.assertTrue { oneAndHalf !in range }
+            Assertions.assertTrue { Ratio(9,1) !in range }
+            Assertions.assertTrue { Ratio(18,2) !in range }
+            Assertions.assertTrue { Ratio(10,1) !in range }
         }
     }
 }

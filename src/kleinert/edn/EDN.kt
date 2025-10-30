@@ -1,9 +1,9 @@
 package kleinert.edn
 
-import kleinert.edn.pprint.EDNSoapWriter
+import kleinert.edn.pprint.EDNSoupWriter
 import kleinert.edn.pprint.EdnWriterException
 import kleinert.edn.reader.CodePointIterator
-import kleinert.edn.reader.EDNSoapReader
+import kleinert.edn.reader.EDNSoupReader
 import java.io.File
 import java.io.InputStream
 import java.io.Reader
@@ -14,26 +14,25 @@ import java.io.Reader
  * @author Armin Kleinert
  */
 object EDN {
-    val defaultOptions = EDNSoapOptions.defaultOptions
-    val extendedOptions = EDNSoapOptions.extendedOptions
+    val defaultOptions = EDNSoupOptions.defaultOptions
+    val extendedOptions = EDNSoupOptions.extendedOptions
 
     /**
      * Parse EDN from a string.
      *
      * Possible options:
-     *  - [EDNSoapOptions.allowComplexNumberLiterals]
-     *  - [EDNSoapOptions.allowDispatchChars]
-     *  - [EDNSoapOptions.allowMoreEncoderDecoderNames]
-     *  - [EDNSoapOptions.allowNumericSuffixes]
-     *  - [EDNSoapOptions.allowSchemeUTF32Codes]
-     *  - [EDNSoapOptions.allowUTFSymbols]
-     *  - [EDNSoapOptions.ednClassDecoders]
-     *  - [EDNSoapOptions.encoderCollectionElementLimit]
-     *  - [EDNSoapOptions.listToPersistentListConverter]
-     *  - [EDNSoapOptions.listToPersistentVectorConverter]
-     *  - [EDNSoapOptions.mapToPersistentMapConverter]
-     *  - [EDNSoapOptions.moreNumberPrefixes]
-     *  - [EDNSoapOptions.setToPersistentSetConverter]
+     *  - [EDNSoupOptions.allowDispatchChars]
+     *  - [EDNSoupOptions.allowMoreEncoderDecoderNames]
+     *  - [EDNSoupOptions.allowNumericSuffixes]
+     *  - [EDNSoupOptions.allowSchemeUTF32Codes]
+     *  - [EDNSoupOptions.allowUTFSymbols]
+     *  - [EDNSoupOptions.ednClassDecoders]
+     *  - [EDNSoupOptions.encoderCollectionElementLimit]
+     *  - [EDNSoupOptions.listToPersistentListConverter]
+     *  - [EDNSoupOptions.listToPersistentVectorConverter]
+     *  - [EDNSoupOptions.mapToPersistentMapConverter]
+     *  - [EDNSoupOptions.moreNumberPrefixes]
+     *  - [EDNSoupOptions.setToPersistentSetConverter]
      *
      * Using tagged objects, users can define their own tagged objects.
      * ```
@@ -45,31 +44,31 @@ object EDN {
      *     println(EDN.read("#my/range (0 9)", options)) // Returns the range 0..9
      * ```
      */
-    fun read(s: String, options: EDNSoapOptions = defaultOptions): Any? {
+    fun read(s: String, options: EDNSoupOptions = defaultOptions): Any? {
         val cpi1 = CodePointIterator(s.codePoints())
-        return cpi1.use { cpi -> EDNSoapReader.read(cpi, options) }
+        return cpi1.use { cpi -> EDNSoupReader.read(cpi, options) }
     }
 
     /**
      * Parse EDN from a [File]. The file is assumed to exist and be a non-directory.
      */
-    fun read(file: File, options: EDNSoapOptions = defaultOptions): Any? {
+    fun read(file: File, options: EDNSoupOptions = defaultOptions): Any? {
         val cpi1 = CodePointIterator(file.reader(Charsets.UTF_8))
-        return cpi1.use { cpi -> EDNSoapReader.read(cpi, options) }
+        return cpi1.use { cpi -> EDNSoupReader.read(cpi, options) }
     }
 
 
-    fun read(reader: InputStream, options: EDNSoapOptions = defaultOptions): Any? {
+    fun read(reader: InputStream, options: EDNSoupOptions = defaultOptions): Any? {
         val cpi = CodePointIterator(reader)
-        return EDNSoapReader.read(cpi, options)
+        return EDNSoupReader.read(cpi, options)
     }
 
-    fun read(reader: Reader, options: EDNSoapOptions = defaultOptions): Any? {
+    fun read(reader: Reader, options: EDNSoupOptions = defaultOptions): Any? {
         val cpi = CodePointIterator(reader)
-        return EDNSoapReader.read(cpi, options)
+        return EDNSoupReader.read(cpi, options)
     }
 
-    fun pprint(obj: Any?, file: File, options: EDNSoapOptions = defaultOptions) {
+    fun pprint(obj: Any?, file: File, options: EDNSoupOptions = defaultOptions) {
         return file.writer(Charsets.UTF_8).use {
             try {
                 pprint(obj, it, options)
@@ -85,24 +84,23 @@ object EDN {
      * The writer is assumed to use UTF-8 encoding.
      *
      * Possible options:
-     *   [EDNSoapOptions.allowComplexNumberLiterals]
-     *   [EDNSoapOptions.allowDispatchChars]
-     *   [EDNSoapOptions.allowMoreEncoderDecoderNames]
-     *   [EDNSoapOptions.allowNumericSuffixes]
-     *   [EDNSoapOptions.ednClassEncoders]
-     *   [EDNSoapOptions.encoderCollectionElementLimit]
-     *   [EDNSoapOptions.encoderLineIndent]
-     *   [EDNSoapOptions.encoderMaxColumn]
-     *   [EDNSoapOptions.encoderSequenceElementLimit]
-     *   [EDNSoapOptions.encodingSequenceSeparator]
-     *   [EDNSoapOptions.moreNumberPrefixes]
+     *   [EDNSoupOptions.allowDispatchChars]
+     *   [EDNSoupOptions.allowMoreEncoderDecoderNames]
+     *   [EDNSoupOptions.allowNumericSuffixes]
+     *   [EDNSoupOptions.ednClassEncoders]
+     *   [EDNSoupOptions.encoderCollectionElementLimit]
+     *   [EDNSoupOptions.encoderLineIndent]
+     *   [EDNSoupOptions.encoderMaxColumn]
+     *   [EDNSoupOptions.encoderSequenceElementLimit]
+     *   [EDNSoupOptions.encodingSequenceSeparator]
+     *   [EDNSoupOptions.moreNumberPrefixes]
      *
      * If [writer] is null, uses [System.out].
      */
-    fun pprint(obj: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
+    fun pprint(obj: Any?, writer: Appendable? = null, options: EDNSoupOptions = defaultOptions) {
         try {
-            if (writer == null) EDNSoapWriter.pprint(obj, options, System.out.writer())
-            else EDNSoapWriter.pprint(obj, options, writer)
+            if (writer == null) EDNSoupWriter.pprint(obj, options, System.out.writer())
+            else EDNSoupWriter.pprint(obj, options, writer)
         } catch (ex: Exception) {
             throw EdnWriterException(cause = ex)
         }
@@ -111,10 +109,10 @@ object EDN {
     /**
      * Same as [pprint], but appends a linebreak.
      */
-    fun pprintln(obj: Any?, writer: Appendable? = null, options: EDNSoapOptions = defaultOptions) {
+    fun pprintln(obj: Any?, writer: Appendable? = null, options: EDNSoupOptions = defaultOptions) {
         try {
-            if (writer == null) EDNSoapWriter.pprintln(obj, options, System.out.writer())
-            else EDNSoapWriter.pprintln(obj, options, writer)
+            if (writer == null) EDNSoupWriter.pprintln(obj, options, System.out.writer())
+            else EDNSoupWriter.pprintln(obj, options, writer)
         } catch (ex: Exception) {
             throw EdnWriterException(cause = ex)
         }
@@ -124,9 +122,9 @@ object EDN {
      * Encodes an object into a pretty string.
      * @see pprint
      */
-    fun pprintToString(obj: Any?, options: EDNSoapOptions = defaultOptions): String {
+    fun pprintToString(obj: Any?, options: EDNSoupOptions = defaultOptions): String {
         try {
-            return EDNSoapWriter.pprintToString(obj, options)
+            return EDNSoupWriter.pprintToString(obj, options)
         } catch (ex: Exception) {
             throw EdnWriterException(cause = ex)
         }

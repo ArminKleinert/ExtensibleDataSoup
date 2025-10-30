@@ -1,6 +1,6 @@
 package kleinert.edn.pprint
 
-import kleinert.edn.EDNSoapOptions
+import kleinert.edn.EDNSoupOptions
 import kleinert.edn.data.*
 import java.io.Flushable
 import java.math.BigDecimal
@@ -8,29 +8,29 @@ import java.math.BigInteger
 import java.time.Instant
 import java.util.*
 
-class EDNSoapWriter private constructor(private val options: EDNSoapOptions, private val writer: Appendable) {
+class EDNSoupWriter private constructor(private val options: EDNSoupOptions, private val writer: Appendable) {
     companion object {
-        fun pprintToString(obj: Any?, options: EDNSoapOptions = EDNSoapOptions.defaultOptions): String {
+        fun pprintToString(obj: Any?, options: EDNSoupOptions = EDNSoupOptions.defaultOptions): String {
             val writer: StringBuilder = StringBuilder()
-            EDNSoapWriter(options, writer).encode(obj, writer)
+            EDNSoupWriter(options, writer).encode(obj, writer)
             return writer.toString()
         }
 
         fun pprint(
             obj: Any?,
-            options: EDNSoapOptions = EDNSoapOptions.defaultOptions,
+            options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
             writer: Appendable = System.out.writer()
         ) {
-            EDNSoapWriter(options, writer).encode(obj, writer)
+            EDNSoupWriter(options, writer).encode(obj, writer)
             if (writer is Flushable) writer.flush()
         }
 
         fun pprintln(
             obj: Any?,
-            options: EDNSoapOptions = EDNSoapOptions.defaultOptions,
+            options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
             writer: Appendable = System.out.writer()
         ) {
-            EDNSoapWriter(options, writer).encode(obj, writer)
+            EDNSoupWriter(options, writer).encode(obj, writer)
             writer.append('\n')
             if (writer is Flushable) writer.flush()
         }
@@ -125,44 +125,32 @@ class EDNSoapWriter private constructor(private val options: EDNSoapOptions, pri
         formatCollectionTo(obj.toList(), "(", ")", writer, indent)
     }
 
-    private fun join(elements:Iterable<*>,
-                     buffer:Appendable,
-                     separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", indent:Int=0): Appendable {
-        buffer.append(prefix)
-        var count = 0
-        for (element in elements) {
-            if (++count > 1) buffer.append(separator)
-            if (limit < 0 || count <= limit) {
-                if (element is Map.Entry<*,*>) {
-                    encode(element.key, buffer, indent + 1)
-                    buffer.append(' ')
-                    encode(element.value, buffer, indent + 1)
-                }
-                else {
-                    encode(element, buffer, indent + 1)
-                }
-            } else break
-        }
-        if (limit in 0..<count) buffer.append(truncated)
-        buffer.append(postfix)
-        return buffer
-    }
+//    private fun join(elements:Iterable<*>,
+//                     buffer:Appendable,
+//                     separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", indent:Int=0): Appendable {
+//        buffer.append(prefix)
+//        var count = 0
+//        for (element in elements) {
+//            if (++count > 1) buffer.append(separator)
+//            if (limit < 0 || count <= limit) {
+//                if (element is Map.Entry<*,*>) {
+//                    encode(element.key, buffer, indent + 1)
+//                    buffer.append(' ')
+//                    encode(element.value, buffer, indent + 1)
+//                }
+//                else {
+//                    encode(element, buffer, indent + 1)
+//                }
+//            } else break
+//        }
+//        if (limit in 0..<count) buffer.append(truncated)
+//        buffer.append(postfix)
+//        return buffer
+//    }
 
     private fun formatCollectionTo(
         elements: List<*>, open: String, close: String, writer: Appendable, indent: Int, isMap: Boolean = false
     ) {
-//        val tmp = StringBuilder()
-//        join(
-//            if (isMap) (elements as Map<*,*>).entries else elements,
-//            tmp,
-//            separator = options.encodingSequenceSeparator,
-//            prefix = open,
-//            postfix = close,
-//            limit = options.encoderCollectionElementLimit,
-//            truncated = "...",
-//            indent = indent+1,
-//        )
-
                 // Try inline first (dry-run)
         val tmp = StringBuilder()
         tmp.append(open)

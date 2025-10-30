@@ -1,4 +1,4 @@
-# ExtensibleDataSoup
+# Extensible Data Soup
 
 An EDN library for Kotlin.
 
@@ -45,7 +45,7 @@ An EDN library for Kotlin.
 ## Examples
 
 ```kotlin
-import kleinert.edn.data.EDN
+import kleinert.edn.EDN
 
 println(EDN.read("symbol")) // Symbol without namespace
 println(EDN.read("namespace/symbol")) // Symbol

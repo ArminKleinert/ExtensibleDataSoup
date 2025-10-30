@@ -77,38 +77,6 @@ class PersistentMapTest {
     }
 
     @Test
-    fun clear() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) { PersistentMap.of(1 to 2, 3 to 4).clear() }
-    }
-
-    @Test
-    fun remove() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentMap.of(1 to 2, 3 to 4).remove(1)
-        }
-    }
-
-    @Test
-    fun putAll() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentMap.of(1 to 2, 3 to 4).putAll(listOf(1 to 5))
-        }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentMap.of(1 to 2, 3 to 4).putAll(mapOf(1 to 5))
-        }
-    }
-
-    @Test
-    fun put() {
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentMap.of(1 to 2, 3 to 4).put(1, 5)
-        }
-        Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            PersistentMap.of(1 to 2, 3 to 4).put(-1, 5)
-        }
-    }
-
-    @Test
     fun testEquals() {
         val pmap = PersistentMap.of(1 to 2, 3 to 4)
         Assertions.assertTrue(pmap.equals(pmap))
