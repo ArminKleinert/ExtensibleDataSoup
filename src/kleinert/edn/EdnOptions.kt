@@ -250,6 +250,8 @@ data class EDNSoupOptions(
     val setToPersistentSetConverter: (Set<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
     val mapToPersistentMapConverter: (Map<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
     val allowUTFSymbols: Boolean = false,
+    val allowDefinitionsAndReferences: Boolean = false,
+    val dispatchMacros: Map<String, (Any?)->Any?> = mapOf(),
     val encoderSequenceElementLimit: Int = 1000,
     val encoderCollectionElementLimit: Int = 10000,
     val encoderMaxColumn: Int = 80,

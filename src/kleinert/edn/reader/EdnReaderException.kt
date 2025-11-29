@@ -6,4 +6,6 @@ open class EdnReaderException(
 ) : Exception(text, cause) {
     class EdnClassConversionError(lineIndex: Int, textIndex: Int, text: String? = null, cause: Throwable? = null) :
         EdnReaderException(lineIndex, textIndex, text, cause)
+    class EdnMacroException(lineIndex: Int, textIndex: Int, text: String? = null, cause: Throwable? = null) :
+        EdnReaderException(lineIndex, textIndex, text, cause)
 }

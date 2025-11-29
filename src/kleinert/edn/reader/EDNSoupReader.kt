@@ -13,14 +13,18 @@ import kotlin.collections.LinkedHashMap
  * @author Armin Kleinert
  */
 class EDNSoupReader private constructor(
-    private val options: EDNSoupOptions = EDNSoupOptions.extendedOptions, private val cpi: CodePointIterator
+    private val options: EDNSoupOptions = EDNSoupOptions.extendedOptions, private val cpi: CodePointIterator,
+    private val references: MutableMap<Symbol, Any?>,
 ) {
     companion object {
         private val NOTHING = object {}
 
         @Throws(EdnReaderException::class)
-        internal fun read(cpi: CodePointIterator, options: EDNSoupOptions = EDNSoupOptions.defaultOptions): Any? =
-            EDNSoupReader(options, cpi).readString()
+        internal fun read(
+            cpi: CodePointIterator, options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
+            references: MutableMap<Symbol, Any?> = mutableMapOf()
+        ): Any? =
+            EDNSoupReader(options, cpi, references).readString()
     }
 
     init {
@@ -32,6 +36,11 @@ class EDNSoupReader private constructor(
      */
     private fun ensureValidDecoderNames() {
         for (key in options.ednClassDecoders.keys) {
+            if (key in options.dispatchMacros)
+                throw EdnReaderException(
+                    cpi.lineIdx, cpi.textIndex,
+                    "Decoder $key is already defined as a macro."
+                )
             val name = Symbol.parse(key)
             if (name == null) {
                 val message = "Decoder name \"$key\" is not a valid symbol."
@@ -39,6 +48,10 @@ class EDNSoupReader private constructor(
             }
             if (!options.allowMoreEncoderDecoderNames && name.namespace == null) {
                 val message = "Decoder without namespace: $name"
+                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
+            }
+            if (key == "inst" || key == "uuid" || key == "def" || key == "ref") {
+                val message = "Decoder name $name is not allowed."
                 throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
             }
         }
@@ -201,7 +214,7 @@ class EDNSoupReader private constructor(
         return options.listToPersistentListConverter(temp)
     }
 
-    private fun readVector(level: Int, separator: Int, doConvert: Boolean = true): List<*> =
+    private fun readVector(level: Int, separator: Int = ']'.code, doConvert: Boolean = true): List<*> =
         buildList {
             val linePos = cpi.lineIdx
             do {
@@ -389,12 +402,21 @@ class EDNSoupReader private constructor(
                     throw EdnReaderException(linePos, codePosIndex, msg)
                 }
                 return Instant.parse(form)
+            } else if (options.allowDefinitionsAndReferences && (token == "def" || token == "ref")) {
+                return readDefOrRef(token, form)
+            } else if (token in options.dispatchMacros) {
+                val macro = options.dispatchMacros[token]
+                if (macro != null) try {
+                    return macro(form)
+                } catch (ex: IllegalArgumentException) {
+                    throw EdnReaderException.EdnMacroException(linePos, codePosIndex, cause = ex)
+                }
             } else {
                 val decoder = options.ednClassDecoders[token]
                 if (decoder != null) return decoder(form)
             }
         } catch (ex: EdnReaderException.EdnClassConversionError) {
-            throw EdnReaderException.EdnClassConversionError(linePos, codePosIndex, ex.message ?: "", ex.cause)
+            throw ex
         } catch (ex: IllegalArgumentException) {
             // For UUID.fromString
             throw EdnReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex)
@@ -432,6 +454,42 @@ class EDNSoupReader private constructor(
         }
     }
 
+    private fun readDefOrRef(token: CharSequence, form: Any?): Any? {
+        if (token == "def") {
+            if (form !is List<*> || form.size != 2 || form[0] !is Symbol)
+                throw EdnReaderException(
+                    cpi.lineIdx, cpi.textIndex,
+                    "#$token requires a pair (vector or list) of form [Symbol, anything] as its argument, but got $form"
+                )
+
+            val name = form[0] as Symbol
+            val binding = form[1]
+            if (name in references)
+                throw EdnReaderException(
+                    cpi.lineIdx,
+                    cpi.textIndex,
+                    "#$name is already assigned to ${references[name]}"
+                )
+
+            references[name] = binding
+            return NOTHING
+        }
+
+        if (token == "ref") {
+            if (form !is Symbol) throw EdnReaderException(
+                cpi.lineIdx, cpi.textIndex,
+                "#$token requires a symbol for the reference, but got $form of type ${form?.javaClass}"
+            )
+            if (!references.containsKey(form)) throw EdnReaderException(
+                cpi.lineIdx, cpi.textIndex,
+                "#$token: $form not found in the lookup. (lookup contains ${references.keys})"
+            )
+            return references[form]
+        }
+
+        throw EdnReaderException(cpi.lineIdx, cpi.textIndex, "Unsupported reference macro: $token")
+    }
+
     private fun readForm(level: Int, stopAfterOne: Boolean = false): Any? {
         val res = mutableListOf<Any?>()
         var linePos: Int = cpi.lineIdx
@@ -453,8 +511,8 @@ class EDNSoupReader private constructor(
 
                 '"'.code -> res.add(readEdnString())
                 '('.code -> res.add(readList(level + 1))
-                '['.code -> res.add(readVector(level + 1, ']'.code))
-                '{'.code -> res.add(readMap(level + 1, '}'.code))
+                '['.code -> res.add(readVector(level + 1))
+                '{'.code -> res.add(readMap(level + 1))
                 '\\'.code -> res.add(readChar())
                 '#'.code -> {
                     if (cpi.hasNext() && cpi.peek() == '_'.code) {
@@ -499,15 +557,18 @@ class EDNSoupReader private constructor(
                 }
             }
 
+            res.remove(NOTHING)
+
             if (stopAfterOne && res.isNotEmpty()) {
                 return res[0]
             }
         } while (true)
 
-        if (res.size != 1)
+        if (res.size != 1) {
             throw EdnReaderException(
                 linePos, codePosIndex, "Reader requires exactly one expression, but got ${res.size}."
             )
+        }
 
         return res
     }

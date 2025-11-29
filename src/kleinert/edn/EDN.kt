@@ -1,5 +1,6 @@
 package kleinert.edn
 
+import kleinert.edn.data.Symbol
 import kleinert.edn.pprint.EDNSoupWriter
 import kleinert.edn.pprint.EdnWriterException
 import kleinert.edn.reader.CodePointIterator
@@ -44,28 +45,34 @@ object EDN {
      *     println(EDN.read("#my/range (0 9)", options)) // Returns the range 0..9
      * ```
      */
-    fun read(s: String, options: EDNSoupOptions = defaultOptions): Any? {
-        val cpi1 = CodePointIterator(s.codePoints())
-        return cpi1.use { cpi -> EDNSoupReader.read(cpi, options) }
+    fun read(
+        s: String, options: EDNSoupOptions = defaultOptions,
+        references: MutableMap<Symbol, Any?> = mutableMapOf(),
+    ): Any? {
+        val cpi = CodePointIterator(s.codePoints())
+        return EDNSoupReader.read(cpi, options, references)
     }
 
     /**
      * Parse EDN from a [File]. The file is assumed to exist and be a non-directory.
      */
-    fun read(file: File, options: EDNSoupOptions = defaultOptions): Any? {
-        val cpi1 = CodePointIterator(file.reader(Charsets.UTF_8))
-        return cpi1.use { cpi -> EDNSoupReader.read(cpi, options) }
+    fun read(file: File, options: EDNSoupOptions = defaultOptions,
+             references: MutableMap<Symbol, Any?> = mutableMapOf(),): Any? {
+        val cpi = CodePointIterator(file.reader(Charsets.UTF_8))
+        return  EDNSoupReader.read(cpi, options, references)
     }
 
 
-    fun read(reader: InputStream, options: EDNSoupOptions = defaultOptions): Any? {
+    fun read(reader: InputStream, options: EDNSoupOptions = defaultOptions,
+             references: MutableMap<Symbol, Any?> = mutableMapOf(),): Any? {
         val cpi = CodePointIterator(reader)
-        return EDNSoupReader.read(cpi, options)
+        return EDNSoupReader.read(cpi, options, references)
     }
 
-    fun read(reader: Reader, options: EDNSoupOptions = defaultOptions): Any? {
+    fun read(reader: Reader, options: EDNSoupOptions = defaultOptions,
+             references: MutableMap<Symbol, Any?> = mutableMapOf(),): Any? {
         val cpi = CodePointIterator(reader)
-        return EDNSoupReader.read(cpi, options)
+        return EDNSoupReader.read(cpi, options, references)
     }
 
     fun pprint(obj: Any?, file: File, options: EDNSoupOptions = defaultOptions) {
