@@ -34,6 +34,7 @@ object EDNReaderPredefMacros {
                 is Float -> it.toLong()
                 else -> throw IllegalArgumentException()
             }
+            res
         } else {
             args
         }
