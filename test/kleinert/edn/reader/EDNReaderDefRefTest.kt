@@ -87,6 +87,7 @@ class EDNReaderDefRefTest {
         Assertions.assertThrows(EdnReaderException::class.java) { parse("#ref A") }
         Assertions.assertThrows(EdnReaderException::class.java) { parse("#def [A 11] #ref B") }
     }
+
     @Test
     fun parseIllegalRefTest() {
         Assertions.assertThrows(EdnReaderException::class.java) { parse("#ref") }
@@ -114,7 +115,7 @@ class EDNReaderDefRefTest {
     @Test
     fun parseRefUsesReferencesOutsideTest() {
         val options = EDNSoupOptions.defaultOptions.copy(allowDefinitionsAndReferences = true)
-        val value = listOf(1,2,3)
+        val value = listOf(1, 2, 3)
         val refs = mutableMapOf<Symbol, Any?>(Symbol["A"] to value)
 
         Assertions.assertTrue(value === EDN.read("#ref A", options, references = refs))
@@ -171,6 +172,5 @@ class EDNReaderDefRefTest {
         Assertions.assertEquals(22L, refs[Symbol["A"]])
         Assertions.assertEquals(33L, refs[Symbol["B"]])
         Assertions.assertEquals(44L, refs[Symbol["C"]])
-
     }
 }

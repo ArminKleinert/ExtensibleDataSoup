@@ -12,12 +12,20 @@ class EDNReaderRatioTest {
             Assertions.assertTrue(it is Ratio)
             Assertions.assertEquals(Ratio.ZERO, it)
         }
+        EDN.read("+0/1").let {
+            Assertions.assertTrue(it is Ratio)
+            Assertions.assertEquals(Ratio.ZERO, it)
+        }
         EDN.read("-0/1").let {
             Assertions.assertTrue(it is Ratio)
             Assertions.assertEquals(Ratio.ZERO, it)
         }
 
         EDN.read("1/1").let {
+            Assertions.assertTrue(it is Ratio)
+            Assertions.assertEquals(Ratio.valueOf(1), it)
+        }
+        EDN.read("+1/1").let {
             Assertions.assertTrue(it is Ratio)
             Assertions.assertEquals(Ratio.valueOf(1), it)
         }
@@ -45,6 +53,10 @@ class EDNReaderRatioTest {
         }
 
         EDN.read("123456789/2567").let {
+            Assertions.assertTrue(it is Ratio)
+            Assertions.assertEquals(Ratio.valueOf(123456789, 2567), it)
+        }
+        EDN.read("+123456789/2567").let {
             Assertions.assertTrue(it is Ratio)
             Assertions.assertEquals(Ratio.valueOf(123456789, 2567), it)
         }

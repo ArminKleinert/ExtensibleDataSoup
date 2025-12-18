@@ -126,6 +126,18 @@ class EDNReaderNumberFloatyTest {
             Assertions.assertTrue(it is Double)
             Assertions.assertEquals(50.0, it)
         }
+        EDN.read("+5e+0").let {
+            Assertions.assertTrue(it is Double)
+            Assertions.assertEquals(5.0, it)
+        }
+        EDN.read("+5e-0").let {
+            Assertions.assertTrue(it is Double)
+            Assertions.assertEquals(5.0, it)
+        }
+        EDN.read("+5e+1").let {
+            Assertions.assertTrue(it is Double)
+            Assertions.assertEquals(50.0, it)
+        }
         EDN.read("5e-1").let {
             Assertions.assertTrue(it is Double)
             Assertions.assertEquals(0.5, it)

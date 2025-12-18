@@ -5,7 +5,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 object EDNReaderPredefMacros {
-    fun macroMergeMaps(args: Any?) = when (args) {
+    fun macroMergeMaps(args: Any?): Any? = when (args) {
         is Map<*, *> -> args
         is Iterable<*> -> {
             val res = mutableMapOf<Any?, Any?>()
@@ -19,7 +19,7 @@ object EDNReaderPredefMacros {
         else -> throw IllegalArgumentException()
     }
 
-    fun macroPlusLong(args: Any?) =
+    fun macroPlusLong(args: Any?): Any? =
         if (args is Iterable<*>) {
             var res = 0L
             for (it in args) res += when (it) {
