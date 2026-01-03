@@ -36,11 +36,6 @@ class EDNSoupReader private constructor(
      */
     private fun ensureValidDecoderNames() {
         for (key in options.ednClassDecoders.keys) {
-            if (key in options.dispatchMacros)
-                throw EdnReaderException(
-                    cpi.lineIdx, cpi.textIndex,
-                    "Decoder $key is already defined as a macro."
-                )
             val name = Symbol.parse(key)
             if (name == null) {
                 val message = "Decoder name \"$key\" is not a valid symbol."
@@ -404,13 +399,6 @@ class EDNSoupReader private constructor(
                 return Instant.parse(form)
             } else if (options.allowDefinitionsAndReferences && (token == "def" || token == "ref")) {
                 return readDefOrRef(token, form)
-            } else if (token in options.dispatchMacros) {
-                val macro = options.dispatchMacros[token]
-                if (macro != null) try {
-                    return macro(form)
-                } catch (ex: IllegalArgumentException) {
-                    throw EdnReaderException.EdnMacroException(linePos, codePosIndex, cause = ex)
-                }
             } else {
                 val decoder = options.ednClassDecoders[token]
                 if (decoder != null) return decoder(form)
