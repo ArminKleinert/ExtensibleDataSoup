@@ -8,11 +8,11 @@ import java.math.BigInteger
 import java.time.Instant
 import java.util.*
 
-class EDNSoupWriter private constructor(private val options: EDNSoupOptions, private val writer: Appendable) {
+class EDNSoupWriter private constructor(private val options: EDNSoupOptions) {
     companion object {
         fun pprintToString(obj: Any?, options: EDNSoupOptions = EDNSoupOptions.defaultOptions): String {
             val writer: StringBuilder = StringBuilder()
-            EDNSoupWriter(options, writer).encode(obj, writer)
+            EDNSoupWriter(options).encode(obj, writer)
             return writer.toString()
         }
 
@@ -21,7 +21,7 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
             options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
             writer: Appendable = System.out.writer()
         ) {
-            EDNSoupWriter(options, writer).encode(obj, writer)
+            EDNSoupWriter(options).encode(obj, writer)
             if (writer is Flushable) writer.flush()
         }
 
@@ -30,13 +30,20 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
             options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
             writer: Appendable = System.out.writer()
         ) {
-            EDNSoupWriter(options, writer).encode(obj, writer)
+            EDNSoupWriter(options).encode(obj, writer)
             writer.append('\n')
             if (writer is Flushable) writer.flush()
         }
     }
 
+    fun appendIfPrettyEnabled(writer: Appendable, cs: CharSequence): Appendable {
+        if (options.encoderPrettyPrint) writer.append(cs)
+        return writer
+    }
+
     private fun tryEncoder(obj: Any, writer: Appendable, indent: Int): Any? {
+        val indent =
+            if (options.encoderPrettyPrint) indent else 0
         var encoder: ((Any) -> Pair<String?, Any?>?)? = null
         for ((jClass, enc) in options.ednClassEncoders) {
             if (jClass.isInstance(obj)) {
@@ -57,6 +64,8 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
         writer: Appendable,
         indent: Int = 0
     ) {
+        val indent =
+            if (options.encoderPrettyPrint) indent else 0
         when (obj) {
             null -> writer.append(encodeNull())
             true -> writer.append(encodeBool(true))
@@ -151,7 +160,9 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
     private fun formatCollectionTo(
         elements: List<*>, open: String, close: String, writer: Appendable, indent: Int, isMap: Boolean = false
     ) {
-                // Try inline first (dry-run)
+        val indent =
+            if (options.encoderPrettyPrint) indent else 0
+        // Try inline first (dry-run)
         val tmp = StringBuilder()
         tmp.append(open)
         if (isMap) {
@@ -176,26 +187,34 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
         }
 
         // Multi-line formatting
-        writer.append(open).append("\n")
+        writer.append(open)
+        appendIfPrettyEnabled(writer, "\n")
         val childIndent = indent + 1
         val pad = options.encoderLineIndent.repeat(childIndent)
         if (isMap) {
             for ((i, entry) in elements.withIndex()) {
                 val e = entry as Map.Entry<*, *>
-                writer.append(pad)
+                appendIfPrettyEnabled(writer, pad)
                 encode(e.key, writer, childIndent)
                 writer.append(' ')
                 encode(e.value, writer, childIndent)
-                if (i != elements.lastIndex) writer.append(options.encodingSequenceSeparator).append("\n")
+                if (i != elements.lastIndex) {
+                    writer.append(options.encodingSequenceSeparator)
+                    appendIfPrettyEnabled(writer, "\n")
+                }
             }
         } else {
             for ((i, e) in elements.withIndex()) {
-                writer.append(pad)
+                appendIfPrettyEnabled(writer, pad)
                 encode(e, writer, childIndent)
-                if (i != elements.lastIndex) writer.append(options.encodingSequenceSeparator).append("\n")
+                if (i != elements.lastIndex) {
+                    writer.append(options.encodingSequenceSeparator)
+                    appendIfPrettyEnabled(writer, "\n")
+                }
             }
         }
-        writer.append("\n").append(options.encoderLineIndent.repeat(indent)).append(close)
+        appendIfPrettyEnabled(writer, "\n")
+        appendIfPrettyEnabled(writer, options.encoderLineIndent.repeat(indent)).append(close)
     }
 
     @Suppress("NOTHING_TO_INLINE")
@@ -207,7 +226,6 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
 
     @Suppress("NOTHING_TO_INLINE")
     private inline fun encodeBool(b: Boolean): CharSequence = if (b) "true" else "false"
-
 
     private fun encodeString(obj: String): CharSequence {
         val writer = StringBuilder()
@@ -226,7 +244,6 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
         writer.append('"')
         return writer
     }
-
 
     private fun encodeIObj(obj: IObj<*>, writer: Appendable, indent: Int) {
         writer.append('^')
@@ -283,7 +300,7 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions, pri
             'l'.code, 'm'.code, 'n'.code, 'o'.code, 'p'.code, 'q'.code, 'r'.code, 's'.code, 't'.code, 'u'.code, 'v'.code,
             'w'.code, 'x'.code, 'y'.code, 'z'.code,
             '|'.code, '~'.code, '§'.code, '°'.code, '´'.code, '€'.code
-            -> "#\\$obj"
+                -> "#\\$obj"
 
             '\n'.code -> "#\\newline"
             ' '.code -> "#\\space"
