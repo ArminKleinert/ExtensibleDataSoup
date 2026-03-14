@@ -100,27 +100,29 @@ class EDNSoupReader private constructor(
             val first = token[startIndex]
             if (first == '0' && token.length - startIndex > 1) {
                 startIndex += 2
+                val errorTxt = EdnReaderException(linePos, codePosIndex, "Invalid number prefix in number $token.")
                 base = when (token[startIndex - 1]) {
-                    'x' -> 16
-                    'o' -> if (options.moreNumberPrefixes) 8 else throw EdnReaderException(
-                        linePos, codePosIndex, "Invalid number prefix in number $token."
-                    )
-
-                    'b' -> if (options.moreNumberPrefixes) 2 else throw EdnReaderException(
-                        linePos, codePosIndex, "Invalid number prefix in number $token."
-                    )
-
+                    'x' -> if (options.moreNumberPrefixes) 16 else throw errorTxt
+                    'o' -> if (options.moreNumberPrefixes) 8 else throw errorTxt
+                    'b' -> if (options.moreNumberPrefixes) 2 else throw errorTxt
                     else -> {
                         startIndex -= 2 // Reset start index
-                        8
+                        base
                     }
                 }
+            }
+
+            if (!options.allowZeroPrefix && tokenLen > startIndex + 1 && token[startIndex] == '0' && token[startIndex + 1] in '0'..'9') {
+                throw EdnReaderException(
+                    linePos, codePosIndex,
+                    "Invalid number format: $token (numbers other than 0 can not start with a 0)"
+                )
             }
         } else if (floatyRegex.matches(token)) {
             startIndex = 0
             if (token.endsWith('M')) return token.substring(startIndex, tokenLen - 1).toBigDecimal()
             return sign * (token.toDouble())
-        } else if (ratioRegex.matches(token)) {
+        } else if (options.allowRatios && ratioRegex.matches(token)) {
             return Ratio.valueOf(token)
         } else {
             throw EdnReaderException(linePos, codePosIndex, "Invalid number format: $token")
@@ -206,7 +208,7 @@ class EDNSoupReader private constructor(
 
     private fun readList(level: Int): List<Any?> {
         val temp = readVector(level, ')'.code, false)
-        return options.listToPersistentListConverter(temp)
+        return options.listToEdnListConverter(temp)
     }
 
     private fun readVector(level: Int, separator: Int = ']'.code, doConvert: Boolean = true): List<*> =
@@ -231,7 +233,7 @@ class EDNSoupReader private constructor(
                 if (elem != NOTHING) add(elem)
             } while (true)
         }.toList().let {
-            if (doConvert) options.listToPersistentVectorConverter(it) else it
+            if (doConvert) options.listToEdnVectorConverter(it) else it
         }
 
     private fun readMap(level: Int, separator: Int = '}'.code): Map<*, *> {
@@ -253,13 +255,13 @@ class EDNSoupReader private constructor(
             result[key] = value
             i++
         } while (true)
-        return options.mapToPersistentMapConverter(result)
+        return options.mapToEdnMapConverter(lst.chunked(2, {(k, v) -> Pair(k, v)}))
     }
 
     private fun readSet(level: Int, separator: Int = '}'.code): Set<*> {
         val linePos = cpi.lineIdx
         val codePosIndex = cpi.textIndex
-        val result = LinkedHashSet<Any?>()
+        val result = HashSet<Any?>()
         val lst = readVector(level, separator)
         var i = 0
         do {
@@ -271,7 +273,7 @@ class EDNSoupReader private constructor(
             result.add(key)
             i++
         } while (true)
-        return options.setToPersistentSetConverter(result)
+        return options.setToEdnSetConverter(lst)
     }
 
     private fun readChar(): Char {
@@ -509,7 +511,7 @@ class EDNSoupReader private constructor(
                             val temp = readForm(level + 1, true)
                         } while (temp == NOTHING)
                         if (stopAfterOne) return NOTHING
-                    } else if (cpi.hasNext() && cpi.peek() == '^'.code) {
+                    } else if (cpi.hasNext() && options.allowMetadata && cpi.peek() == '^'.code) {
                         cpi.nextInt()
                         res.add(readMeta(level))
                     } else {
@@ -536,7 +538,12 @@ class EDNSoupReader private constructor(
                 }
 
                 '^'.code -> {
-                    res.add(readMeta(level))
+                    if (options.allowMetadata) {
+                        res.add(readMeta(level))
+                    }else{
+                        cpi.unread(codePoint)
+                        res.add(readOther())
+                    }
                 }
 
                 else -> {
@@ -564,9 +571,13 @@ class EDNSoupReader private constructor(
     private fun readMeta(level: Int): IObj<Any?> {
         val linePos = cpi.lineIdx
         val codePosIndex = cpi.textIndex
+
+        if (!options.allowMetadata)
+            throw EdnReaderException(linePos, codePosIndex, "Metadata is turned off.")
+
         val meta = when (val m = readForm(level, true)) {
-            is String, is Symbol -> PersistentMap(mapOf(Keyword["tag"] to m))
-            is Keyword -> PersistentMap(mapOf(m to true))
+            is String, is Symbol -> EdnMap(mapOf(Keyword["tag"] to m))
+            is Keyword -> EdnMap(mapOf(m to true))
             !is Map<*, *> -> throw EdnReaderException(
                 linePos, codePosIndex, "Metadata must be Symbol,Keyword,String or Map"
             )

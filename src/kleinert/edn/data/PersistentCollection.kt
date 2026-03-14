@@ -3,7 +3,7 @@ package kleinert.edn.data
 /**
  * @author Armin Kleinert
  */
-class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T> {
+private class EdnIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T> {
     constructor(coll: Collection<T>) : this(if (coll is List<T>) coll.listIterator() else coll.toList().listIterator())
 
     override fun hasNext(): Boolean = inner.hasNext()
@@ -42,41 +42,25 @@ class PersistentIterator<T>(private val inner: ListIterator<T>) : MutableListIte
  *
  * @author Armin Kleinert
  */
-class PersistentSet<T> : Set<T> {
+class EdnSet<T> : Set<T> {
     companion object {
-        fun <T> of(vararg elements: T): PersistentSet<T> =
-            PersistentSet(LinkedHashSet(elements.toList()), ordered = true)
-
-        fun <T> wrap(xs: Set<T>, ordered: Boolean = false, sorted: Boolean = false): PersistentSet<T> =
-            PersistentSet(xs, ordered = ordered, sorted = sorted)
+        fun <T> of(vararg elements: T): EdnSet<T> = EdnSet(LinkedHashSet(elements.toList()))
+        fun <T> wrap(xs: Set<T>): EdnSet<T> = EdnSet(xs)
+        fun <T> wrap(xs: List<T>): EdnSet<T> = EdnSet(xs)
     }
 
     private val inner: Set<T>
-    val sorted: Boolean
-    val ordered: Boolean
 
     constructor(xs: List<T>) {
         this.inner = LinkedHashSet(xs)
-        this.sorted = false
-        this.ordered = true
     }
 
     constructor(xs: Collection<T>) {
         this.inner = LinkedHashSet(xs)
-        this.sorted = false
-        this.ordered = true
     }
 
     constructor(xs: Set<T>) {
         this.inner = xs.minus(xs).plus(xs) // Copy the set without changing its type.
-        this.sorted = false
-        this.ordered = false
-    }
-
-    private constructor(xs: Set<T>, ordered: Boolean = false, sorted: Boolean = false) {
-        this.inner = xs
-        this.sorted = sorted
-        this.ordered = ordered
     }
 
     override val size: Int
@@ -98,9 +82,9 @@ class PersistentSet<T> : Set<T> {
     override fun contains(element: T): Boolean = inner.contains(element)
 
     /**
-     * Returns a [PersistentIterator] for this collection.
+     * Returns a [EdnIterator] for this collection.
      */
-    override fun iterator(): PersistentIterator<T> = PersistentIterator(inner)
+    override fun iterator(): Iterator<T> = EdnIterator(inner)
 
     override fun equals(other: Any?): Boolean {
         return inner == other
@@ -125,7 +109,7 @@ class PersistentSet<T> : Set<T> {
  *
  * @author Armin Kleinert
  */
-class PersistentMap<K, V> : Map<K, V> {
+class EdnMap<K, V> : Map<K, V> {
     class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V> {
         override fun toString(): String {
             return "[$key=$value]"
@@ -145,56 +129,40 @@ class PersistentMap<K, V> : Map<K, V> {
     }
 
     private val inner: Map<K, V>
-    val sorted: Boolean
-    val ordered: Boolean
 
     companion object {
-        fun <K, V> of(vararg entries: Pair<K, V>): PersistentMap<K, V> =
-            PersistentMap(entries.toList())
-
-        fun <K, V> wrap(xs: Map<K, V>, ordered: Boolean = false, sorted: Boolean = false): PersistentMap<K, V> =
-            PersistentMap(xs, ordered = ordered, sorted = sorted)
+        fun <K, V> of(vararg entries: Pair<K, V>): EdnMap<K, V> = EdnMap(entries.toList())
+        fun <K, V> wrap(xs: Map<K, V>): EdnMap<K, V> = EdnMap(xs)
+        fun <K, V> wrap(xs: List<Pair<K, V>>): EdnMap<K, V> = EdnMap(xs)
     }
 
     constructor(xs: List<Pair<K, V>>) {
         inner = LinkedHashMap(xs.size * 2)
         for ((k, v) in xs)
             inner[k] = v
-        sorted = false
-        ordered = true
     }
 
     constructor(xs: Collection<Pair<K, V>>) {
         inner = LinkedHashMap(xs.size * 2)
         for ((k, v) in xs)
             inner[k] = v
-        sorted = false
-        ordered = false
     }
 
     constructor(xs: Map<K, V>) {
         this.inner = xs
-        this.sorted = false
-        this.ordered = false
-    }
-
-    private constructor(xs: Map<K, V>, ordered: Boolean, sorted: Boolean) {
-        this.inner = xs
-        this.sorted = sorted
-        this.ordered = ordered
     }
 
     override val entries: Set<Map.Entry<K, V>>
-        get() = PersistentSet(inner.entries.mapTo(mutableSetOf()) { Entry(it.key, it.value) })
+        get() = EdnSet(inner.entries.mapTo(mutableSetOf()) { Entry(it.key, it.value) })
 
     override val keys: Set<K>
-        get() = PersistentSet(inner.keys)
+        get() = EdnSet(inner.keys)
 
     override val size: Int
         get() = inner.size
 
     override val values: Collection<V>
-        get() = PersistentSet(inner.values.toSet())
+        get() = EdnSet(inner.values.toSet())
 
     override fun get(key: K): V? = inner[key]
     override fun containsValue(value: V): Boolean = inner.containsValue(value)
@@ -224,18 +192,18 @@ class PersistentMap<K, V> : Map<K, V> {
 }
 
 /**
- * A wrapper around a [List]. This class is distinct from [PersistentVector] only in name.
- * [kleinert.edn.EDN] makes a distinction between this and [PersistentVector].
+ * A wrapper around a [List]. This class is distinct from [EdnVector] only in name.
+ * [kleinert.edn.EDN] makes a distinction between this and [EdnVector].
  *
  * @param T The type of the elements.
  *
  * @author Armin Kleinert
  */
-class PersistentList<T> : List<T> {
+class EdnList<T> : List<T> {
     companion object {
-        fun <T> of(vararg elements: T): PersistentList<T> = PersistentList(elements.toList())
+        fun <T> of(vararg elements: T): EdnList<T> = EdnList(elements.toList())
 
-        fun <T> wrap(xs: List<T>): PersistentList<T> = PersistentList(xs, true)
+        fun <T> wrap(xs: List<T>): EdnList<T> = EdnList(xs, true)
     }
 
     private val inner: List<T>
@@ -256,12 +224,12 @@ class PersistentList<T> : List<T> {
 
     override fun get(index: Int): T = inner[index]
     override fun isEmpty(): Boolean = inner.isEmpty()
-    override fun iterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
-    override fun listIterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
-    override fun listIterator(index: Int): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator(index))
+    override fun iterator(): Iterator<T> = EdnIterator(inner.toMutableList().listIterator())
+    override fun listIterator(): ListIterator<T> = EdnIterator(inner.toMutableList().listIterator())
+    override fun listIterator(index: Int): ListIterator<T> = EdnIterator(inner.toMutableList().listIterator(index))
 
-    override fun subList(fromIndex: Int, toIndex: Int): PersistentList<T> =
-        PersistentList(inner.toMutableList().subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): EdnList<T> =
+        EdnList(inner.toMutableList().subList(fromIndex, toIndex))
 
     override fun lastIndexOf(element: T): Int = inner.lastIndexOf(element)
     override fun indexOf(element: T): Int = inner.indexOf(element)
@@ -282,18 +250,18 @@ class PersistentList<T> : List<T> {
 }
 
 /**
- * A wrapper around a [List]. This class is distinct from [PersistentList] only in name.
- * [kleinert.edn.EDN] makes a distinction between this and [PersistentList].
+ * A wrapper around a [List]. This class is distinct from [EdnList] only in name.
+ * [kleinert.edn.EDN] makes a distinction between this and [EdnList].
  *
  * @param T The type of the elements.
  *
  * @author Armin Kleinert
  */
-class PersistentVector<T> : List<T> {
+class EdnVector<T> : List<T> {
     companion object {
-        fun <T> of(vararg elements: T): PersistentVector<T> = PersistentVector(elements.toList())
+        fun <T> of(vararg elements: T): EdnVector<T> = EdnVector(elements.toList())
 
-        fun <T> wrap(xs: List<T>): PersistentVector<T> = PersistentVector(xs, true)
+        fun <T> wrap(xs: List<T>): EdnVector<T> = EdnVector(xs, true)
     }
 
     private val inner: List<T>
@@ -316,12 +284,12 @@ class PersistentVector<T> : List<T> {
 
     override fun get(index: Int): T = inner[index]
     override fun isEmpty(): Boolean = inner.isEmpty()
-    override fun iterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
-    override fun listIterator(): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator())
-    override fun listIterator(index: Int): PersistentIterator<T> = PersistentIterator(inner.toMutableList().listIterator(index))
+    override fun iterator(): Iterator<T> = EdnIterator(inner.toMutableList().listIterator())
+    override fun listIterator(): ListIterator<T> = EdnIterator(inner.toMutableList().listIterator())
+    override fun listIterator(index: Int): ListIterator<T> = EdnIterator(inner.toMutableList().listIterator(index))
 
-    override fun subList(fromIndex: Int, toIndex: Int): PersistentVector<T> =
-        PersistentVector(inner.toMutableList().subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): EdnVector<T> =
+        EdnVector(inner.toMutableList().subList(fromIndex, toIndex))
 
     override fun lastIndexOf(element: T): Int = inner.lastIndexOf(element)
     override fun indexOf(element: T): Int = inner.indexOf(element)

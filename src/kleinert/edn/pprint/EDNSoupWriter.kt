@@ -75,17 +75,11 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions) {
             is Keyword -> tryEncoder(obj, writer, indent) ?: writer.append(encodeKeyword(obj))
             is Symbol -> tryEncoder(obj, writer, indent) ?: writer.append(encodeSymbol(obj))
 
-            is PersistentList<*> ->
+            is EdnList<*> ->
                 tryEncoder(obj, writer, indent) ?: encodePersistentList(obj, writer, indent) // List, not vector
 
-            is ByteArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is ShortArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is IntArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is LongArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is FloatArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is DoubleArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is Array<*> -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
             is List<*> -> tryEncoder(obj, writer, indent) ?: encodeVector(obj, writer, indent) // Vector
+            is Array<*> -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
 
             is Set<*> -> tryEncoder(obj, writer, indent) ?: encodeSet(obj, writer, indent)
             is Map<*, *> -> tryEncoder(obj, writer, indent) ?: encodeMap(obj, writer, indent)
@@ -105,12 +99,19 @@ class EDNSoupWriter private constructor(private val options: EDNSoupOptions) {
             is UUID -> writer.append(encodeUuid(obj))
             is Instant -> writer.append(encodeInstant(obj))
 
+            is ByteArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
+            is ShortArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
+            is IntArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
+            is LongArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
+            is FloatArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
+            is DoubleArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
+
             else -> tryEncoder(obj, writer, indent) ?: writer.append(obj.toString())
         }
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun encodePersistentList(obj: PersistentList<*>, writer: Appendable, indent: Int) {
+    private inline fun encodePersistentList(obj: EdnList<*>, writer: Appendable, indent: Int) {
         formatCollectionTo(obj, "(", ")", writer, indent)
     }
 

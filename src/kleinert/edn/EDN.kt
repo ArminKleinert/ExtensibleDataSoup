@@ -29,11 +29,11 @@ object EDN {
      *  - [EDNSoupOptions.allowUTFSymbols]
      *  - [EDNSoupOptions.ednClassDecoders]
      *  - [EDNSoupOptions.encoderCollectionElementLimit]
-     *  - [EDNSoupOptions.listToPersistentListConverter]
-     *  - [EDNSoupOptions.listToPersistentVectorConverter]
-     *  - [EDNSoupOptions.mapToPersistentMapConverter]
+     *  - [EDNSoupOptions.listToEdnListConverter]
+     *  - [EDNSoupOptions.listToEdnVectorConverter]
+     *  - [EDNSoupOptions.mapToEdnMapConverter]
      *  - [EDNSoupOptions.moreNumberPrefixes]
-     *  - [EDNSoupOptions.setToPersistentSetConverter]
+     *  - [EDNSoupOptions.setToEdnSetConverter]
      *
      * Using tagged objects, users can define their own tagged objects.
      * ```

@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class EDNReaderMetaTest {
+    private val opts = EDN.defaultOptions.copy(allowMetadata = true)
+
     @Test
     fun parseMetaErrors() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^abc") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^[]") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^[] abc") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^", opts) }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^abc", opts) }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^[]", opts) }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^[] abc", opts) }
     }
 
     @Test
@@ -22,11 +24,18 @@ class EDNReaderMetaTest {
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^abc") }
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[]") }
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[] abc") }
+
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^", opts) }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^abc", opts) }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[]", opts) }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[] abc", opts) }
     }
 
     @Test
     fun parseMetaSymbolTest() {
-        EDN.read("^a b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^a b") }
+
+        EDN.read("^a b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to Symbol.symbol("a")), it.meta)
@@ -36,7 +45,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseMetaStringTest() {
-        EDN.read("^\"a\" b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^\"a\" b") }
+
+        EDN.read("^\"a\" b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to "a"), it.meta)
@@ -46,7 +57,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseMetaKeywordTest() {
-        EDN.read("^:a b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^:a b") }
+
+        EDN.read("^:a b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["a"] to true), it.meta)
@@ -56,7 +69,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseMetaMapTest() {
-        EDN.read("^{\"a\" \"c\"} b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^{\"a\" \"c\"} b") }
+
+        EDN.read("^{\"a\" \"c\"} b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf("a" to "c"), it.meta)
@@ -66,7 +81,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseDispatchMetaSymbolTest() {
-        EDN.read("#^a b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^a b") }
+
+        EDN.read("#^a b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to Symbol.symbol("a")), it.meta)
@@ -76,7 +93,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseDispatchMetaStringTest() {
-        EDN.read("#^\"a\" b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^\"a\" b") }
+
+        EDN.read("#^\"a\" b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["tag"] to "a"), it.meta)
@@ -86,7 +105,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseDispatchMetaKeywordTest() {
-        EDN.read("#^:a b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^:a b") }
+
+        EDN.read("#^:a b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf(Keyword["a"] to true), it.meta)
@@ -96,7 +117,9 @@ class EDNReaderMetaTest {
 
     @Test
     fun parseDispatchMetaMapTest() {
-        EDN.read("#^{\"a\" \"c\"} b").let {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^{\"a\" \"c\"} b") }
+
+        EDN.read("#^{\"a\" \"c\"} b", opts).let {
             Assertions.assertTrue(it is IObj<*>)
             it as IObj<*>
             Assertions.assertEquals(mapOf("a" to "c"), it.meta)

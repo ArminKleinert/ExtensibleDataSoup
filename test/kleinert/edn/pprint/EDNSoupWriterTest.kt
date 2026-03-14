@@ -174,8 +174,8 @@ class EDNSoupWriterTest {
 
     @Test
     fun encodePersistentList() {
-        Assertions.assertEquals("()", EDN.pprintToString(PersistentList.of<Keyword>()))
-        Assertions.assertEquals("(:a, :b)", EDN.pprintToString(PersistentList.of(Keyword["a"], Keyword["b"])))
+        Assertions.assertEquals("()", EDN.pprintToString(EdnList.of<Keyword>()))
+        Assertions.assertEquals("(:a, :b)", EDN.pprintToString(EdnList.of(Keyword["a"], Keyword["b"])))
     }
 
     @Test
@@ -271,33 +271,33 @@ class EDNSoupWriterTest {
 
     @Test
     fun encodeVector() {
-        Assertions.assertEquals("[]", EDN.pprintToString(PersistentVector.of<Keyword>()))
-        Assertions.assertEquals("[:a, :b]", EDN.pprintToString(PersistentVector.of(Keyword["a"], Keyword["b"])))
+        Assertions.assertEquals("[]", EDN.pprintToString(EdnVector.of<Keyword>()))
+        Assertions.assertEquals("[:a, :b]", EDN.pprintToString(EdnVector.of(Keyword["a"], Keyword["b"])))
         Assertions.assertEquals("[:a, :b]", EDN.pprintToString(listOf(Keyword["a"], Keyword["b"])))
     }
 
     @Test
     fun encodeSet() {
-        Assertions.assertEquals("#{}", EDN.pprintToString(PersistentSet.of<Keyword>()))
-        Assertions.assertEquals("#{:a, :b}", EDN.pprintToString(PersistentSet.of(Keyword["a"], Keyword["b"])))
+        Assertions.assertEquals("#{}", EDN.pprintToString(EdnSet.of<Keyword>()))
+        Assertions.assertEquals("#{:a, :b}", EDN.pprintToString(EdnSet.of(Keyword["a"], Keyword["b"])))
 
         val encoders: List<Pair<Class<*>, (Any) -> Pair<String, Any?>?>> = listOf(
-            PersistentSet::class.java to { "set" to (it as Set<*>).toList() }
+            EdnSet::class.java to { "set" to (it as Set<*>).toList() }
         )
         val options =
             EDNSoupOptions.defaultOptions.copy(ednClassEncoders = encoders)
         Assertions.assertEquals(
             "#set [:a, :b]",
-            EDN.pprintToString(PersistentSet.of(Keyword["a"], Keyword["b"]), options)
+            EDN.pprintToString(EdnSet.of(Keyword["a"], Keyword["b"]), options)
         )
     }
 
     @Test
     fun encodeMap() {
-        Assertions.assertEquals("{}", EDN.pprintToString(PersistentMap.of<Keyword, Keyword>()))
+        Assertions.assertEquals("{}", EDN.pprintToString(EdnMap.of<Keyword, Keyword>()))
         Assertions.assertEquals(
             "{:a :b, :c :d}",
-            EDN.pprintToString(PersistentMap.of(Keyword["a"] to Keyword["b"], Keyword["c"] to Keyword["d"]))
+            EDN.pprintToString(EdnMap.of(Keyword["a"] to Keyword["b"], Keyword["c"] to Keyword["d"]))
         )
     }
 

@@ -226,11 +226,11 @@ object ExtendedEDNDecoders {
  * @param encoderMaxColumn For [EDN.pprint] only.
  * @param encoderSequenceElementLimit Only for [EDN.pprint]. Print a maximum of this many elements for [Sequence]s before truncating with "...".
  * @param encodingSequenceSeparator Only for [EDN.pprint]. Specifies the separator between elements in printed [Collection] and [Sequence] objects. The default is ", ", but " " is also a good choice.
- * @param listToPersistentListConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [PersistentList]. This function is used when reading lists, but not vectors.
- * @param listToPersistentVectorConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [PersistentVector]. This function is used when reading vectors, but not lists.
- * @param mapToPersistentMapConverter Option for [EDN.read] only. By default, Maps are ordered (for example, [LinkedHashMap]). This function allows the user to convert it to another [Map] type. The default is the construction of a [PersistentMap].
+ * @param listToEdnListConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [EdnList]. This function is used when reading lists, but not vectors.
+ * @param listToEdnVectorConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [EdnVector]. This function is used when reading vectors, but not lists.
+ * @param mapToEdnMapConverter Option for [EDN.read] only. By default, Maps are ordered (for example, [LinkedHashMap]). This function allows the user to convert it to another [Map] type. The default is the construction of a [EdnMap].
  * @param moreNumberPrefixes Option for [EDN.read] only. Allows more prefixes for integral numbers with different bases: "0o" for octal, "0b" for binary.
- * @param setToPersistentSetConverter Option for [EDN.read] only. By default, Sets are ordered (for example, [LinkedHashSet]). The user might want unordered Sets. This options allows user-defined conversion. The default is the construction of a [PersistentSet].
+ * @param setToEdnSetConverter Option for [EDN.read] only. By default, Sets are ordered (for example, [LinkedHashSet]). The user might want unordered Sets. This options allows user-defined conversion. The default is the construction of a [EdnSet].
  * @param encoderPrettyPrint Option for [EDN.pprint]. If true, pretty printing is done. Otherwise, it is not.
  *
  * @author Armin Kleinert
@@ -244,11 +244,12 @@ data class EDNSoupOptions(
     //val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
+    val allowRatios: Boolean = false,
     val encodingSequenceSeparator: String = ", ",
-    val listToPersistentListConverter: (List<*>) -> List<*> = { PersistentList.wrap(it) },
-    val listToPersistentVectorConverter: (List<*>) -> List<*> = { PersistentVector.wrap(it) },
-    val setToPersistentSetConverter: (Set<*>) -> Set<*> = { PersistentSet.wrap(it, ordered = true) },
-    val mapToPersistentMapConverter: (Map<*, *>) -> Map<*, *> = { PersistentMap.wrap(it, ordered = true) },
+    val listToEdnListConverter: (List<*>) -> List<*> = { EdnList.wrap(it) },
+    val listToEdnVectorConverter: (List<*>) -> List<*> = { EdnVector.wrap(it) },
+    val setToEdnSetConverter: (List<*>) -> Set<*> = { EdnSet.wrap(it) },
+    val mapToEdnMapConverter: (List<Pair<*, *>>) -> Map<*, *> = { EdnMap.wrap(it) },
     val allowUTFSymbols: Boolean = false,
     val allowDefinitionsAndReferences: Boolean = false,
     val dispatchMacros: Map<String, (Any?)->Any?> = mapOf(),
@@ -257,6 +258,8 @@ data class EDNSoupOptions(
     val encoderMaxColumn: Int = 80,
     val encoderLineIndent: String = "  ",
     val encoderPrettyPrint: Boolean = true,
+    val allowMetadata: Boolean = false,
+    val allowZeroPrefix: Boolean = false,
 ) {
     companion object {
         val extendedOptions: EDNSoupOptions
@@ -277,6 +280,8 @@ data class EDNSoupOptions(
                 allowMoreEncoderDecoderNames = true,
                 encodingSequenceSeparator = ", ",
                 allowUTFSymbols = true,
+                allowRatios = true,
+                allowMetadata = true,
                 ednClassDecoders = ednClassDecoder,
                 ednClassEncoders = listOf(),
             )

@@ -17,10 +17,8 @@ An EDN library for Kotlin.
 ☑ `nil`, `true`, `false`
 
 ☑ Number literals
-
 - Signed values.
 - `N` and `M` suffixes.
-- Base prefix `0` for base 8 and `0x` for base 16.
 - `kleinert.edn.data.Ratio` type.
 
 ☑ Symbolic values `##NaN`, `##INF` and `##-INF`  
@@ -45,8 +43,6 @@ An EDN library for Kotlin.
 ## Examples
 
 ```kotlin
-import kleinert.edn.EDN
-
 println(EDN.read("symbol")) // Symbol without namespace
 println(EDN.read("namespace/symbol")) // Symbol
 println(EDN.read(":keyword")) // Keyword without namespace
@@ -59,8 +55,8 @@ println(EDN.read("[vector elements]")) // Vector
 println(EDN.read("#{set elements}")) // Set
 println(EDN.read("{map-key map-value}")) // Map
 
-println(EDN.read("0xC0FFEE")) // Long
 println(EDN.read("12648430")) // The same Long
+println(EDN.read("0xC0FFEE", EDN.defaultOptions.copy(moreNumberPrefixes = true))) // Long, hex prefix requires additional setting
 println(EDN.read("12648430N")) // The same as BigInt
 println(EDN.read("5.0")) // Double
 println(EDN.read("5.0M")) // BigDecimal
@@ -73,25 +69,10 @@ println(EDN.read("true")) // True
 println(EDN.read("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"")) // UUID
 println(EDN.read("#inst \"1985-04-12T23:20:50.52Z\"")) // Instant
 
-println(EDN.read("^:a abc")) // Meta
+println(EDN.read("^:a abc", EDN.defaultOptions.copy(allowMetadata = true))) // Meta
 ```
 
 ```kotlin
-import kleinert.edn.data.Keyword
-import kleinert.edn.data.Char32
-import kleinert.edn.data.PersistentList
-import kleinert.edn.data.PersistentVector
-import kleinert.edn.data.PersistentSet
-import kleinert.edn.data.PersistentMap
-import kleinert.edn.data.IObj
-import kleinert.edn.data.Ratio
-import kleinert.edn.data.Symbol
-import kleinert.edn.edn.EDN
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.time.Instant
-import java.util.UUID
-
 EDN.pprintln(Symbol.symbol("symbol"))                       // symbol
 EDN.pprintln(Symbol.symbol("namespace/symbol"))             // namespace/symbol
 EDN.pprintln(Keyword["keyword"])                            // :keyword
@@ -147,23 +128,23 @@ EDN.pprintln(IObj.valueOf(mapOf(12 to 13), 159))            // ^{12 13} 159
 
 I included some non-standard features. All of these can be turned off (see examples).
 
-| Option                            | Description                                                                  | Default                  |
-|:----------------------------------|:-----------------------------------------------------------------------------|:-------------------------|
-| `allowSchemeUTF32Codes`           | Allow scheme UTF-32 char codes (`\\xXXXXXXXX`).                              | `false`                  |
-| `allowDispatchChars`              | Allow dispatch UTF-32chars (`#\uXXXXXXXX`).                                  | `false`                  |
-| `allowNumericSuffixes`            | Enable `_i8`, `_16`, `_i32`, `_64`, and `L` suffixes for integral numbers.   | `false`                  |
-| `allowMoreEncoderDecoderNames`    | Allow symbols without explicit namespaces for tagged elements.               | `false`                  |
-| `allowUTFSymbols`                 | Allow UTF-8 strings as symbols.                                              | `false`                  |
-| `decodingSequenceSeparator`       | Separator between elements in lists, vectors, maps, and sets.                | `", "`                   |
-| `ednClassDecoders`                | Functions for decoding tagged elements to objects.                           | `mapOf()`                |
-| `ednClassEncoders`                | Functions for encoding objects to tagged elements.                           | `listOf()`               |
-| `listToPersistentListConverter`   | Converter function from Kotlin's default List to your preferred list type.   | `{PersistentList(it)}`   |
-| `listToPersistentVectorConverter` | Converter function from Kotlin's default List to your preferred vector type. | `{PersistentVector(it)}` |
-| `mapToPersistentMapConverter`     | Converter function from maps (`LinkedHashMap`) to your preferred map type.   | `{PersistentMap(it)}`    |
-| `setToPersistentSetConverter`     | Converter function from sets (`LinkedHashSet`) to your preferred set type.   | `{PersistentSet(it)}`    |
-| `sequenceElementLimit`            | Limit of elements after which lazy sequences are shortened.                  | `10000`                  |
+| Option                         | Description                                                                   | Default                |
+|:-------------------------------|:------------------------------------------------------------------------------|:-----------------------|
+| `allowSchemeUTF32Codes`        | Allow scheme UTF-32 char codes (`\\xXXXXXXXX`).                               | `false`                |
+| `allowDispatchChars`           | Allow dispatch UTF-32chars (`#\uXXXXXXXX`).                                   | `false`                |
+| `allowNumericSuffixes`         | Enable `_i8`, `_16`, `_i32`, `_64`, and `L` suffixes for integral numbers.    | `false`                |
+| `allowMoreEncoderDecoderNames` | Allow symbols without explicit namespaces for tagged elements.                | `false`                |
+| `allowUTFSymbols`              | Allow UTF-8 strings as symbols.                                               | `false`                |
+| `decodingSequenceSeparator`    | Separator between elements in lists, vectors, maps, and sets.                 | `", "`                 |
+| `ednClassDecoders`             | Functions for decoding tagged elements to objects.                            | `mapOf()`              |
+| `ednClassEncoders`             | Functions for encoding objects to tagged elements.                            | `listOf()`             |
+| `listToEdnListConverter`       | Converter function from Kotlin's default List to a list type.                 | Implementation detail. |
+| `listToEdnVectorConverter`     | Converter function from Kotlin's default List to a vector type.               | Implementation detail. |
+| `listToEdnMapConverter`        | Converter function from Kotlin's List<Pair<*, *>> to a map type.              | Implementation detail. |
+| `listToEdnSetConverter`        | Converter function from Kotlin's List (assumed to be distinct) to a set type. | Implementation detail. |
+| `sequenceElementLimit`         | Limit of elements after which lazy sequences are shortened.                   | `10000`                |
 
-☑ `0o` and `0b` prefixes for numbers (for octal and binary respectively). (Option: `moreNumberPrefixes`)
+☑ `0x`, `0o` and `0b` prefixes for numbers (for hexadecimal, octal and binary respectively). (Option: `moreNumberPrefixes`)
 
 ☑ Number suffixes for different sizes. (Option: `allowNumericSuffixes`)
 

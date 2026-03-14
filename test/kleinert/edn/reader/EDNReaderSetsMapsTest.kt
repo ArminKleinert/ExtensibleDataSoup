@@ -40,13 +40,13 @@ class EDNReaderSetsMapsTest {
     @Test
     fun parseWithConverter() {
         run {
-            val options = EDN.defaultOptions.copy(mapToPersistentMapConverter = { IdentityHashMap(it) })
+            val options = EDN.defaultOptions.copy(mapToEdnMapConverter = { IdentityHashMap(it.toMap()) })
             val parsed = EDN.read("{1 2}", options)
             Assertions.assertTrue(parsed is IdentityHashMap<*, *>)
             Assertions.assertEquals(mapOf(1L to 2L), parsed)
         }
         run {
-            val options = EDN.defaultOptions.copy(setToPersistentSetConverter = { TreeSet<Long>() })
+            val options = EDN.defaultOptions.copy(setToEdnSetConverter = { TreeSet<Long>() })
             val parsed = EDN.read("#{1 2}", options)
             Assertions.assertTrue(parsed is TreeSet<*>)
             Assertions.assertEquals(setOf<Long>(), parsed)
