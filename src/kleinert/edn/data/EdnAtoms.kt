@@ -1,5 +1,13 @@
 package kleinert.edn.data
 
+import kleinert.edn.data.Keyword.Companion.parse
+import kleinert.edn.data.Symbol.Companion.isValidSymbol
+import kleinert.edn.data.Symbol.Companion.parse
+import java.lang.ref.Reference
+import java.lang.ref.ReferenceQueue
+import java.lang.ref.WeakReference
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  * A Keyword as specified in the EDN format specification.
  * When a keyword is created, it is interned.
@@ -10,10 +18,31 @@ package kleinert.edn.data
  *
  * @author Armin Kleinert
  */
-class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
+class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
+    val name: String
+        get() = sym.name
+
+    val fullyQualified: Boolean
+        get() = sym.fullyQualified
+
+    val namespace
+        get() = sym.namespace
+
+    operator fun component1(): String? = namespace
+    operator fun component2(): String = name
+
+    override fun toString(): String = ":$sym"
+
+    override fun compareTo(other: Keyword): Int = sym.compareTo(other.sym)
+
+    override fun hashCode(): Int = this.sym.hashCode() + -1640531527
+
+    override fun equals(other: Any?): Boolean =
+        this === other || (other is Keyword && sym == other.sym)
+
     companion object {
-        private val definedKeywords = mutableMapOf<String, Int>()
-        private val definedKeywordList = mutableListOf<Keyword>()
+        private val table = ConcurrentHashMap<Symbol, Reference<Keyword?>>()
+        private val rq = ReferenceQueue<Keyword?>()
 
         /**
          * Creates a new [Keyword] from the input [s]. The input must start with a colon.2
@@ -30,14 +59,57 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
 
             val substring = s.substring(1)
 
-            if (!Symbol.isValidSymbol(substring, allowUTF)) return null
+            if (!isValidSymbol(substring, allowUTF)) return null
 
-            val existingIndex = definedKeywords[s]
-            if (existingIndex != null) return definedKeywordList[existingIndex]
+            return intern(Symbol.parse(substring, allowUTF) ?: return null)
+        }
 
-            // Keywords follow the same conventions as symbols.
-            val tempSymbol = Symbol.parse(substring, allowUTF) ?: return null
-            return keyword(tempSymbol)
+        fun clearCache() {
+            if (rq.poll() == null)
+                return
+
+            var rqPoll = rq.poll()
+            while (rqPoll != null) {
+                rqPoll = rq.poll()
+            }
+
+            for (e in table.entries) {
+                val ref: Reference<Keyword?> = e.value
+                if (ref.get() == null) {
+                    table.remove(e.key, ref)
+                }
+            }
+        }
+
+        fun intern(sym: Symbol): Keyword {
+            var k: Keyword? = null
+            var existingRef = table[sym]
+            if (existingRef == null) {
+                clearCache()
+
+                k = Keyword(sym)
+                existingRef = table.putIfAbsent(sym, WeakReference<Keyword?>(k, rq))
+            }
+
+            if (existingRef == null) {
+                return k!!
+            }
+
+            val existingk = existingRef.get()
+            if (existingk != null) {
+                return existingk
+            }
+            table.remove(sym, existingRef)
+            return intern(sym)
+        }
+
+        fun find(sym: Symbol): Keyword? {
+            val ref = table[sym]
+            return ref?.get()
+        }
+
+        fun find(nsname: String): Keyword? {
+            return find(Symbol[nsname])
         }
 
         /**
@@ -45,11 +117,7 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
          * @return A new [Keyword] from the input [Symbol].
          */
         private fun keyword(s: Symbol): Keyword {
-            val k = Keyword(s)
-            val index = definedKeywordList.size
-            definedKeywords[k.toString()] = index
-            definedKeywordList.add(k)
-            return k
+            return intern(s)
         }
 
         /**
@@ -69,33 +137,16 @@ class Keyword private constructor(private val s: Symbol) : Comparable<Keyword> {
             val name = if (s.startsWith(':')) s else ":$s"
             return parse(name) ?: throw IllegalStateException("Illegal keyword format: $s")
         }
-    }
 
-    val fullyQualified: Boolean
-        get() = s.fullyQualified
-
-    val namespace
-        get() = s.namespace
-
-    val name
-        get() = s.name
-
-    override fun toString() = ":$s"
-    override fun hashCode() = (definedKeywords[s.toString()] ?: 0) xor 0xCAFEBEEF.toInt()
-
-    override fun compareTo(other: Keyword): Int =
-        when {
-            this === other -> 0
-            else -> s.compareTo(other.s)
+        /**
+         * Equivalent to [parse], but Nicer to read.
+         * Keyword["abc"] == Keyword.parse("abc")
+         * @return A new [Keyword] from the input [Symbol].
+         */
+        operator fun get(s: Symbol): Keyword {
+            return intern(s)
         }
-
-    override fun equals(other: Any?): Boolean {
-        if (other == null) return false
-        if (other !is Keyword) return false
-        return this === other
     }
-
-    operator fun <T> invoke(m: Map<*, T>): T? = m[this]
 }
 
 /**
@@ -204,7 +255,6 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
          * @return A new [Symbol].
          */
         fun symbol(namespace: String?, name: String) = Symbol(namespace, name)
-
 
         /**
          * Creates a new [Symbol]. Unlike [parse], no format checking is performed.
