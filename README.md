@@ -30,15 +30,15 @@ An EDN library for Kotlin.
 ☑ Sets  
 ☑ Maps
 
-☑ Metadata  
+☑ Metadata (optional)  
 
 ## Not implemented
 
 ☐ The pretty printer isn't printing so pretty yet.
 
-☐ `@`, `'`, `~` and backtick prefixes, `#` prefix for lists.
+☐ `@`, `'`, `~` and backtick prefixes, `#` prefix for lists. (I don't see a use for them in this context.)
 
-- Why not? I don't see a use for them in this context.
+☐ Add optional support for explicit prefixes. (Eg. decimal `10r255`, binary `2r11111111`, octal 8r377, hex `16rFF`)
 
 ## Examples
 
