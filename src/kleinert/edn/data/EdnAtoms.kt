@@ -302,7 +302,7 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
             else -> namespace.compareTo(other.namespace)
         }
         if (prefixCompare != 0) return prefixCompare
-        return name.compareTo(name)
+        return name.compareTo(other.name)
     }
 
     override fun equals(other: Any?): Boolean {

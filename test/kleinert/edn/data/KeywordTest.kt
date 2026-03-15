@@ -2,6 +2,7 @@ package kleinert.edn.data
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 class KeywordTest {
     @Test
@@ -252,22 +253,102 @@ class KeywordTest {
     @Test
     fun getSymbol() {
         Assertions.assertEquals(Keyword.get(Symbol.symbol("abc")), Keyword.get(Symbol.symbol("abc")))
-        Assertions.assertEquals(Keyword.get(Symbol.symbol("ns", "+")), Keyword.get(Symbol.symbol("ns","+")))
-        Assertions.assertEquals(Keyword.get(Symbol.symbol("ns", "abc")), Keyword.get(Symbol.symbol("ns","abc")))
+        Assertions.assertEquals(Keyword.get(Symbol.symbol("ns", "+")), Keyword.get(Symbol.symbol("ns", "+")))
+        Assertions.assertEquals(Keyword.get(Symbol.symbol("ns", "abc")), Keyword.get(Symbol.symbol("ns", "abc")))
     }
 
     @Test
     fun findSymbol() {
-        TODO()
+        val random = Random(0xCAFEC0FFEE)
+        Symbol.symbol(random.nextDouble().toString()).let { // A hopefully random name
+            Assertions.assertNull(Keyword.find(it)) // Did not exist.
+            Assertions.assertNull(Keyword.find(it)) // Was not interned by the first call.
+
+            val k = Keyword.intern(it) // Create and intern
+            Assertions.assertEquals(k, Keyword.find(it))
+        }
     }
 
     @Test
     fun findString() {
-        TODO()
+        val random = Random(0xDEADBEEF)
+        random.nextDouble().toString().let { // A hopefully random name
+            Assertions.assertNull(Keyword.find(it)) // Did not exist.
+            Assertions.assertNull(Keyword.find(it)) // Was not interned by the first call.
+
+            val k = Keyword.intern(Symbol.symbol(it)) // Create and intern
+            Assertions.assertEquals(k, Keyword.find(it))
+        }
     }
 
     @Test
     fun compareTo() {
-        TODO()
+        let {
+            val ks = listOf(
+                Keyword.keyword(null, ""), Keyword.keyword("a", "b"),
+                Keyword.keyword(null, "b"), Keyword.keyword("a", "🎁")
+            )
+            val res = ks.flatMap { k ->
+                ks.map { b -> listOf(k, b).sorted().let { (a, b) -> a to b } }
+            }
+            val expect = listOf(
+                Keyword.keyword(null, "") to Keyword.keyword(null, ""),
+                Keyword.keyword(null, "") to Keyword.keyword("a", "b"),
+                Keyword.keyword(null, "") to Keyword.keyword(null, "b"),
+                Keyword.keyword(null, "") to Keyword.keyword("a", "🎁"),
+                Keyword.keyword(null, "") to Keyword.keyword("a", "b"),
+                Keyword.keyword("a", "b") to Keyword.keyword("a", "b"),
+                Keyword.keyword(null, "b") to Keyword.keyword("a", "b"),
+                Keyword.keyword("a", "b") to Keyword.keyword("a", "🎁"),
+                Keyword.keyword(null, "") to Keyword.keyword(null, "b"),
+                Keyword.keyword(null, "b") to Keyword.keyword("a", "b"),
+                Keyword.keyword(null, "b") to Keyword.keyword(null, "b"),
+                Keyword.keyword(null, "b") to Keyword.keyword("a", "🎁"),
+                Keyword.keyword(null, "") to Keyword.keyword("a", "🎁"),
+                Keyword.keyword("a", "b") to Keyword.keyword("a", "🎁"),
+                Keyword.keyword(null, "b") to Keyword.keyword("a", "🎁"),
+                Keyword.keyword("a", "🎁") to Keyword.keyword("a", "🎁")
+            )
+            Assertions.assertEquals(expect, res)
+        }
+
+        let {
+            val ks = listOf(
+                Keyword.keyword(""), Keyword.keyword("a"),
+                Keyword.keyword("b"), Keyword.keyword("🎁")
+            )
+            val res = ks.flatMap { k ->
+                ks.map { b -> listOf(k, b).sorted().let { (a, b) -> a to b } }
+            }
+            val expect = listOf(
+                Keyword.keyword("") to Keyword.keyword(""), Keyword.keyword("") to Keyword.keyword("a"),
+                Keyword.keyword("") to Keyword.keyword("b"), Keyword.keyword("") to Keyword.keyword("🎁"),
+                Keyword.keyword("") to Keyword.keyword("a"), Keyword.keyword("a") to Keyword.keyword("a"),
+                Keyword.keyword("a") to Keyword.keyword("b"), Keyword.keyword("a") to Keyword.keyword("🎁"),
+                Keyword.keyword("") to Keyword.keyword("b"), Keyword.keyword("a") to Keyword.keyword("b"),
+                Keyword.keyword("b") to Keyword.keyword("b"), Keyword.keyword("b") to Keyword.keyword("🎁"),
+                Keyword.keyword("") to Keyword.keyword("🎁"), Keyword.keyword("a") to Keyword.keyword("🎁"),
+                Keyword.keyword("b") to Keyword.keyword("🎁"), Keyword.keyword("🎁") to Keyword.keyword("🎁")
+            )
+            Assertions.assertEquals(expect, res)
+        }
+    }
+
+    @Test
+    fun equals() {
+        Assertions.assertEquals(Keyword.keyword(null, "abc"), Keyword.keyword(null, "abc"))
+        Assertions.assertEquals(Keyword.keyword("ns", "+"), Keyword.keyword("ns", "+"))
+        Assertions.assertEquals(Keyword.keyword("ns", "abc"), Keyword.keyword("ns", "abc"))
+
+        Assertions.assertNotEquals(Keyword.keyword(null, "abc"), Keyword.keyword("ns", "+"))
+    }
+
+    @Test
+    fun equalsBecauseInterned() {
+        Assertions.assertSame(Keyword.keyword(null, "abc"), Keyword.keyword(null, "abc"))
+        Assertions.assertSame(Keyword.keyword("ns", "+"), Keyword.keyword("ns", "+"))
+        Assertions.assertSame(Keyword.keyword("ns", "abc"), Keyword.keyword("ns", "abc"))
+
+        Assertions.assertNotSame(Keyword.keyword(null, "abc"), Keyword.keyword("ns", "+"))
     }
 }

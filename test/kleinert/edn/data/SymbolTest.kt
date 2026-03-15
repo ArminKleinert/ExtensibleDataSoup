@@ -252,6 +252,62 @@ class SymbolTest {
 
     @Test
     fun compareTo() {
-        TODO()
+        let {
+            val ks = listOf(
+                Symbol.symbol(null, ""), Symbol.symbol("a", "b"),
+                Symbol.symbol(null, "b"), Symbol.symbol("a", "🎁")
+            )
+            val res = ks.flatMap { k ->
+                ks.map { b -> listOf(k, b).sorted().let { (a, b) -> a to b } }
+            }
+            val expect = listOf(
+                Symbol.symbol(null, "") to Symbol.symbol(null, ""),
+                Symbol.symbol(null, "") to Symbol.symbol("a", "b"),
+                Symbol.symbol(null, "") to Symbol.symbol(null, "b"),
+                Symbol.symbol(null, "") to Symbol.symbol("a", "🎁"),
+                Symbol.symbol(null, "") to Symbol.symbol("a", "b"),
+                Symbol.symbol("a", "b") to Symbol.symbol("a", "b"),
+                Symbol.symbol(null, "b") to Symbol.symbol("a", "b"),
+                Symbol.symbol("a", "b") to Symbol.symbol("a", "🎁"),
+                Symbol.symbol(null, "") to Symbol.symbol(null, "b"),
+                Symbol.symbol(null, "b") to Symbol.symbol("a", "b"),
+                Symbol.symbol(null, "b") to Symbol.symbol(null, "b"),
+                Symbol.symbol(null, "b") to Symbol.symbol("a", "🎁"),
+                Symbol.symbol(null, "") to Symbol.symbol("a", "🎁"),
+                Symbol.symbol("a", "b") to Symbol.symbol("a", "🎁"),
+                Symbol.symbol(null, "b") to Symbol.symbol("a", "🎁"),
+                Symbol.symbol("a", "🎁") to Symbol.symbol("a", "🎁")
+            )
+            Assertions.assertEquals(expect, res)
+        }
+
+        let {
+            val ks = listOf(
+                Symbol.symbol(""), Symbol.symbol("a"),
+                Symbol.symbol("b"), Symbol.symbol("🎁")
+            )
+            val res = ks.flatMap { k ->
+                ks.map { b -> listOf(k, b).sorted().let { (a, b) -> a to b } }
+            }
+            val expect = listOf(
+                Symbol.symbol("") to Symbol.symbol(""), Symbol.symbol("") to Symbol.symbol("a"),
+                Symbol.symbol("") to Symbol.symbol("b"), Symbol.symbol("") to Symbol.symbol("🎁"),
+                Symbol.symbol("") to Symbol.symbol("a"), Symbol.symbol("a") to Symbol.symbol("a"),
+                Symbol.symbol("a") to Symbol.symbol("b"), Symbol.symbol("a") to Symbol.symbol("🎁"),
+                Symbol.symbol("") to Symbol.symbol("b"), Symbol.symbol("a") to Symbol.symbol("b"),
+                Symbol.symbol("b") to Symbol.symbol("b"), Symbol.symbol("b") to Symbol.symbol("🎁"),
+                Symbol.symbol("") to Symbol.symbol("🎁"), Symbol.symbol("a") to Symbol.symbol("🎁"),
+                Symbol.symbol("b") to Symbol.symbol("🎁"), Symbol.symbol("🎁") to Symbol.symbol("🎁")
+            )
+            Assertions.assertEquals(expect, res)
+        }
+    }
+
+    @Test
+    fun equals() {
+        Assertions.assertEquals(Symbol.symbol(null, "abc"), Symbol.symbol(null, "abc"))
+        Assertions.assertEquals(Symbol.symbol("ns", "+"), Symbol.symbol("ns", "+"))
+        Assertions.assertEquals(Symbol.symbol("ns", "abc"), Symbol.symbol("ns", "abc"))
+        Assertions.assertNotEquals(Symbol.symbol(null, "abc"), Symbol.symbol("ns", "+"))
     }
 }
