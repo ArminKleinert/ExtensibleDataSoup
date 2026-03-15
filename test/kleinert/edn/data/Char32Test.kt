@@ -145,26 +145,16 @@ class Char32Test {
 
     @Test
     fun charToChar32() {
-        Assertions.assertEquals(Char32('A'.code), 'A'.toChar32())
+        Assertions.assertEquals(Char32('A'.code), Char32.valueOf('A'))
     }
 
     @Test
     fun byteToChar32() {
-        Assertions.assertEquals(Char32('A'.code), 65.toByte().toChar32())
-    }
-
-    @Test
-    fun shortToChar32() {
-        Assertions.assertEquals(Char32('A'.code), 65.toShort().toChar32())
+        Assertions.assertEquals(Char32('A'.code), Char32.valueOf(65))
     }
 
     @Test
     fun intToChar32() {
-        Assertions.assertEquals(Char32('A'.code), 65.toChar32())
-    }
-
-    @Test
-    fun longToChar32() {
-        Assertions.assertEquals(Char32('A'.code), 65L.toChar32())
+        Assertions.assertEquals(Char32('A'.code), Char32.valueOf(65))
     }
 }

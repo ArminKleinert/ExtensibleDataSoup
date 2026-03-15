@@ -148,25 +148,6 @@ interface Char32Iterator : Iterator<Char32> {
     fun nextChar32(): Char32
 }
 
-//class Char32ProgressionIterator(first: Char32, last: Char32, private val step: Int) : Char32Iterator {
-//    private val finalElement: Char32 = last
-//    private var hasNext: Boolean = if (step > 0) first <= last else first >= last
-//    private var next: Char32 = if (hasNext) first else finalElement
-//
-//    override fun hasNext(): Boolean = hasNext
-//
-//    override fun nextChar32(): Char32 {
-//        val value = next
-//        if (value == finalElement) {
-//            if (!hasNext) throw NoSuchElementException()
-//            hasNext = false
-//        } else {
-//            next += step
-//        }
-//        return value
-//    }
-//}
-
 /**
  * A progression of values of type `Char32`.
  */
@@ -278,9 +259,3 @@ class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start
 
     override fun toString(): String = "$first..$last"
 }
-
-fun Char.toChar32() = Char32(this.code)
-fun Byte.toChar32() = Char32(this.toInt())
-fun Short.toChar32() = Char32(this.toInt())
-fun Int.toChar32() = Char32(this)
-fun Long.toChar32() = Char32(this.toInt())
