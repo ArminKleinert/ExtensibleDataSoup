@@ -1,5 +1,6 @@
 package kleinert.edn.data
 
+import java.util.SequencedCollection
 import java.util.SequencedMap
 import java.util.SequencedSet
 
@@ -54,7 +55,7 @@ class EdnSet<T> : Set<T>, SequencedSet<T> {
         this.inner = LinkedHashSet(xs)
     }
 
-    constructor(xs: Collection<T>) {
+    constructor(xs: SequencedCollection<T>) {
         this.inner = LinkedHashSet(xs)
     }
 
@@ -131,23 +132,24 @@ class EdnMap<K, V> : Map<K, V>, SequencedMap<K, V> {
     companion object {
         fun <K, V> of(vararg entries: Pair<K, V>): EdnMap<K, V> = EdnMap(entries.toList())
         fun <K, V> wrap(xs: SequencedMap<K, V>): EdnMap<K, V> = EdnMap(xs)
+        fun <K, V> wrap(xs: SequencedCollection<Pair<K, V>>): EdnMap<K, V> = EdnMap(xs)
         fun <K, V> wrap(xs: List<Pair<K, V>>): EdnMap<K, V> = EdnMap(xs)
     }
 
     constructor(xs: List<Pair<K, V>>) {
-        inner = LinkedHashMap(xs.size * 2)
+        inner = LinkedHashMap(xs.size)
         for ((k, v) in xs)
             inner[k] = v
     }
 
-    constructor(xs: Collection<Pair<K, V>>) {
-        inner = LinkedHashMap(xs.size * 2)
+    constructor(xs: SequencedCollection<Pair<K, V>>) {
+        inner = LinkedHashMap(xs.size)
         for ((k, v) in xs)
             inner[k] = v
     }
 
     constructor(xs: SequencedMap<K, V>) {
-        this.inner = xs
+        this.inner = LinkedHashMap(xs)
     }
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
@@ -160,13 +162,13 @@ class EdnMap<K, V> : Map<K, V>, SequencedMap<K, V> {
 
 
     override val keys: MutableSet<K>
-        get() = EdnSet(inner.keys)
+        get() = EdnSet(LinkedHashSet(inner.keys))
 
     override val size: Int
         get() = inner.size
 
     override val values: MutableCollection<V>
-        get() = EdnSet(inner.values.toSet())
+        get() = EdnSet(LinkedHashSet(inner.values))
 
     override fun get(key: K): V? = inner[key]
     override fun containsValue(value: V): Boolean = inner.containsValue(value)

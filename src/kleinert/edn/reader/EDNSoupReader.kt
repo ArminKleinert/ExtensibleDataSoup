@@ -189,7 +189,7 @@ class EDNSoupReader private constructor(
         val linePos = cpi.lineIdx
         val codePosIndex = cpi.textIndex
         val token = cpi.takeCodePoints(StringBuilder(), maxLength, ::isHexNum)
-        if (token.length < minLength || token.length > maxLength)
+        if (token.length !in minLength..maxLength)
             throw EdnReaderException(linePos, codePosIndex, "Invalid unicode sequence \\$initChar$token")
         return readUnicodeChar(token, 16, initChar)
     }
@@ -255,7 +255,7 @@ class EDNSoupReader private constructor(
             result[key] = value
             i++
         } while (true)
-        return options.mapToEdnMapConverter(lst.chunked(2, { (k, v) -> Pair(k, v) }))
+        return options.mapToEdnMapConverter(lst.chunked(2) { (k, v) -> Pair(k, v) })
     }
 
     private fun readSet(level: Int, separator: Int = '}'.code): Set<*> {
@@ -309,7 +309,7 @@ class EDNSoupReader private constructor(
         val errorTokenText = if (isDispatch) "#\\$token" else "\\$token"
         when (token[0]) {
             'o' -> {
-                if (reducedToken.length <= 1 || reducedToken.length > 3) {
+                if (reducedToken.length !in 2..3) {
                     val msg =
                         "Invalid length of unicode sequence ${reducedToken.length} in sequence $errorTokenText (should be 4)."
                     throw EdnReaderException(linePos, codePosIndex, msg)

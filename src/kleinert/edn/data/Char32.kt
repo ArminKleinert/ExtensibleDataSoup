@@ -170,9 +170,7 @@ interface Char32Iterator : Iterator<Char32> {
 /**
  * A progression of values of type `Char32`.
  */
-open class Char32Progression
-internal constructor
-    (
+open class Char32Progression internal constructor(
     val start: Char32,
     val endInclusive: Char32,
     val step: Int
@@ -253,7 +251,15 @@ class Char32Range(start: Char32, endInclusive: Char32) : Char32Progression(start
             return last + 1
         }
 
-    override fun contains(value: Char32): Boolean = !(value < first || value > endInclusive)
+    override fun contains(value: Char32): Boolean {
+        // This implementation is stupid, but the equivalent
+        //   !(value < first || value > endInclusive)
+        // keeps autocorrecting to a recursive call.
+
+        if (value < first) return false
+        if (value > endInclusive) return false
+        return true
+    }
 
     /**
      * Checks whether the range is empty.
