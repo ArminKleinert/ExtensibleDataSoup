@@ -2,6 +2,7 @@ package kleinert.edn.data
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
 
 class SymbolTest {
     @Test
@@ -177,6 +178,19 @@ class SymbolTest {
         Assertions.assertNull(Symbol.parse("~a/abc"))
         Assertions.assertNull(Symbol.parse("a#/abc"))
         Assertions.assertNull(Symbol.parse("a~/abc"))
+    }
+
+    @Test
+    fun parseChecked() {
+        Assertions.assertEquals(Symbol.symbol("ns", "abc"), Symbol.parseChecked("ns/abc"))
+        Assertions.assertEquals(Symbol.symbol("abc"), Symbol.parseChecked("abc"))
+        Assertions.assertEquals(Symbol.symbol("🎁"), Symbol.parseChecked("🎁", true))
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.parseChecked("") } //not valid
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.parseChecked("🎁") }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.parseChecked("a/+1") }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.parseChecked("🎁/a") }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.parseChecked("a~/abc") }
     }
 
     @Test

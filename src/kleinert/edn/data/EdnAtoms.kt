@@ -1,9 +1,5 @@
 package kleinert.edn.data
 
-import kleinert.edn.data.Keyword.Companion.parse
-import kleinert.edn.data.Symbol.Companion.isValidSymbol
-import kleinert.edn.data.Symbol.Companion.parse
-import java.lang.ref.Reference
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
@@ -41,7 +37,7 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
         this === other || (other is Keyword && sym == other.sym)
 
     companion object {
-        private val table = ConcurrentHashMap<Symbol, Reference<Keyword?>>()
+        private val table = ConcurrentHashMap<Symbol, WeakReference<Keyword?>>()
         private val rq = ReferenceQueue<Keyword?>()
 
         /**
@@ -59,9 +55,12 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
 
             val substring = s.substring(1)
 
-            if (!isValidSymbol(substring, allowUTF)) return null
-
             return intern(Symbol.parse(substring, allowUTF) ?: return null)
+        }
+
+        fun parseChecked(s: String, allowUTF: Boolean = false): Keyword {
+            val name = if (s.startsWith(':')) s else ":$s"
+            return parse(name, allowUTF) ?: throw IllegalArgumentException("Illegal keyword format: $s")
         }
 
         private fun clearCache() {
@@ -74,7 +73,7 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
             }
 
             for (e in table.entries) {
-                val ref: Reference<Keyword?> = e.value
+                val ref: WeakReference<Keyword?> = e.value
                 if (ref.get() == null) {
                     table.remove(e.key, ref)
                 }
@@ -100,7 +99,7 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
                 return existingKeyword
             }
             table.remove(sym, existingRef)
-            return intern(sym)
+            return intern(sym) // Intentional recursion
         }
 
         fun find(sym: Symbol): Keyword? {
@@ -180,25 +179,22 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
             var dividerIndex: Int? = -1
 
             val codepoints = s.codePoints().toArray()
-            when (codepoints[0]) {
-                '.'.code, '+'.code, '-'.code ->
-                    if (codepoints.size > 1 && (codepoints[1] in '0'.code..'9'.code)) return null
-
-                '/'.code -> return if (codepoints.size == 1) -1 else null
-            }
-
-            val iter = codepoints.iterator().withIndex()
+            val iter = codepoints.withIndex()
             for ((index, chr) in iter) {
+                if (chr in 'a'.code..'z'.code || chr in 'A'.code..'Z'.code || chr in '0'.code..'9'.code) {
+                    continue
+                }
                 when (chr) {
                     '*'.code, '!'.code, '_'.code, '?'.code, '$'.code, '%'.code, '&'.code, '='.code, '<'.code, '>'.code -> {}
-                    in 'a'.code..'z'.code, in 'A'.code..'Z'.code, in '0'.code..'9'.code -> {}
+
                     '.'.code, '+'.code, '-'.code -> {
                         if ((index == 0 || index - 1 == dividerIndex) && index < codepoints.size - 1 && codepoints[index + 1] in '0'.code..'9'.code)
                             return null
                     }
 
                     '/'.code -> {
-                        if (!iter.hasNext()) return null
+                        if (index == 0) return null
+                        if (codepoints.size <= index + 1) return null
                         if (dividerIndex == -1) dividerIndex = index
                     }
 
@@ -248,7 +244,7 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
             val dividerIndex = dividerIndexIfValid(s, allowUTF) ?: return null
 
             if (dividerIndex != -1) {
-                val (prefix, postfix) = s.split('/')
+                val (prefix, postfix) = s.split('/', limit = 2)
                 return symbol(prefix, postfix)
             }
 
@@ -273,6 +269,20 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
          * @return A new [Symbol].
          */
         fun symbol(name: String) = Symbol(null, name)
+
+        /**
+         * Parses [s] into a [Symbol]. Throws an exception if parsing fails.
+         *
+         * @throws IllegalArgumentException If parsing failed.
+         *
+         * @see parse
+         *
+         * @param s The input [String].
+         *
+         * @return A new [Symbol].
+         */
+        fun parseChecked(s: String, allowUTF: Boolean = false): Symbol =
+            parse(s, allowUTF) ?: throw IllegalArgumentException("Illegal symbol format: $s")
 
         /**
          * Parses [s] into a [Symbol]. Throws an exception if parsing fails.
