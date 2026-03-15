@@ -18,6 +18,7 @@ class EDNReaderCharTest {
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("[\\ ]") }
         Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("[#\\ ]") }
     }
+
     @Test
     fun parseSpecialCharsTest() {
         Assertions.assertEquals('\n', EDN.read("\\newline"))
@@ -69,7 +70,13 @@ class EDNReaderCharTest {
         Assertions.assertEquals(Char32(12), EDN.read("#\\formfeed", options = EDN.extendedOptions))
         Assertions.assertEquals(Char32('\r'.code), EDN.read("#\\return", options = EDN.extendedOptions))
 
-        Assertions.assertEquals(Char32.valueOf("\uD83D\uDD46"), EDN.read("#\\u0001F546", options = EDN.extendedOptions)) // White latin cross
-        Assertions.assertEquals(Char32.valueOf("\uD83D\uDD47"), EDN.read("#\\u0001F547", options = EDN.extendedOptions)) // Heavy latin cross
+        Assertions.assertEquals(
+            Char32.valueOf("\uD83D\uDD46"),
+            EDN.read("#\\u0001F546", options = EDN.extendedOptions)
+        ) // White latin cross
+        Assertions.assertEquals(
+            Char32.valueOf("\uD83D\uDD47"),
+            EDN.read("#\\u0001F547", options = EDN.extendedOptions)
+        ) // Heavy latin cross
     }
 }

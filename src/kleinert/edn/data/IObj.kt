@@ -11,17 +11,17 @@ data class IObj<T>(val meta: Map<out Any?, Any?>?, val obj: T) {
         /**
          * Creates an [IObj] with the meta-data being the map {:tag [meta]}.
          */
-        fun <T> valueOf(meta: String, obj: T) = IObj(EdnMap(listOf(Keyword["tag"] to meta)), obj)
+        fun <T> valueOf(meta: String, obj: T) = IObj(EdnMap.create(listOf(Keyword["tag"] to meta)), obj)
 
         /**
          * Creates an [IObj] with the meta-data being the map {:tag [meta]}.
          */
-        fun <T> valueOf(meta: Symbol, obj: T) = IObj(EdnMap(listOf(Keyword["tag"] to meta)), obj)
+        fun <T> valueOf(meta: Symbol, obj: T) = IObj(EdnMap.create(listOf(Keyword["tag"] to meta)), obj)
 
         /**
          * Creates an [IObj] with the meta-data being the map {[meta] true}.
          */
-        fun <T> valueOf(meta: Keyword, obj: T) = IObj(EdnMap(listOf(meta to true)), obj)
+        fun <T> valueOf(meta: Keyword, obj: T) = IObj(EdnMap.create(listOf(meta to true)), obj)
 
         /**
          * Equivalent to a normal constructor call for [IObj].

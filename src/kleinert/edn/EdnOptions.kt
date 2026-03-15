@@ -163,7 +163,7 @@ object ExtendedEDNDecoders {
     @OptIn(ExperimentalEncodingApi::class)
     private fun base64decode(it: Any?): Any {
         require(it is String)
-        return String(Base64.Default.decode(it))
+        return String(Base64.decode(it))
     }
 
     @OptIn(ExperimentalEncodingApi::class)
@@ -218,19 +218,19 @@ object ExtendedEDNDecoders {
  * @param allowMoreEncoderDecoderNames By default, the names of decoders for [EDN.read] and encoders for [EDN.pprint] must be valid [Symbol] strings with a namespace. With this option, the namespace is optional.
  * @param allowNumericSuffixes Allow numeric suffixes to specify the number type. "_i8" means [Byte], "_i16" means [Short], "_i32" means [Int]. "_i64" and "L" specify [Long], but all numbers which aren't [BigInteger], [BigDecimal], or [Double], are considered to be [Long] by default.
  * @param allowSchemeUTF32Codes Option for [EDN.read] only. Allow [Char32] literals of the form "\\xXXXXXXXX" where X is a hexadecimal digit.
- * @param allowUTFSymbols For [EDN.read] only. By the EDN specification, [Symbol] names and namespaces can only contain 16-bit chars. This option allows the usage of the full unicode spectrum.
+ * @param allowUTFSymbols For [EDN.read] only. By the EDN specification, [Symbol] names and namespaces can only contain 16-bit chars. This option allows the usage of the full Unicode spectrum.
  * @param ednClassDecoders Option for [EDN.read] only. This Map contains string keys and `(Any?)->Any?` functions as values. These can be used to create more complex objects from EDN-objects. See examples at [EDN.read].
  * @param ednClassEncoders For [EDN.pprint] only. A list of Pairs of [Class] objects and functions which convert objects into tagged EDN objects. See examples at [EDN.pprint].
  * @param encoderCollectionElementLimit Only for [EDN.pprint]. Print a maximum of this many elements for collections (Lists, Vectors, Maps, Sets, etc.) before truncating with "...".
  * @param encoderLineIndent For [EDN.pprint] only.
  * @param encoderMaxColumn For [EDN.pprint] only.
  * @param encoderSequenceElementLimit Only for [EDN.pprint]. Print a maximum of this many elements for [Sequence]s before truncating with "...".
- * @param encodingSequenceSeparator Only for [EDN.pprint]. Specifies the separator between elements in printed [Collection] and [Sequence] objects. The default is ", ", but " " is also a good choice.
+ * @param encodingSequenceSeparator Only for [EDN.pprint]. Specifies the separator between elements in printed [Collection] and [Sequence] objects. The default is ",", but " " is also a good choice.
  * @param listToEdnListConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [EdnList]. This function is used when reading lists, but not vectors.
  * @param listToEdnVectorConverter Option for [EDN.read] only. A function which takes a [List] and returns a [List]. The default is the construction of a [EdnVector]. This function is used when reading vectors, but not lists.
- * @param mapToEdnMapConverter Option for [EDN.read] only. By default, Maps are ordered (for example, [LinkedHashMap]). This function allows the user to convert it to another [Map] type. The default is the construction of a [EdnMap].
+ * @param listToEdnMapConverter Option for [EDN.read] only. By default, Maps are ordered (for example, [LinkedHashMap]). This function allows the user to convert it to another [Map] type. The default is the construction of a [EdnMap].
  * @param moreNumberPrefixes Option for [EDN.read] only. Allows more prefixes for integral numbers with different bases: "0o" for octal, "0b" for binary.
- * @param setToEdnSetConverter Option for [EDN.read] only. By default, Sets are ordered (for example, [LinkedHashSet]). The user might want unordered Sets. This options allows user-defined conversion. The default is the construction of a [EdnSet].
+ * @param listToEdnSetConverter Option for [EDN.read] only. By default, Sets are ordered (for example, [LinkedHashSet]). The user might want unordered Sets. This options allows user-defined conversion. The default is the construction of a [EdnSet].
  * @param encoderPrettyPrint Option for [EDN.pprint]. If true, pretty printing is done. Otherwise, it is not.
  *
  * @author Armin Kleinert
@@ -241,15 +241,14 @@ data class EDNSoupOptions(
     val ednClassDecoders: Map<String, (Any?) -> Any?> = mapOf(),
     val ednClassEncoders: List<Pair<Class<*>, (Any) -> Pair<String?, *>?>> = listOf(),
     val moreNumberPrefixes: Boolean = false,
-    //val allowTimeDispatch: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
     val allowRatios: Boolean = false,
     val encodingSequenceSeparator: String = ", ",
-    val listToEdnListConverter: (List<*>) -> List<*> = { EdnList.wrap(it) },
-    val listToEdnVectorConverter: (List<*>) -> List<*> = { EdnVector.wrap(it) },
-    val setToEdnSetConverter: (List<*>) -> Set<*> = { EdnSet.wrap(it) },
-    val mapToEdnMapConverter: (List<Pair<*, *>>) -> Map<*, *> = { EdnMap.wrap(it) },
+    val listToEdnListConverter: (List<*>) -> List<*> = { EdnList.create(it) },
+    val listToEdnVectorConverter: (List<*>) -> List<*> = { EdnVector.create(it) },
+    val listToEdnSetConverter: (List<*>) -> Set<*> = { EdnSet.create(it) },
+    val listToEdnMapConverter: (List<Pair<*, *>>) -> Map<*, *> = { EdnMap.create(it) },
     val allowUTFSymbols: Boolean = false,
     val allowDefinitionsAndReferences: Boolean = false,
     val dispatchMacros: Map<String, (Any?)->Any?> = mapOf(),
@@ -291,7 +290,6 @@ data class EDNSoupOptions(
                 allowSchemeUTF32Codes = true,
                 allowDispatchChars = true,
                 moreNumberPrefixes = true,
-                //allowTimeDispatch = true,
                 allowNumericSuffixes = true,
                 allowMoreEncoderDecoderNames = true,
                 encodingSequenceSeparator = ", ",

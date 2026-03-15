@@ -4,15 +4,42 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions
 import java.util.*
-import kotlin.collections.HashSet
 import kotlin.collections.LinkedHashSet
 
 class EdnSetTest {
+    private fun <T> sequencedSetOf(vararg xs: T): SequencedSet<T> =
+        LinkedHashSet(xs.toList())
+
+    @Test
+    fun fromSequencedCollection() {
+        Assertions.assertEquals(setOf(1, 2, 3), EdnSet.create(sequencedSetOf(1, 2, 3)))
+        Assertions.assertEquals(setOf(2, 3, 1), EdnSet.create(sequencedSetOf(2, 3, 1)))
+
+        Assertions.assertEquals(listOf(1, 2, 3), EdnSet.create(sequencedSetOf(1, 2, 3)).toList())
+        Assertions.assertEquals(listOf(2, 3, 1), EdnSet.create(sequencedSetOf(2, 3, 1)).toList())
+
+        val lhs = LinkedHashSet<Int>()
+        val list = (0..19990).filter { it.mod(2) == 0 }.shuffled()
+        lhs.addAll(list)
+        Assertions.assertEquals(list, EdnSet.create(lhs).toList())
+        Assertions.assertEquals(list, EdnSet.create(list).toList())
+    }
+
+    @Test
+    fun fromSelf() {
+        val l = EdnSet.of(1, 2, 3, 4, 5)
+        Assertions.assertSame(l, EdnSet.create(l))
+    }
+
     @Test
     fun getSize() {
         Assertions.assertEquals(0, EdnSet.of<Int>().size)
         Assertions.assertEquals(5, EdnSet.of(1, 2, 3, 4, 5).size)
         Assertions.assertEquals(1, EdnSet.of(1, 1, 1, 1, 1).size)
+
+        Assertions.assertEquals(0, EdnSet.create<Int>(sequencedSetOf()).size)
+        Assertions.assertEquals(5, EdnSet.create(sequencedSetOf(1, 2, 3, 4, 5)).size)
+        Assertions.assertEquals(1, EdnSet.create(sequencedSetOf(1, 1, 1, 1, 1)).size)
     }
 
     @Test
@@ -43,11 +70,13 @@ class EdnSetTest {
 
     @Test
     fun testEquals() {
-        val pset = EdnSet.of(1, 2, 3)
-        Assertions.assertTrue(pset.equals(pset))
-        Assertions.assertTrue(pset.equals(EdnSet.of(1, 2, 3)))
-        Assertions.assertTrue(pset.equals(setOf(1, 2, 3)))
-        Assertions.assertFalse(pset.equals(listOf<Int>()))
-        Assertions.assertFalse(pset.equals(setOf<Int>()))
+        val testSet = EdnSet.of(1, 2, 3)
+        Assertions.assertEquals(testSet, testSet)
+        Assertions.assertEquals(testSet, EdnSet.of(1, 2, 3))
+        Assertions.assertEquals(testSet, setOf(1, 2, 3))
+        Assertions.assertEquals(testSet, EdnSet.of(2, 1, 3))
+        Assertions.assertEquals(testSet, setOf(2, 1, 3))
+        Assertions.assertFalse(testSet == listOf<Int>())
+        Assertions.assertNotEquals(testSet, setOf<Int>())
     }
 }

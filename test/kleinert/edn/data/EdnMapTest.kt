@@ -4,8 +4,49 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions
 import java.util.*
+import kotlin.collections.toList
 
 class EdnMapTest {
+    private fun <K, V> sequencedMapOf(vararg xs: Pair<K, V>): SequencedMap<K, V> {
+        val lhm = LinkedHashMap<K, V>()
+        for ((k, v) in xs) {
+            lhm[k] = v
+        }
+        return lhm
+    }
+
+    @Test
+    fun fromSequencedCollection() {
+        // From Map, order doesn't matter.
+        Assertions.assertEquals(mapOf(1 to 2, 3 to 4), EdnMap.create(sequencedMapOf(1 to 2, 3 to 4)))
+        Assertions.assertEquals(mapOf(2 to 3, 1 to 4), EdnMap.create(sequencedMapOf(2 to 3, 1 to 4)))
+
+        // From Map, order does matter.
+        Assertions.assertEquals(listOf(1 to 2, 3 to 4), EdnMap.create(sequencedMapOf(1 to 2, 3 to 4)).toList())
+        Assertions.assertEquals(listOf(2 to 3, 1 to 4), EdnMap.create(sequencedMapOf(2 to 3, 1 to 4)).toList())
+
+
+        // From List, order does matter.
+        Assertions.assertEquals(mapOf(1 to 2, 3 to 4), EdnMap.create(listOf(1 to 2, 3 to 4)))
+        Assertions.assertEquals(mapOf(2 to 3, 1 to 4), EdnMap.create(listOf(2 to 3, 1 to 4)))
+
+        // From SequencedSet, order does matter.
+        Assertions.assertEquals(mapOf(1 to 2, 3 to 4), EdnMap.create(EdnSet.of(1 to 2, 3 to 4)))
+        Assertions.assertEquals(mapOf(2 to 3, 1 to 4), EdnMap.create(EdnSet.of(2 to 3, 1 to 4)))
+
+        val lhs = LinkedHashMap<Int, Int>()
+        val list = (0..19991).chunked(2).map { (k, v) -> k to v }.shuffled()
+        lhs.putAll(list)
+        Assertions.assertEquals(list, EdnMap.create(lhs).toList())
+        Assertions.assertEquals(list, EdnMap.create(list).toList())
+    }
+
+    @Test
+    fun fromSelf() {
+        val l = EdnMap.of(1 to 2, 3 to 4, 5 to 6)
+        Assertions.assertSame(l, EdnMap.create(l))
+    }
+
     @Test
     fun getEntries() {
         Assertions.assertEquals(setOf<Map.Entry<Int, Int>>(), EdnMap.of<Int, Int>().entries)
@@ -32,9 +73,9 @@ class EdnMapTest {
 
     @Test
     fun get() {
-        Assertions.assertNull(EdnMap.of<Int, Int>().get(1))
-        Assertions.assertNull(EdnMap.of(1 to 2, 3 to 4).get(6))
-        Assertions.assertEquals(2, EdnMap.of(1 to 2, 3 to 4).get(1))
+        Assertions.assertNull(EdnMap.of<Int, Int>()[1])
+        Assertions.assertNull(EdnMap.of(1 to 2, 3 to 4)[6])
+        Assertions.assertEquals(2, EdnMap.of(1 to 2, 3 to 4)[1])
     }
 
     @Test
@@ -60,9 +101,9 @@ class EdnMapTest {
     @Test
     fun testEquals() {
         val pmap = EdnMap.of(1 to 2, 3 to 4)
-        Assertions.assertTrue(pmap.equals(pmap))
-        Assertions.assertTrue(pmap.equals(EdnMap.of(1 to 2, 3 to 4)))
-        Assertions.assertTrue(pmap.equals(mapOf(1 to 2, 3 to 4)))
-        Assertions.assertFalse(pmap.equals(mapOf<Int, Int>()))
+        Assertions.assertSame(pmap, pmap)
+        Assertions.assertEquals(pmap, EdnMap.of(1 to 2, 3 to 4))
+        Assertions.assertEquals(pmap, mapOf(1 to 2, 3 to 4))
+        Assertions.assertNotEquals(pmap, mapOf<Int, Int>())
     }
 }

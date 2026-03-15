@@ -248,17 +248,17 @@ class EDNReaderNumberBasicIntegralTest {
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
 
-        Assertions.assertThrows(EdnReaderException::class.java) {EDN.read("00N")}
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("00N") }
         EDN.read("00N", allowZeros).let {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        Assertions.assertThrows(EdnReaderException::class.java) {EDN.read("+00N")}
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("+00N") }
         EDN.read("+00N", allowZeros).let {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
         }
-        Assertions.assertThrows(EdnReaderException::class.java) {EDN.read("-00N")}
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("-00N") }
         EDN.read("-00N", allowZeros).let {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.ZERO, it)
@@ -374,17 +374,17 @@ class EDNReaderNumberBasicIntegralTest {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(bigint128.negate(), it)
         }
-        Assertions.assertThrows(EdnReaderException::class.java) {EDN.read("0200N")}
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("0200N") }
         EDN.read("0200N", allowZeros).let {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.valueOf(200L), it)
         }
-        Assertions.assertThrows(EdnReaderException::class.java) {EDN.read("+0200N")}
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("+0200N") }
         EDN.read("+0200N", allowZeros).let {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.valueOf(200L), it)
         }
-        Assertions.assertThrows(EdnReaderException::class.java) {EDN.read("-0200N")}
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("-0200N") }
         EDN.read("-0200N", allowZeros).let {
             Assertions.assertTrue(it is BigInteger)
             Assertions.assertEquals(BigInteger.valueOf(200L).negate(), it)

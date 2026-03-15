@@ -1,6 +1,5 @@
 package kleinert.edn.data
 
-import kleinert.edn.data.Char32
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

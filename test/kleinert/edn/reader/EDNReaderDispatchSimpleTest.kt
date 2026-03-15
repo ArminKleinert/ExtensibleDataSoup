@@ -48,10 +48,22 @@ class EDNReaderDispatchSimpleTest {
         Assertions.assertEquals(Char32('ῷ'.code), EDN.read("#\\x00001ff7", EDN.extendedOptions))
 
         // Hexadecimal dispatch "char" (string) over 2^16
-        Assertions.assertEquals(Char32.valueOf("\uD83C\uDF81"), EDN.read("#\\u0001F381", EDN.extendedOptions)) // Wrapped present 🎁
-        Assertions.assertEquals(Char32.valueOf("\uD83C\uDF81"), EDN.read("#\\x0001F381", EDN.extendedOptions)) // Wrapped present 🎁
-        Assertions.assertEquals(Char32.valueOf("\uD83E\uDFF0"), EDN.read("#\\u0001FBF0", EDN.extendedOptions)) // Segmented Digit Zero
-        Assertions.assertEquals(Char32.valueOf("\uD83E\uDFF0"), EDN.read("#\\x0001FBF0", EDN.extendedOptions)) // Segmented Digit Zero
+        Assertions.assertEquals(
+            Char32.valueOf("\uD83C\uDF81"),
+            EDN.read("#\\u0001F381", EDN.extendedOptions)
+        ) // Wrapped present 🎁
+        Assertions.assertEquals(
+            Char32.valueOf("\uD83C\uDF81"),
+            EDN.read("#\\x0001F381", EDN.extendedOptions)
+        ) // Wrapped present 🎁
+        Assertions.assertEquals(
+            Char32.valueOf("\uD83E\uDFF0"),
+            EDN.read("#\\u0001FBF0", EDN.extendedOptions)
+        ) // Segmented Digit Zero
+        Assertions.assertEquals(
+            Char32.valueOf("\uD83E\uDFF0"),
+            EDN.read("#\\x0001FBF0", EDN.extendedOptions)
+        ) // Segmented Digit Zero
     }
 
     @Test

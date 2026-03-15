@@ -95,9 +95,9 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
                 return k!!
             }
 
-            val existingk = existingRef.get()
-            if (existingk != null) {
-                return existingk
+            val existingKeyword = existingRef.get()
+            if (existingKeyword != null) {
+                return existingKeyword
             }
             table.remove(sym, existingRef)
             return intern(sym)

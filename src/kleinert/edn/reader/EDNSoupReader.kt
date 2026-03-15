@@ -255,7 +255,7 @@ class EDNSoupReader private constructor(
             result[key] = value
             i++
         } while (true)
-        return options.mapToEdnMapConverter(lst.chunked(2) { (k, v) -> Pair(k, v) })
+        return options.listToEdnMapConverter(lst.chunked(2) { (k, v) -> Pair(k, v) })
     }
 
     private fun readSet(level: Int, separator: Int = '}'.code): Set<*> {
@@ -273,7 +273,7 @@ class EDNSoupReader private constructor(
             result.add(key)
             i++
         } while (true)
-        return options.setToEdnSetConverter(lst)
+        return options.listToEdnSetConverter(lst)
     }
 
     private fun readChar(): Char {
@@ -582,8 +582,8 @@ class EDNSoupReader private constructor(
             throw EdnReaderException(linePos, codePosIndex, "Metadata is turned off.")
 
         val meta = when (val m = readForm(level, true)) {
-            is String, is Symbol -> EdnMap(listOf(Keyword["tag"] to m))
-            is Keyword -> EdnMap(listOf(m to true))
+            is String, is Symbol -> EdnMap.create(listOf(Keyword["tag"] to m))
+            is Keyword -> EdnMap.create(listOf(m to true))
             !is Map<*, *> -> throw EdnReaderException(
                 linePos, codePosIndex, "Metadata must be Symbol,Keyword,String or Map"
             )

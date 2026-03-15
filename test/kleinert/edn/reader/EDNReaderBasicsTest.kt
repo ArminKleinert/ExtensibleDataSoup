@@ -21,7 +21,7 @@ class EDNReaderBasicsTest {
         // the sequence is not terminated correctly.
         Assertions.assertEquals(listOf<Any?>(), EDN.read("(;\n)"))
         Assertions.assertEquals(listOf<Any?>(), EDN.read("[;\n]"))
-        Assertions.assertEquals(mapOf<Any?,Any?>(), EDN.read("{;\n}"))
+        Assertions.assertEquals(mapOf<Any?, Any?>(), EDN.read("{;\n}"))
         Assertions.assertEquals(setOf<Any?>(), EDN.read("#{;\n}"))
     }
 

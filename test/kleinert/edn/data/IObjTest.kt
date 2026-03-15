@@ -8,7 +8,6 @@ class IObjTest {
     fun valueOf_StringAndObj() {
         val meta = "meta"
         val io = IObj.valueOf(meta, "obj")
-        Assertions.assertTrue(io is IObj<String>)
         Assertions.assertEquals("obj", io.obj)
         Assertions.assertEquals(mapOf(Keyword["tag"] to meta), io.meta)
         Assertions.assertEquals(IObj(mapOf(Keyword["tag"] to meta), "obj"), io)
@@ -18,7 +17,6 @@ class IObjTest {
     fun valueOf_SymbolAndObj() {
         val meta = Symbol.symbol("meta")
         val io = IObj.valueOf(meta, "obj")
-        Assertions.assertTrue(io is IObj<String>)
         Assertions.assertEquals("obj", io.obj)
         Assertions.assertEquals(mapOf(Keyword["tag"] to meta), io.meta)
         Assertions.assertEquals(IObj(mapOf(Keyword["tag"] to meta), "obj"), io)
@@ -26,9 +24,8 @@ class IObjTest {
 
     @Test
     fun valueOf_KeywordAndObj() {
-        val meta = Keyword.get("meta")
+        val meta = Keyword.parse(":meta")!!
         val io = IObj.valueOf(meta, "obj")
-        Assertions.assertTrue(io is IObj<String>)
         Assertions.assertEquals("obj", io.obj)
         Assertions.assertEquals(mapOf(meta to true), io.meta)
         Assertions.assertEquals(IObj(mapOf(meta to true), "obj"), io)
@@ -38,7 +35,6 @@ class IObjTest {
     fun valueOf_MapAndObj() {
         val meta = mapOf(Keyword["tag"] to 123)
         val io = IObj.valueOf(meta, "obj")
-        Assertions.assertTrue(io is IObj<String>)
         Assertions.assertEquals("obj", io.obj)
         Assertions.assertEquals(meta, io.meta)
         Assertions.assertEquals(IObj(meta, "obj"), io)
@@ -47,9 +43,8 @@ class IObjTest {
     @Test
     fun valueOf_ObjOnly() {
         val io = IObj.valueOf("obj")
-        Assertions.assertTrue(io is IObj<String>)
-        Assertions.assertEquals("obj", IObj.valueOf("obj").obj)
-        Assertions.assertEquals(mapOf<Any?, Any?>(), IObj.valueOf("obj").meta)
+        Assertions.assertEquals("obj", io.obj)
+        Assertions.assertEquals(mapOf<Any?, Any?>(), io.meta)
     }
 
     @Test

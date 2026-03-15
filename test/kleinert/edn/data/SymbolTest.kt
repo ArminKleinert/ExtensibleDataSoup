@@ -165,7 +165,7 @@ class SymbolTest {
 
 
     @Test
-    fun parseInvalidWitInvalidhNs() {
+    fun parseInvalidWitInvalidNs() {
         Assertions.assertNull(Symbol.parse("/abc")) // empty namespace
         Assertions.assertNull(Symbol.parse("+1/abc"))// invalid first char
         Assertions.assertNull(Symbol.parse("-1/abc"))// invalid first char
@@ -243,11 +243,11 @@ class SymbolTest {
 
     @Test
     fun get() {
-        Assertions.assertEquals(Symbol.symbol("ns", "abc"), Symbol.get("ns/abc"))
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("ns/🎁") }
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("ns/") }// no name
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("/abc") } // empty namespace
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("+1") }// invalid first char
+        Assertions.assertEquals(Symbol.symbol("ns", "abc"), Symbol["ns/abc"])
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol["ns/🎁"] }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol["ns/"] }// no name
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol["/abc"] } // empty namespace
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol["+1"] }// invalid first char
     }
 
     @Test

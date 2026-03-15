@@ -31,9 +31,9 @@ object EDN {
      *  - [EDNSoupOptions.encoderCollectionElementLimit]
      *  - [EDNSoupOptions.listToEdnListConverter]
      *  - [EDNSoupOptions.listToEdnVectorConverter]
-     *  - [EDNSoupOptions.mapToEdnMapConverter]
+     *  - [EDNSoupOptions.listToEdnMapConverter]
      *  - [EDNSoupOptions.moreNumberPrefixes]
-     *  - [EDNSoupOptions.setToEdnSetConverter]
+     *  - [EDNSoupOptions.listToEdnSetConverter]
      *
      * Using tagged objects, users can define their own tagged objects.
      * ```

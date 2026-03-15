@@ -1,7 +1,7 @@
 package kleinert.edn.data
 
 /**
- * A unicode char using a 32 bit code. This class is a value class, so it takes up no extra space on the stack or heap.
+ * A Unicode char using a 32 bit code. This class is a value class, so it takes up no extra space on the stack or heap.
  *
  * @property code The char code Should be between 0 and 0x10ffff.
  * @constructor Creates a new [Char32].

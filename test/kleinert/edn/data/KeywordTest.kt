@@ -129,7 +129,7 @@ class KeywordTest {
 
 
     @Test
-    fun parseInvalidWitInvalidhNs() {
+    fun parseInvalidWitInvalidNs() {
         Assertions.assertNull(Keyword.parse(":/abc")) // empty namespace
         Assertions.assertNull(Keyword.parse(":+1/abc"))// invalid first char
         Assertions.assertNull(Keyword.parse(":-1/abc"))// invalid first char
@@ -241,20 +241,20 @@ class KeywordTest {
 
     @Test
     fun get() {
-        Assertions.assertEquals(Keyword.keyword(null, "abc"), Keyword.get("abc"))
-        Assertions.assertEquals(Keyword.keyword("ns", "+"), Keyword.get("ns/+"))
-        Assertions.assertEquals(Keyword.keyword("ns", "abc"), Keyword.get("ns/abc"))
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword.get("ns/🎁") }
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword.get("ns/") }// no name
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword.get("/abc") } // empty namespace
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword.get("+1") }// invalid first char
+        Assertions.assertEquals(Keyword.keyword(null, "abc"), Keyword["abc"])
+        Assertions.assertEquals(Keyword.keyword("ns", "+"), Keyword["ns/+"])
+        Assertions.assertEquals(Keyword.keyword("ns", "abc"), Keyword["ns/abc"])
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword["ns/🎁"] }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword["ns/"] }// no name
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword["/abc"] } // empty namespace
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Keyword["+1"] }// invalid first char
     }
 
     @Test
     fun getSymbol() {
-        Assertions.assertEquals(Keyword.get(Symbol.symbol("abc")), Keyword.get(Symbol.symbol("abc")))
-        Assertions.assertEquals(Keyword.get(Symbol.symbol("ns", "+")), Keyword.get(Symbol.symbol("ns", "+")))
-        Assertions.assertEquals(Keyword.get(Symbol.symbol("ns", "abc")), Keyword.get(Symbol.symbol("ns", "abc")))
+        Assertions.assertSame(Keyword[Symbol.symbol("abc")], Keyword[Symbol.symbol("abc")])
+        Assertions.assertSame(Keyword[Symbol.symbol("ns", "+")], Keyword[Symbol.symbol("ns", "+")])
+        Assertions.assertSame(Keyword[Symbol.symbol("ns", "abc")], Keyword[Symbol.symbol("ns", "abc")])
     }
 
     @Test

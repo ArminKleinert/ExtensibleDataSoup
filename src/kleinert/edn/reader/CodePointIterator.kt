@@ -85,32 +85,32 @@ internal class CodePointIterator : PrimitiveIterator.OfInt, Closeable {
         return this
     }
 
-    fun takeCodePoints(dest: StringBuilder, condition: (Int) -> Boolean): StringBuilder {
+    fun takeCodePoints(destination: StringBuilder, condition: (Int) -> Boolean): StringBuilder {
         while (hasNext()) {
             val codepoint = nextInt()
             if (!condition(codepoint)) {
                 unread(codepoint)
-                return dest
+                return destination
             }
-            dest.appendCodePoint(codepoint)
+            destination.appendCodePoint(codepoint)
         }
-        return dest
+        return destination
     }
 
     inline fun takeCodePoints(
-        dest: StringBuilder = StringBuilder(), maxCount: Int, condition: (Int) -> Boolean
+        destination: StringBuilder = StringBuilder(), maxCount: Int, condition: (Int) -> Boolean
     ): StringBuilder {
         var count = 0
         while (count < maxCount && hasNext()) {
             val codepoint = nextInt()
             if (!condition(codepoint)) {
                 unread(codepoint)
-                return dest
+                return destination
             }
-            dest.appendCodePoint(codepoint)
+            destination.appendCodePoint(codepoint)
             count++
         }
-        return dest
+        return destination
     }
 
     fun skipLine() {
