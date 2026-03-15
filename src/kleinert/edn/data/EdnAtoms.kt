@@ -64,7 +64,7 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
             return intern(Symbol.parse(substring, allowUTF) ?: return null)
         }
 
-        fun clearCache() {
+        private fun clearCache() {
             if (rq.poll() == null)
                 return
 
@@ -108,16 +108,24 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
             return ref?.get()
         }
 
-        fun find(nsname: String): Keyword? {
-            return find(Symbol[nsname])
+        fun find(nsAndName: String): Keyword? {
+            return find(Symbol[nsAndName])
         }
 
         /**
          * Creates a new [Keyword]. Unlike [parse], this function performs no additional format checking.
          * @return A new [Keyword] from the input [Symbol].
          */
-        private fun keyword(s: Symbol): Keyword {
+        fun keyword(s: Symbol): Keyword {
             return intern(s)
+        }
+
+        /**
+         * Creates a new [Keyword]. Unlike [parse], this function performs no additional format checking.
+         * @return A new [Keyword] from the input [Symbol].
+         */
+        fun keyword(s: String): Keyword {
+            return keyword(null, s)
         }
 
         /**
@@ -125,7 +133,7 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
          * @return A new [Keyword].
          */
         fun keyword(prefix: String?, name: String): Keyword {
-            return Keyword(Symbol.symbol(prefix, name))
+            return intern(Symbol.symbol(prefix, name))
         }
 
         /**
@@ -135,14 +143,9 @@ class Keyword private constructor(val sym: Symbol) : Comparable<Keyword> {
          */
         operator fun get(s: String): Keyword {
             val name = if (s.startsWith(':')) s else ":$s"
-            return parse(name) ?: throw IllegalStateException("Illegal keyword format: $s")
+            return parse(name) ?: throw IllegalArgumentException("Illegal keyword format: $s")
         }
 
-        /**
-         * Equivalent to [parse], but Nicer to read.
-         * Keyword["abc"] == Keyword.parse("abc")
-         * @return A new [Keyword] from the input [Symbol].
-         */
         operator fun get(s: Symbol): Keyword {
             return intern(s)
         }

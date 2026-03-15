@@ -6,26 +6,17 @@ import org.junit.jupiter.api.Test
 class SymbolTest {
     @Test
     fun getFullyQualified() {
-        Symbol.symbol(null, "abc").let {
-            Assertions.assertFalse(it.fullyQualified)
-        }
-        Symbol.symbol("abc").let {
-            Assertions.assertFalse(it.fullyQualified)
-        }
-        Symbol.symbol("ns", "abc").let {
-            Assertions.assertTrue(it.fullyQualified)
-        }
-        Symbol.parse("abc").let {
-            Assertions.assertFalse(it!!.fullyQualified)
-        }
-        Symbol.parse("ns/abc").let {
-            Assertions.assertTrue(it!!.fullyQualified)
-        }
+        Assertions.assertFalse(Symbol.symbol(null, "abc").fullyQualified)
+        Assertions.assertFalse(Symbol.symbol("abc").fullyQualified)
+        Assertions.assertTrue(Symbol.symbol("ns", "abc").fullyQualified)
+        Assertions.assertFalse(Symbol.parse("abc")!!.fullyQualified)
+        Assertions.assertTrue(Symbol.parse("ns/abc")!!.fullyQualified)
 
         // Corner case: Empty string as ns is valid.
-        Symbol.symbol("", "abc").let {
-            Assertions.assertTrue(it.fullyQualified)
-        }
+        Assertions.assertTrue(Symbol.symbol("", "abc").fullyQualified)
+
+        // Corner case: A single slash is a valid symbol but does not have a namespace.
+        Assertions.assertFalse(Symbol.parse("/")!!.fullyQualified)
     }
 
 
@@ -67,10 +58,6 @@ class SymbolTest {
         }
     }
 
-    //    @Test
-//    fun compareTo() {
-//        TODO()
-//    }
     @Test
     fun isValidSymbolSimple() {
         Assertions.assertTrue(Symbol.isValidSymbol("abc"))
@@ -261,5 +248,10 @@ class SymbolTest {
         Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("ns/") }// no name
         Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("/abc") } // empty namespace
         Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("+1") }// invalid first char
+    }
+
+    @Test
+    fun compareTo() {
+        TODO()
     }
 }
