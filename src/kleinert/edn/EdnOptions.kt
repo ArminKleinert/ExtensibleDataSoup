@@ -250,7 +250,7 @@ data class EDNSoupOptions(
     val listToEdnSetConverter: (List<*>) -> Set<*> = { EdnSet.create(it) },
     val listToEdnMapConverter: (List<Pair<*, *>>) -> Map<*, *> = { EdnMap.create(it) },
     val allowUTFSymbols: Boolean = false,
-    val allowDefinitionsAndReferences: Boolean = false,
+    val allowReferences: Boolean = false,
     val dispatchMacros: Map<String, (Any?)->Any?> = mapOf(),
     val encoderSequenceElementLimit: Int = 1000,
     val encoderCollectionElementLimit: Int = 10000,

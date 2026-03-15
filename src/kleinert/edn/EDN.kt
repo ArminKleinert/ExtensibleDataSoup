@@ -47,7 +47,7 @@ object EDN {
      */
     fun read(
         s: String, options: EDNSoupOptions = defaultOptions,
-        references: MutableMap<Symbol, Any?> = mutableMapOf(),
+        references: Map<Symbol, Any?> = mapOf()
     ): Any? {
         val cpi = CodePointIterator(s.codePoints())
         return EDNSoupReader.read(cpi, options, references)
@@ -56,21 +56,27 @@ object EDN {
     /**
      * Parse EDN from a [File]. The file is assumed to exist and be a non-directory.
      */
-    fun read(file: File, options: EDNSoupOptions = defaultOptions,
-             references: MutableMap<Symbol, Any?> = mutableMapOf(),): Any? {
+    fun read(
+        file: File, options: EDNSoupOptions = defaultOptions,
+        references: Map<Symbol, Any?> = mapOf()
+    ): Any? {
         val cpi = CodePointIterator(file.reader(Charsets.UTF_8))
-        return  EDNSoupReader.read(cpi, options, references)
+        return EDNSoupReader.read(cpi, options, references)
     }
 
 
-    fun read(reader: InputStream, options: EDNSoupOptions = defaultOptions,
-             references: MutableMap<Symbol, Any?> = mutableMapOf(),): Any? {
+    fun read(
+        reader: InputStream, options: EDNSoupOptions = defaultOptions,
+        references: Map<Symbol, Any?> = mapOf()
+    ): Any? {
         val cpi = CodePointIterator(reader)
         return EDNSoupReader.read(cpi, options, references)
     }
 
-    fun read(reader: Reader, options: EDNSoupOptions = defaultOptions,
-             references: MutableMap<Symbol, Any?> = mutableMapOf(),): Any? {
+    fun read(
+        reader: Reader, options: EDNSoupOptions = defaultOptions,
+        references: Map<Symbol, Any?> = mapOf()
+    ): Any? {
         val cpi = CodePointIterator(reader)
         return EDNSoupReader.read(cpi, options, references)
     }

@@ -14,7 +14,7 @@ import kotlin.collections.LinkedHashMap
  */
 class EDNSoupReader private constructor(
     private val options: EDNSoupOptions, private val cpi: CodePointIterator,
-    private val references: MutableMap<Symbol, Any?>,
+    private val references: Map<Symbol, Any?>,
 ) {
     companion object {
         private val NOTHING = object {}
@@ -22,7 +22,7 @@ class EDNSoupReader private constructor(
         @Throws(EdnReaderException::class)
         internal fun read(
             cpi: CodePointIterator, options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
-            references: MutableMap<Symbol, Any?> = mutableMapOf()
+            references: Map<Symbol, Any?> = mapOf()
         ): Any? =
             EDNSoupReader(options, cpi, references).readString()
     }
@@ -45,7 +45,7 @@ class EDNSoupReader private constructor(
                 val message = "Decoder without namespace: $name"
                 throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
             }
-            if (key == "inst" || key == "uuid" || key == "def" || key == "ref") {
+            if (key == "inst" || key == "uuid" || key == "ref") {
                 val message = "Decoder name $name is not allowed."
                 throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
             }
@@ -402,8 +402,8 @@ class EDNSoupReader private constructor(
                     throw EdnReaderException(linePos, codePosIndex, msg)
                 }
                 return Instant.parse(form)
-            } else if (options.allowDefinitionsAndReferences && (token == "def" || token == "ref")) {
-                return readDefOrRef(token, form)
+            } else if (options.allowReferences && token == "ref") {
+                return readRef(token, form)
             } else {
                 val decoder = options.ednClassDecoders[token]
                 if (decoder != null) return decoder(form)
@@ -447,27 +447,7 @@ class EDNSoupReader private constructor(
         }
     }
 
-    private fun readDefOrRef(token: CharSequence, form: Any?): Any? {
-        if (token == "def") {
-            if (form !is List<*> || form.size != 2 || form[0] !is Symbol)
-                throw EdnReaderException(
-                    cpi.lineIdx, cpi.textIndex,
-                    "#$token requires a pair (vector or list) of form [Symbol, anything] as its argument, but got $form"
-                )
-
-            val name = form[0] as Symbol
-            val binding = form[1]
-            if (name in references)
-                throw EdnReaderException(
-                    cpi.lineIdx,
-                    cpi.textIndex,
-                    "#$name is already assigned to ${references[name]}"
-                )
-
-            references[name] = binding
-            return NOTHING
-        }
-
+    private fun readRef(token: CharSequence, form: Any?): Any? {
         if (token == "ref") {
             if (form !is Symbol) throw EdnReaderException(
                 cpi.lineIdx, cpi.textIndex,
