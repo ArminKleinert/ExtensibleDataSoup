@@ -85,8 +85,8 @@ class EdnSet<T> : Set<T>, SequencedSet<T> {
      */
     override fun iterator(): MutableIterator<T> = EdnIterator(inner)
 
-    override fun equals(other: Any?): Boolean= inner == other
-    override fun hashCode(): Int=inner.hashCode()
+    override fun equals(other: Any?): Boolean = inner == other
+    override fun hashCode(): Int = inner.hashCode()
     override fun toString(): String = inner.toString()
     override fun reversed(): SequencedSet<T> = wrap(inner.reversed())
 
@@ -151,12 +151,12 @@ class EdnMap<K, V> : Map<K, V>, SequencedMap<K, V> {
     }
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
-        get() = EdnSet(inner.entries.map{ Entry(it.key, it.value) })
+        get() = EdnSet(inner.entries.map { Entry(it.key, it.value) })
 
     override fun put(key: K?, value: V?): V = throw UnsupportedOperationException()
     override fun remove(key: K?): V = throw UnsupportedOperationException()
-    override fun putAll(from: Map<out K?, V?>)  = throw UnsupportedOperationException()
-    override fun clear()  = throw UnsupportedOperationException()
+    override fun putAll(from: Map<out K?, V?>) = throw UnsupportedOperationException()
+    override fun clear() = throw UnsupportedOperationException()
 
 
     override val keys: MutableSet<K>

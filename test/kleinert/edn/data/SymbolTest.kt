@@ -257,9 +257,9 @@ class SymbolTest {
     @Test
     fun get() {
         Assertions.assertEquals(Symbol.symbol("ns", "abc"), Symbol.get("ns/abc"))
-        Assertions.assertThrows(IllegalArgumentException::class.java) {Symbol.get("ns/🎁")}
-        Assertions.assertThrows(IllegalArgumentException::class.java) {Symbol.get("ns/")}// no name
-        Assertions.assertThrows(IllegalArgumentException::class.java) {Symbol.get("/abc")} // empty namespace
-        Assertions.assertThrows(IllegalArgumentException::class.java) {Symbol.get("+1")}// invalid first char
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("ns/🎁") }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("ns/") }// no name
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("/abc") } // empty namespace
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Symbol.get("+1") }// invalid first char
     }
 }

@@ -255,7 +255,7 @@ class EDNSoupReader private constructor(
             result[key] = value
             i++
         } while (true)
-        return options.mapToEdnMapConverter(lst.chunked(2, {(k, v) -> Pair(k, v)}))
+        return options.mapToEdnMapConverter(lst.chunked(2, { (k, v) -> Pair(k, v) }))
     }
 
     private fun readSet(level: Int, separator: Int = '}'.code): Set<*> {
@@ -537,14 +537,14 @@ class EDNSoupReader private constructor(
                     res.add(if (isNumber) readNumber() else readOther())
                 }
 
-                '^'.code -> {
+                '^'.code ->
                     if (options.allowMetadata) {
                         res.add(readMeta(level))
-                    }else{
+                    } else {
                         cpi.unread(codePoint)
                         res.add(readOther())
                     }
-                }
+
 
                 else -> {
                     cpi.unread(codePoint)

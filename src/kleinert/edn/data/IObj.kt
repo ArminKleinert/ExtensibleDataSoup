@@ -11,22 +11,26 @@ data class IObj<T>(val meta: Map<out Any?, Any?>?, val obj: T) {
         /**
          * Creates an [IObj] with the meta-data being the map {:tag [meta]}.
          */
-        fun <T> valueOf(meta:String, obj:T) = IObj(EdnMap(listOf(Keyword["tag"] to meta)), obj)
+        fun <T> valueOf(meta: String, obj: T) = IObj(EdnMap(listOf(Keyword["tag"] to meta)), obj)
+
         /**
          * Creates an [IObj] with the meta-data being the map {:tag [meta]}.
          */
-        fun <T> valueOf(meta: Symbol, obj:T) = IObj(EdnMap(listOf(Keyword["tag"] to meta)), obj)
+        fun <T> valueOf(meta: Symbol, obj: T) = IObj(EdnMap(listOf(Keyword["tag"] to meta)), obj)
+
         /**
          * Creates an [IObj] with the meta-data being the map {[meta] true}.
          */
-        fun <T> valueOf(meta: Keyword, obj:T) = IObj(EdnMap(listOf(meta to true)), obj)
+        fun <T> valueOf(meta: Keyword, obj: T) = IObj(EdnMap(listOf(meta to true)), obj)
+
         /**
          * Equivalent to a normal constructor call for [IObj].
          */
-        fun <T> valueOf(meta:Map<out Any?, Any?>, obj:T) = IObj(meta, obj)
+        fun <T> valueOf(meta: Map<out Any?, Any?>, obj: T) = IObj(meta, obj)
+
         /**
          * Creates an [IObj] with empty meta-data.
          */
-        fun <T> valueOf(obj:T) = IObj(mapOf(), obj)
+        fun <T> valueOf(obj: T) = IObj(mapOf(), obj)
     }
 }
