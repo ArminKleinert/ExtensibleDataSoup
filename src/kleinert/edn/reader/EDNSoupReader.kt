@@ -289,8 +289,14 @@ class EDNSoupReader private constructor(
         val codePosIndex = cpi.textIndex
 
         val token =
-            if (initialToken.isEmpty() && cpi.hasNext()) cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle)
-            else initialToken
+            if (initialToken.isEmpty() && cpi.hasNext()) cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle).trim()
+            else initialToken.trim()
+
+        if (token.isEmpty())
+            throw EdnReaderException(
+                linePos, codePosIndex,
+                "Invalid char literal. Single backslash or backslash followed by whitespace is invalid."
+            )
 
         if (token.length == 1)
             return Char32(token[0].code)

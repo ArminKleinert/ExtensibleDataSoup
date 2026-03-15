@@ -7,6 +7,18 @@ import org.junit.jupiter.api.Test
 
 class EDNReaderCharTest {
     @Test
+    fun parseSlashWhitespaceIsInvalid() {
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\\") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#\\") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\\ ") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#\\ ") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\\\n ") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#\\\n ") }
+
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("[\\ ]") }
+        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("[#\\ ]") }
+    }
+    @Test
     fun parseSpecialCharsTest() {
         Assertions.assertEquals('\n', EDN.read("\\newline"))
         Assertions.assertEquals(' ', EDN.read("\\space"))
