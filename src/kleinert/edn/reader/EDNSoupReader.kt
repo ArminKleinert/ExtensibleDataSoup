@@ -13,7 +13,7 @@ import kotlin.collections.LinkedHashMap
  * @author Armin Kleinert
  */
 class EDNSoupReader private constructor(
-    private val options: EDNSoupOptions = EDNSoupOptions.extendedOptions, private val cpi: CodePointIterator,
+    private val options: EDNSoupOptions, private val cpi: CodePointIterator,
     private val references: MutableMap<Symbol, Any?>,
 ) {
     companion object {
@@ -53,9 +53,6 @@ class EDNSoupReader private constructor(
     }
 
     private fun readString(): Any? {
-//        if (!cpi.hasNext())
-//            throw EdnReaderException(cpi.lineIdx, cpi.textIndex, "Empty input string.")
-
         val data = readForm(0)
         if ((data as Collection<*>).size != 1)
             throw EdnReaderException(

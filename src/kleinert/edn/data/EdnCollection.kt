@@ -297,7 +297,19 @@ class EdnVector<T> : List<T> {
     override fun contains(element: T): Boolean = inner.contains(element)
 
     override fun equals(other: Any?): Boolean {
-        return inner == other
+        if (other === this) return true
+        if (other !is List<*> && other !is MutableList<*>) return false
+
+        if (size != other.size) return false
+
+        val otherIterator = other.iterator()
+        for (elem in this) {
+            val elemOther = otherIterator.next()
+            if (elem != elemOther) {
+                return false
+            }
+        }
+        return true
     }
 
     override fun hashCode(): Int {

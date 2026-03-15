@@ -236,7 +236,7 @@ class KeywordTest {
     }
 
     @Test
-    fun internOnlyName() {
+    fun intern() {
         val xs = listOf(
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )

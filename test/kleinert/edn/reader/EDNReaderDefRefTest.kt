@@ -2,6 +2,7 @@ package kleinert.edn.reader
 
 import kleinert.edn.EDN
 import kleinert.edn.EDNSoupOptions
+import kleinert.edn.data.EdnVector
 import kleinert.edn.data.Symbol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -106,36 +107,34 @@ class EDNReaderDefRefTest {
     @Test
     fun parseRefUsingOutsideTest() {
         val options = EDNSoupOptions.defaultOptions.copy(allowDefinitionsAndReferences = true)
-        val refs = mutableMapOf<Symbol, Any?>(Symbol["A"] to 1L, Symbol["B"] to 2L)
 
-        Assertions.assertEquals(1L, EDN.read("#ref A", options, references = refs))
-        Assertions.assertEquals(2L, EDN.read("#ref B", options, references = refs))
+        Assertions.assertEquals(1L, EDN.read("#def [A 1] #ref A", options))
+        Assertions.assertEquals(2L, EDN.read("#def [B 2] #ref B", options))
     }
 
     @Test
     fun parseRefUsesReferencesOutsideTest() {
         val options = EDNSoupOptions.defaultOptions.copy(allowDefinitionsAndReferences = true)
-        val value = listOf(1, 2, 3)
-        val refs = mutableMapOf<Symbol, Any?>(Symbol["A"] to value)
+        val value = listOf(1L, 2L, 3L)
 
-        Assertions.assertTrue(value === EDN.read("#ref A", options, references = refs))
+        Assertions.assertEquals(value , EDN.read("#def [A [1 2 3]] #ref A", options))
 
-        val temp = EDN.read("[#ref A #ref A]", options, references = refs)
+        val temp = EDN.read("#def [A [1 2 3]] [#ref A #ref A]", options)
         temp as List<*>
-        Assertions.assertTrue(value === temp[0])
-        Assertions.assertTrue(value === temp[1])
+        Assertions.assertTrue(temp[0] === temp[1])
+        Assertions.assertTrue(value == temp[0])
+        Assertions.assertTrue(value == temp[1])
     }
 
     @Test
     fun parseRefIsDynamicTest() {
         val options = EDNSoupOptions.defaultOptions.copy(allowDefinitionsAndReferences = true)
-        val refs = mutableMapOf<Symbol, Any?>(Symbol["A"] to 1L, Symbol["B"] to Symbol["A"], Symbol["C"] to Symbol["B"])
 
-        Assertions.assertEquals(Symbol["A"], EDN.read("#ref B", options, references = refs))
-        Assertions.assertEquals(Symbol["B"], EDN.read("#ref C", options, references = refs))
-        Assertions.assertEquals(Symbol["A"], EDN.read("#ref #ref C", options, references = refs))
-        Assertions.assertEquals(1L, EDN.read("#ref #ref B", options, references = refs))
-        Assertions.assertEquals(1L, EDN.read("#ref #ref #ref C", options, references = refs))
+        Assertions.assertEquals(Symbol["A"], EDN.read("#def [B A] #ref B", options))
+        Assertions.assertEquals(Symbol["B"], EDN.read("#def [C B] #ref C", options))
+        Assertions.assertEquals(Symbol["A"], EDN.read("#def [B A] #def [C B] #ref #ref C", options))
+        Assertions.assertEquals(1L, EDN.read("#def [A 1] #def [B A] #ref #ref B", options))
+        Assertions.assertEquals(1L, EDN.read("#def [A 1] #def [B A] #def [C B] #ref #ref #ref C", options))
     }
 
     @Test
