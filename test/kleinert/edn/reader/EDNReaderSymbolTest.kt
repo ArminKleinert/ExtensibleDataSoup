@@ -116,8 +116,8 @@ class EDNReaderSymbolTest {
     fun parseSymbolUTFTest() {
         run { // 'λ' fits into simple chars.
             val text = "λ"
-            val it = EDN.read(text)
-            val symbol = Symbol.parse(text)!!
+            val it = EDN.read(text, EDN.extendedOptions)
+            val symbol = Symbol.parse(text, true)!!
             Assertions.assertTrue(it is Symbol)
             it as Symbol
             Assertions.assertEquals(symbol, it)

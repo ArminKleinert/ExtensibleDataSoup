@@ -576,8 +576,8 @@ class EDNSoupReader private constructor(
             throw EdnReaderException(linePos, codePosIndex, "Metadata is turned off.")
 
         val meta = when (val m = readForm(level, true)) {
-            is String, is Symbol -> EdnMap(mapOf(Keyword["tag"] to m))
-            is Keyword -> EdnMap(mapOf(m to true))
+            is String, is Symbol -> EdnMap(listOf(Keyword["tag"] to m))
+            is Keyword -> EdnMap(listOf(m to true))
             !is Map<*, *> -> throw EdnReaderException(
                 linePos, codePosIndex, "Metadata must be Symbol,Keyword,String or Map"
             )

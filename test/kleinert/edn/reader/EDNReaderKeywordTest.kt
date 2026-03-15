@@ -14,7 +14,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -24,7 +24,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -38,7 +38,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -52,7 +52,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -62,7 +62,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -72,7 +72,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -82,7 +82,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -92,11 +92,11 @@ class EDNReaderKeywordTest {
     fun parseKeywordSymbolsMixTest() {
         EDN.read(":a+").let {
             Assertions.assertTrue(it is Keyword)
-            Assertions.assertEquals(Keyword.parse(":a+"), it)
+            Assertions.assertSame(Keyword.parse(":a+"), it)
         }
         EDN.read(":-a").let {
             Assertions.assertTrue(it is Keyword)
-            Assertions.assertEquals(Keyword.parse(":-a"), it)
+            Assertions.assertSame(Keyword.parse(":-a"), it)
         }
         run {
             val text = ":a+"
@@ -104,7 +104,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -114,7 +114,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -124,11 +124,11 @@ class EDNReaderKeywordTest {
     fun parseKeywordUTFTest() {
         run { // 'λ' fits into simple chars.
             val text = ":λ"
-            val it = EDN.read(text)
-            val keyword = Keyword.parse(text)!!
+            val it = EDN.read(text, EDN.extendedOptions)
+            val keyword = Keyword.parse(text, true)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }
@@ -138,7 +138,7 @@ class EDNReaderKeywordTest {
             val keyword = Keyword.parse(text, true)!!
             Assertions.assertTrue(it is Keyword)
             it as Keyword
-            Assertions.assertEquals(keyword, it)
+            Assertions.assertSame(keyword, it)
             Assertions.assertEquals(keyword.namespace, it.namespace)
             Assertions.assertEquals(keyword.name, it.name)
         }

@@ -1,9 +1,12 @@
 package kleinert.edn.data
 
+import java.util.SequencedMap
+import java.util.SequencedSet
+
 /**
  * @author Armin Kleinert
  */
-private class EdnIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T> {
+private class EdnIterator<T>(private val inner: ListIterator<T>) : MutableListIterator<T>, MutableIterator<T> {
     constructor(coll: Collection<T>) : this(if (coll is List<T>) coll.listIterator() else coll.toList().listIterator())
 
     override fun hasNext(): Boolean = inner.hasNext()
@@ -37,15 +40,11 @@ private class EdnIterator<T>(private val inner: ListIterator<T>) : MutableListIt
  *
  * @param T The type of the elements.
  *
- * @property sorted
- * @property ordered
- *
  * @author Armin Kleinert
  */
-class EdnSet<T> : Set<T> {
+class EdnSet<T> : Set<T>, SequencedSet<T> {
     companion object {
         fun <T> of(vararg elements: T): EdnSet<T> = EdnSet(LinkedHashSet(elements.toList()))
-        fun <T> wrap(xs: Set<T>): EdnSet<T> = EdnSet(xs)
         fun <T> wrap(xs: List<T>): EdnSet<T> = EdnSet(xs)
     }
 
@@ -59,7 +58,7 @@ class EdnSet<T> : Set<T> {
         this.inner = LinkedHashSet(xs)
     }
 
-    constructor(xs: Set<T>) {
+    constructor(xs: SequencedSet<T>) {
         this.inner = xs.minus(xs).plus(xs) // Copy the set without changing its type.
     }
 
@@ -84,19 +83,19 @@ class EdnSet<T> : Set<T> {
     /**
      * Returns a [EdnIterator] for this collection.
      */
-    override fun iterator(): Iterator<T> = EdnIterator(inner)
+    override fun iterator(): MutableIterator<T> = EdnIterator(inner)
 
-    override fun equals(other: Any?): Boolean {
-        return inner == other
-    }
+    override fun equals(other: Any?): Boolean= inner == other
+    override fun hashCode(): Int=inner.hashCode()
+    override fun toString(): String = inner.toString()
+    override fun reversed(): SequencedSet<T> = wrap(inner.reversed())
 
-    override fun hashCode(): Int {
-        return inner.hashCode()
-    }
-
-    override fun toString(): String {
-        return inner.toString()
-    }
+    override fun add(element: T) = throw UnsupportedOperationException()
+    override fun remove(element: T) = throw UnsupportedOperationException()
+    override fun addAll(elements: Collection<T>) = throw UnsupportedOperationException()
+    override fun removeAll(elements: Collection<T>) = throw UnsupportedOperationException()
+    override fun retainAll(elements: Collection<T>) = throw UnsupportedOperationException()
+    override fun clear() = throw UnsupportedOperationException()
 }
 
 /**
@@ -104,13 +103,10 @@ class EdnSet<T> : Set<T> {
  * @param K The type of the keys.
  * @param V The type of the values.
  *
- * @property sorted
- * @property ordered
- *
  * @author Armin Kleinert
  */
-class EdnMap<K, V> : Map<K, V> {
-    class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V> {
+class EdnMap<K, V> : Map<K, V>, SequencedMap<K, V> {
+    class Entry<K, V>(override val key: K, override val value: V) : MutableMap.MutableEntry<K, V> {
         override fun toString(): String {
             return "[$key=$value]"
         }
@@ -126,13 +122,15 @@ class EdnMap<K, V> : Map<K, V> {
             result = 31 * result + (value?.hashCode() ?: 0)
             return result
         }
+
+        override fun setValue(newValue: V): V = throw UnsupportedOperationException()
     }
 
-    private val inner: Map<K, V>
+    private val inner: SequencedMap<K, V>
 
     companion object {
         fun <K, V> of(vararg entries: Pair<K, V>): EdnMap<K, V> = EdnMap(entries.toList())
-        fun <K, V> wrap(xs: Map<K, V>): EdnMap<K, V> = EdnMap(xs)
+        fun <K, V> wrap(xs: SequencedMap<K, V>): EdnMap<K, V> = EdnMap(xs)
         fun <K, V> wrap(xs: List<Pair<K, V>>): EdnMap<K, V> = EdnMap(xs)
     }
 
@@ -148,20 +146,26 @@ class EdnMap<K, V> : Map<K, V> {
             inner[k] = v
     }
 
-    constructor(xs: Map<K, V>) {
+    constructor(xs: SequencedMap<K, V>) {
         this.inner = xs
     }
 
-    override val entries: Set<Map.Entry<K, V>>
-        get() = EdnSet(inner.entries.mapTo(mutableSetOf()) { Entry(it.key, it.value) })
+    override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
+        get() = EdnSet(inner.entries.map{ Entry(it.key, it.value) })
 
-    override val keys: Set<K>
+    override fun put(key: K?, value: V?): V = throw UnsupportedOperationException()
+    override fun remove(key: K?): V = throw UnsupportedOperationException()
+    override fun putAll(from: Map<out K?, V?>)  = throw UnsupportedOperationException()
+    override fun clear()  = throw UnsupportedOperationException()
+
+
+    override val keys: MutableSet<K>
         get() = EdnSet(inner.keys)
 
     override val size: Int
         get() = inner.size
 
-    override val values: Collection<V>
+    override val values: MutableCollection<V>
         get() = EdnSet(inner.values.toSet())
 
     override fun get(key: K): V? = inner[key]
@@ -189,6 +193,8 @@ class EdnMap<K, V> : Map<K, V> {
     override fun toString(): String {
         return inner.toString()
     }
+
+    override fun reversed(): SequencedMap<K?, V?> = wrap(inner.reversed())
 }
 
 /**

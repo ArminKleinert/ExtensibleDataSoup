@@ -168,35 +168,76 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
          *
          * @return -1 if the string does not include '/', null if the string is invalid or the index of the '/' in the string.
          */
+//        private fun dividerIndexIfValid(s: String, allowUTF: Boolean = false): Int? {
+//            if (s.isEmpty())
+//                return null
+//            if (s.length == 1 && s[0] == '/')
+//                return -1
+//
+//            var dividerIndex = -1
+//
+//            for ((index, chr) in s.codePoints().toArray().withIndex()) {
+//                when (chr) {
+//                    // First-char restriction: If the name starts with dot, plus, or minus, the second char can not be numeric
+//                    '.'.code, '+'.code, '-'.code ->
+//                        if (index == dividerIndex + 1 && s.length > dividerIndex + 2 && s[dividerIndex + 2] in '0'..'9')
+//                            return null
+//
+//                    // First-char restriction: Can not start with numeric, dot, or hash symbol.
+//                    in '0'.code..'9'.code, ':'.code, '#'.code ->
+//                        if (index == dividerIndex + 1) return null
+//
+//                    // Restriction: Only one slash per symbol.
+//                    '/'.code ->
+//                        if (dividerIndex == -1 && index > 0 && index < s.length - 1) dividerIndex = index
+//                        else return null
+//
+//                    '*'.code, '!'.code, '_'.code, '?'.code, '$'.code, '%'.code, '&'.code, '='.code, '<'.code, '>'.code -> {}
+//
+//                    in 'a'.code..'z'.code, in 'A'.code..'Z'.code -> {}
+//
+//                    else -> {
+//                        if (chr.toChar().isWhitespace()) return null
+//                        if (!allowUTF && (chr < Char.MIN_VALUE.code || chr > Char.MAX_VALUE.code)) return null
+//                    }
+//                }
+//            }
+//            return dividerIndex
+//        }
         private fun dividerIndexIfValid(s: String, allowUTF: Boolean = false): Int? {
             if (s.isEmpty())
                 return null
+            if (s.length == 1 && s[0] == '/')
+                return -1
 
-            var dividerIndex = -1
+            var dividerIndex: Int? = -1
 
-            for ((index, chr) in s.codePoints().toArray().withIndex()) {
+            val codepoints = s.codePoints().toArray()
+            when (codepoints[0]) {
+                '.'.code, '+'.code, '-'.code ->
+                    if (codepoints.size > 1 && (codepoints[1] in '0'.code..'9'.code)) return null
+
+                '/'.code -> return if (codepoints.size == 1) -1 else null
+            }
+
+            val iter = codepoints.iterator().withIndex()
+            for ((index, chr) in iter) {
                 when (chr) {
-                    // First-char restriction: If the name starts with dot, plus, or minus, the second char can not be numeric
-                    '.'.code, '+'.code, '-'.code ->
-                        if (index == dividerIndex + 1 && s.length > dividerIndex + 2 && s[dividerIndex + 2] in '0'..'9')
-                            return null
-
-                    // First-char restriction: Can not start with numeric, dot, or hash symbol.
-                    in '0'.code..'9'.code, ':'.code, '#'.code ->
-                        if (index == dividerIndex + 1) return null
-
-                    // Restriction: Only one slash per symbol.
-                    '/'.code ->
-                        if (dividerIndex == -1 && index > 0 && index < s.length - 1) dividerIndex = index
-                        else return null
-
                     '*'.code, '!'.code, '_'.code, '?'.code, '$'.code, '%'.code, '&'.code, '='.code, '<'.code, '>'.code -> {}
-
-                    in 'a'.code..'z'.code, in 'A'.code..'Z'.code -> {}
+                    in 'a'.code..'z'.code, in 'A'.code..'Z'.code, in '0'.code..'9'.code -> {}
+                    '.'.code, '+'.code, '-'.code -> {
+                        if ((index == 0 || index-1 == dividerIndex) && index < codepoints.size-1 && codepoints[index+1] in '0'.code..'9'.code)
+                            return null
+                    }
+                    '/'.code -> {
+                        if (!iter.hasNext()) return null
+                        if (dividerIndex == -1) dividerIndex = index
+                    }
 
                     else -> {
                         if (chr.toChar().isWhitespace()) return null
-                        if (!allowUTF && (chr < Char.MIN_VALUE.code || chr > Char.MAX_VALUE.code)) return null
+                        else if (!allowUTF) return null
+//                        else if (chr >= Char.MIN_VALUE.code && chr <= Char.MAX_VALUE.code) return null
                     }
                 }
             }
@@ -280,11 +321,13 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
     }
 
     val fullyQualified: Boolean
-        get() = namespace?.isNotEmpty() ?: false
+        get() = namespace != null
 
     override fun toString() = if (namespace.isNullOrEmpty()) name else "$namespace/$name"
 
     override fun compareTo(other: Symbol): Int {
+        if (this === other)
+            return 0
         val prefixCompare = when {
             namespace == null -> if (other.namespace == null) 0 else -1
             other.namespace == null -> 1
@@ -296,9 +339,7 @@ class Symbol private constructor(val namespace: String?, val name: String) : Com
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Symbol
+        if (other !is Symbol) return false
 
         if (namespace != other.namespace) return false
         if (name != other.name) return false
