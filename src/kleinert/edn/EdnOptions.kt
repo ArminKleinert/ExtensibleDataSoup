@@ -259,6 +259,7 @@ data class EDNSoupOptions(
     val encoderPrettyPrint: Boolean = true,
     val allowMetadata: Boolean = false,
     val allowZeroPrefix: Boolean = false,
+    val allowMultiThreadingIfImplemented: Boolean = true,
 ) {
     companion object {
         val extendedOptions: EDNSoupOptions

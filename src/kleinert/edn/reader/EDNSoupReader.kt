@@ -56,7 +56,9 @@ class EDNSoupReader private constructor(
         val data = readForm(0)
         if ((data as Collection<*>).size != 1)
             throw EdnReaderException(
-                cpi.lineIdx, cpi.textIndex, "The string should only contain one expression, but there are multiple."
+                cpi.lineIdx,
+                cpi.textIndex,
+                "The input should only contain one expression, but there are none or multiple."
             )
         return data.first()
     }
@@ -65,13 +67,13 @@ class EDNSoupReader private constructor(
         val linePos = cpi.lineIdx
         val codePosIndex = cpi.textIndex
         try {
-            return readNumberHelper(codePosIndex, linePos)
+            return readNumberHelper(linePos, codePosIndex)
         } catch (ex: NumberFormatException) {
-            throw EdnReaderException(codePosIndex, linePos, null, ex)
+            throw EdnReaderException(linePos, codePosIndex, null, ex)
         }
     }
 
-    private fun readNumberHelper(codePosIndex: Int, linePos: Int): Number {
+    private fun readNumberHelper(linePos: Int, codePosIndex: Int): Number {
         val token = readToken(::isNotBreakingSymbol)
 
         val floatyRegex = Regex("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?")
@@ -159,20 +161,22 @@ class EDNSoupReader private constructor(
 
                 '\\'.code -> {
                     if (!cpi.hasNext()) break
-                    when (val codePt2 = cpi.nextInt()) {
-                        't'.code -> currentToken.append('\t')
-                        'b'.code -> currentToken.append('\b')
-                        'n'.code -> currentToken.append('\n')
-                        'r'.code -> currentToken.append('\r')
-                        '"'.code -> currentToken.append('\"')
-                        '\\'.code -> currentToken.append("\\")
-                        'u'.code -> currentToken.append(readUnicodeChar(4, 4, 'u').toChar()) // UTF-16 code
-                        'x'.code -> currentToken.appendCodePoint(readUnicodeChar(8, 8, 'x').code) // UTF-32 code
+                    val temp = when (val escapeCodePt = cpi.nextInt()) {
+                        't'.code -> '\t'.code
+                        'b'.code -> '\b'.code
+                        'n'.code -> '\n'.code
+                        'r'.code -> '\r'.code
+                        '"'.code -> '\"'.code
+                        '\\'.code -> '\\'.code
+                        'u'.code -> readUnicodeChar(4, 4, 'u').code // UTF-16 code
+                        'x'.code -> readUnicodeChar(8, 8, 'x').code // UTF-32 code
                         else -> {
-                            val message = "Invalid escape sequence: \\${codePt2.toChar()} in string $currentToken"
+                            val message =
+                                "Invalid escape sequence: \\${escapeCodePt.toChar()} in string $currentToken"
                             throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
                         }
                     }
+                    currentToken.appendCodePoint(temp)
                 }
 
                 else -> currentToken.appendCodePoint(codePoint)
@@ -185,7 +189,7 @@ class EDNSoupReader private constructor(
     private fun readUnicodeChar(minLength: Int, maxLength: Int, initChar: Char): Char32 {
         val linePos = cpi.lineIdx
         val codePosIndex = cpi.textIndex
-        val token = cpi.takeCodePoints(StringBuilder(), maxLength, ::isHexNum)
+        val token = readToken(maxLength, ::isHexNum)
         if (token.length !in minLength..maxLength)
             throw EdnReaderException(linePos, codePosIndex, "Invalid unicode sequence \\$initChar$token")
         return readUnicodeChar(token, 16, initChar)
@@ -286,7 +290,8 @@ class EDNSoupReader private constructor(
         val codePosIndex = cpi.textIndex
 
         val token =
-            if (initialToken.isEmpty() && cpi.hasNext()) cpi.takeCodePoints(StringBuilder(), 1, ::isValidCharSingle).trim()
+            if (initialToken.isEmpty() && cpi.hasNext()) readToken(1, ::isValidCharSingle)
+                .trim()
             else initialToken.trim()
 
         if (token.isEmpty())
@@ -426,7 +431,7 @@ class EDNSoupReader private constructor(
     private fun readOther(): Any? {
         val linePos = cpi.lineIdx
         val codePosIndex = cpi.textIndex
-        val token = cpi.takeCodePoints(StringBuilder(), ::isValidSymbolChar).toString()
+        val token = readToken(::isValidSymbolChar)
 
         if (token.length > 1)
             when (token[0]) {
@@ -575,10 +580,27 @@ class EDNSoupReader private constructor(
         return IObj(meta, obj)
     }
 
+    private val readTokenBuffer = StringBuilder()
     private fun readToken(condition: (Int) -> Boolean): String {
-        val currentToken = StringBuilder()
-        cpi.takeCodePoints(currentToken) { condition(it) }
-        return currentToken.toString()
+        return readToken(Int.MAX_VALUE, condition);
+    }
+
+    private fun readToken(maxCount: Int, condition: (Int) -> Boolean): String {
+        val currentToken: String
+        if (options.allowMultiThreadingIfImplemented) {
+            synchronized(readTokenBuffer) {
+                readTokenBuffer.setLength(0)
+                cpi.takeCodePoints(readTokenBuffer, maxCount) { condition(it) }
+                currentToken = readTokenBuffer.toString();
+                readTokenBuffer.setLength(0)
+            }
+        } else {
+            readTokenBuffer.setLength(0)
+            cpi.takeCodePoints(readTokenBuffer, maxCount) { condition(it) }
+            currentToken = readTokenBuffer.toString();
+            readTokenBuffer.setLength(0)
+        }
+        return currentToken
     }
 
     private fun isWhitespace(code: Int): Boolean =
