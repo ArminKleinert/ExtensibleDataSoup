@@ -46,39 +46,35 @@ object EDN {
      * ```
      */
     fun read(
-        s: String, options: EDNSoupOptions = defaultOptions,
-        references: Map<Symbol, Any?> = mapOf()
+        s: String, options: EDNSoupOptions = defaultOptions
     ): Any? {
         val cpi = CodePointIterator(s.codePoints())
-        return EDNSoupReader.read(cpi, options, references)
+        return EDNSoupReader.read(cpi, options)
     }
 
     /**
      * Parse EDN from a [File]. The file is assumed to exist and be a non-directory.
      */
     fun read(
-        file: File, options: EDNSoupOptions = defaultOptions,
-        references: Map<Symbol, Any?> = mapOf()
+        file: File, options: EDNSoupOptions = defaultOptions
     ): Any? {
         val cpi = CodePointIterator(file.reader(Charsets.UTF_8))
-        return EDNSoupReader.read(cpi, options, references)
+        return EDNSoupReader.read(cpi, options)
     }
 
 
     fun read(
-        reader: InputStream, options: EDNSoupOptions = defaultOptions,
-        references: Map<Symbol, Any?> = mapOf()
+        reader: InputStream, options: EDNSoupOptions = defaultOptions
     ): Any? {
         val cpi = CodePointIterator(reader)
-        return EDNSoupReader.read(cpi, options, references)
+        return EDNSoupReader.read(cpi, options)
     }
 
     fun read(
-        reader: Reader, options: EDNSoupOptions = defaultOptions,
-        references: Map<Symbol, Any?> = mapOf()
+        reader: Reader, options: EDNSoupOptions = defaultOptions
     ): Any? {
         val cpi = CodePointIterator(reader)
-        return EDNSoupReader.read(cpi, options, references)
+        return EDNSoupReader.read(cpi, options)
     }
 
     fun pprint(obj: Any?, file: File, options: EDNSoupOptions = defaultOptions) {

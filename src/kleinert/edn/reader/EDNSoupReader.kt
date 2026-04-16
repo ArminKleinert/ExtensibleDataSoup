@@ -13,18 +13,16 @@ import kotlin.collections.LinkedHashMap
  * @author Armin Kleinert
  */
 class EDNSoupReader private constructor(
-    private val options: EDNSoupOptions, private val cpi: CodePointIterator,
-    private val references: Map<Symbol, Any?>,
+    private val options: EDNSoupOptions, private val cpi: CodePointIterator
 ) {
     companion object {
         private val NOTHING = object {}
 
         @Throws(EdnReaderException::class)
         internal fun read(
-            cpi: CodePointIterator, options: EDNSoupOptions = EDNSoupOptions.defaultOptions,
-            references: Map<Symbol, Any?> = mapOf()
+            cpi: CodePointIterator, options: EDNSoupOptions = EDNSoupOptions.defaultOptions
         ): Any? =
-            EDNSoupReader(options, cpi, references).readString()
+            EDNSoupReader(options, cpi).readString()
     }
 
     init {
@@ -278,17 +276,18 @@ class EDNSoupReader private constructor(
     }
 
     private fun readChar(): Char {
+        val linePos = cpi.lineIdx
+        val codePosIndex = cpi.textIndex
         val token = readToken(::isNotBreakingSymbol)
-        return readDispatchUnicodeChar(token, false).toChar()
+        return readDispatchUnicodeChar(linePos, codePosIndex, token, false).toChar()
     }
 
     private fun readDispatchUnicodeChar(
+        linePos: Int,
+        codePosIndex: Int,
         initialToken: CharSequence,
         isDispatch: Boolean = false
     ): Char32 {
-        val linePos = cpi.lineIdx
-        val codePosIndex = cpi.textIndex
-
         val token =
             if (initialToken.isEmpty() && cpi.hasNext()) readToken(1, ::isValidCharSingle)
                 .trim()
@@ -367,8 +366,10 @@ class EDNSoupReader private constructor(
         when (token[0]) {
             '\\' ->
                 if (options.allowDispatchChars) {
+                    val linePos = cpi.lineIdx
+                    val codePosIndex = cpi.textIndex
                     val subToken = token.subSequence(1, token.length)
-                    return readDispatchUnicodeChar(subToken, true)
+                    return readDispatchUnicodeChar(linePos, codePosIndex, subToken, true)
                 }
 
             '{' -> return readSet(level + 1)
@@ -433,13 +434,12 @@ class EDNSoupReader private constructor(
         val codePosIndex = cpi.textIndex
         val token = readToken(::isValidSymbolChar)
 
-        if (token.length > 1)
-            when (token[0]) {
-                ':' -> return Keyword.parse(token, options.allowUTFSymbols)
-                    ?: throw EdnReaderException(
-                        linePos, codePosIndex, "Token starts with colon, but is not a valid keyword: $token"
-                    )
-            }
+        if (token.length > 1 && token[0] == ':') {
+            return Keyword.parse(token, options.allowUTFSymbols)
+                ?: throw EdnReaderException(
+                    linePos, codePosIndex, "Token starts with colon, but is not a valid keyword: $token"
+                );
+        }
 
         if (token[0] == ':') throw EdnReaderException(linePos, codePosIndex, "Lonely colon.")
 
@@ -458,11 +458,11 @@ class EDNSoupReader private constructor(
                 cpi.lineIdx, cpi.textIndex,
                 "#$token requires a symbol for the reference, but got $form of type ${form?.javaClass}"
             )
-            if (!references.containsKey(form)) throw EdnReaderException(
+            if (!options.referenceTable.containsKey(form)) throw EdnReaderException(
                 cpi.lineIdx, cpi.textIndex,
-                "#$token: $form not found in the lookup. (lookup contains ${references.keys})"
+                "#$token: $form not found in the lookup. (lookup contains ${options.referenceTable.keys})"
             )
-            return references[form]
+            return options.referenceTable[form]
         }
 
         throw EdnReaderException(cpi.lineIdx, cpi.textIndex, "Unsupported reference macro: $token")
@@ -581,6 +581,7 @@ class EDNSoupReader private constructor(
     }
 
     private val readTokenBuffer = StringBuilder()
+
     private fun readToken(condition: (Int) -> Boolean): String {
         return readToken(Int.MAX_VALUE, condition);
     }

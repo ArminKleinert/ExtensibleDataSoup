@@ -235,6 +235,13 @@ object ExtendedEDNDecoders {
  *
  * @author Armin Kleinert
  */
+
+/*
+    private @NotNull Map<Symbol, Object> referenceTable = Map.of();
+    private boolean allowMetaData = false;
+    private boolean allowZeroPrefix = false;
+    private boolean allowRatios = false;
+ */
 data class EDNSoupOptions(
     val allowSchemeUTF32Codes: Boolean = false,
     val allowDispatchChars: Boolean = false,
@@ -243,7 +250,6 @@ data class EDNSoupOptions(
     val moreNumberPrefixes: Boolean = false,
     val allowNumericSuffixes: Boolean = false,
     val allowMoreEncoderDecoderNames: Boolean = false,
-    val allowRatios: Boolean = false,
     val encodingSequenceSeparator: String = ", ",
     val listToEdnListConverter: (List<*>) -> List<*> = { EdnList.create(it) },
     val listToEdnVectorConverter: (List<*>) -> List<*> = { EdnVector.create(it) },
@@ -257,9 +263,11 @@ data class EDNSoupOptions(
     val encoderMaxColumn: Int = 80,
     val encoderLineIndent: String = "  ",
     val encoderPrettyPrint: Boolean = true,
+    var referenceTable: Map<Symbol, Any?> = mapOf(),
     val allowMetadata: Boolean = false,
     val allowZeroPrefix: Boolean = false,
-    val allowMultiThreadingIfImplemented: Boolean = true,
+    val allowRatios: Boolean = false,
+    val allowMultiThreadingIfImplemented: Boolean = true
 ) {
     companion object {
         val extendedOptions: EDNSoupOptions

@@ -41,8 +41,8 @@ class EDNReaderRefTest {
         val options = EDNSoupOptions.defaultOptions.copy(allowReferences = true)
         val refs = mapOf<Symbol, Any?>(Symbol["A"] to 1L, Symbol["B"] to 2L)
 
-        Assertions.assertEquals(1L, EDN.read("#ref A", options, references = refs))
-        Assertions.assertEquals(2L, EDN.read("#ref B", options, references = refs))
+        Assertions.assertEquals(1L, EDN.read("#ref A", options.copy(referenceTable = refs)))
+        Assertions.assertEquals(2L, EDN.read("#ref B", options.copy(referenceTable = refs)))
     }
 
     @Test
@@ -51,9 +51,9 @@ class EDNReaderRefTest {
         val value = listOf(1L, 2L, 3L)
         val refs = mapOf<Symbol, Any?>(Symbol["A"] to value)
 
-        Assertions.assertEquals(value , EDN.read("#ref A", options, references = refs))
+        Assertions.assertEquals(value , EDN.read("#ref A", options.copy(referenceTable = refs)))
 
-        val temp = EDN.read("[#ref A #ref A]", options, references = refs)
+        val temp = EDN.read("[#ref A #ref A]", options.copy(referenceTable = refs))
         temp as List<*>
         Assertions.assertTrue(value === temp[0])
         Assertions.assertTrue(value === temp[1])
@@ -64,11 +64,11 @@ class EDNReaderRefTest {
         val options = EDNSoupOptions.defaultOptions.copy(allowReferences = true)
         val refs = mapOf<Symbol, Any?>(Symbol["A"] to 1L, Symbol["B"] to Symbol["A"], Symbol["C"] to Symbol["B"])
 
-        Assertions.assertEquals(Symbol["A"], EDN.read("#ref B", options, references = refs))
-        Assertions.assertEquals(Symbol["B"], EDN.read("#ref C", options, references = refs))
-        Assertions.assertEquals(Symbol["A"], EDN.read("#ref #ref C", options, references = refs))
-        Assertions.assertEquals(1L, EDN.read("#ref #ref B", options, references = refs))
-        Assertions.assertEquals(1L, EDN.read("#ref #ref #ref C", options, references = refs))
+        Assertions.assertEquals(Symbol["A"], EDN.read("#ref B", options.copy(referenceTable = refs)))
+        Assertions.assertEquals(Symbol["B"], EDN.read("#ref C", options.copy(referenceTable = refs)))
+        Assertions.assertEquals(Symbol["A"], EDN.read("#ref #ref C", options.copy(referenceTable = refs)))
+        Assertions.assertEquals(1L, EDN.read("#ref #ref B", options.copy(referenceTable = refs)))
+        Assertions.assertEquals(1L, EDN.read("#ref #ref #ref C", options.copy(referenceTable = refs)))
     }
 
     @Test
@@ -76,15 +76,15 @@ class EDNReaderRefTest {
         val options = EDNSoupOptions.defaultOptions.copy(allowReferences = true)
 
         val text = "#ref A"
-        Assertions.assertEquals(22L, EDN.read(text, options, references = mapOf(Symbol["A"] to 22L)))
+        Assertions.assertEquals(22L, EDN.read(text,options.copy(referenceTable =  mapOf(Symbol["A"] to 22L))))
 
         val text2 = "#ref A"
-        Assertions.assertEquals(listOf(1L, 2L), EDN.read(text2, options, references = mapOf(Symbol["A"] to listOf(1L, 2L))))
+        Assertions.assertEquals(listOf(1L, 2L), EDN.read(text2, options.copy(referenceTable =  mapOf(Symbol["A"] to listOf(1L, 2L)))))
 
         val text3 = "#ref A"
-        Assertions.assertEquals(listOf(5L, 6L), EDN.read(text3, options, references = mapOf(Symbol["A"] to listOf(5L, 6L), Symbol["B"] to 44L)))
+        Assertions.assertEquals(listOf(5L, 6L), EDN.read(text3, options.copy(referenceTable = mapOf(Symbol["A"] to listOf(5L, 6L), Symbol["B"] to 44L))))
 
-        val temp = EDN.read("[#ref A #ref A]", options, references = mapOf(Symbol["A"] to 22L))
+        val temp = EDN.read("[#ref A #ref A]", options.copy(referenceTable =  mapOf(Symbol["A"] to 22L)))
         Assertions.assertEquals(listOf(22L, 22L), temp)
     }
 
@@ -96,6 +96,6 @@ class EDNReaderRefTest {
         val config: Map<Symbol, Any?> = EDN.read(configText, options) as Map<Symbol, Any?>
 
         val text = "[#ref A #ref B #ref C]"
-        Assertions.assertEquals(listOf(1L, 2L, 3L), EDN.read(text, options, references = config))
+        Assertions.assertEquals(listOf(1L, 2L, 3L), EDN.read(text, options.copy(referenceTable =  config)))
     }
 }
