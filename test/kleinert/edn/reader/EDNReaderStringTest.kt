@@ -7,44 +7,101 @@ import org.junit.jupiter.api.Test
 class EDNReaderStringTest {
     @Test
     fun parseStringBasicTest() {
-        EDN.read("\"\"").let { Assertions.assertTrue(it is String) }
-        EDN.read("\"\"").let { Assertions.assertEquals("", it) }
-        EDN.read("\"abc\"").let { Assertions.assertEquals("abc", it) }
+        run {
+            val it = EDN.read("\"\"")
+            Assertions.assertTrue(it is String)
+        }
+        run {
+            val it = EDN.read("\"\"")
+            Assertions.assertEquals("", it)
+        }
+        run {
+            val it = EDN.read("\"abc\"")
+            Assertions.assertEquals("abc", it)
+        }
     }
 
     @Test
     fun parseStringEscapeSequenceTest() {
-        EDN.read("\"\\n\"").let { Assertions.assertEquals("\n", it) }
-        EDN.read("\"\\n\"").let { Assertions.assertEquals(listOf("", ""), (it as String).lines()) }
-        EDN.read("\"\\t\"").let { Assertions.assertEquals("\t", it) }
+        run {
+            val it = EDN.read("\"\\n\"")
+            Assertions.assertEquals("\n", it)
+        }
+        run {
+            val it = EDN.read("\"\\n\"")
+            Assertions.assertEquals(listOf("", ""), (it as String).lines())
+        }
+        run {
+            val it = EDN.read("\"\\t\"")
+            Assertions.assertEquals("\t", it)
+        }
 
-        EDN.read("\"\\t\"").let { Assertions.assertEquals("\t", it) }
-        EDN.read("\"\\b\"").let { Assertions.assertEquals("\b", it) }
-        EDN.read("\"\\r\"").let { Assertions.assertEquals("\r", it) }
-        EDN.read("\"\\\"\"").let { Assertions.assertEquals("\"", it) }
+        run {
+            val it = EDN.read("\"\\t\"")
+            Assertions.assertEquals("\t", it)
+        }
+        run {
+            val it = EDN.read("\"\\b\"")
+            Assertions.assertEquals("\b", it)
+        }
+        run {
+            val it = EDN.read("\"\\r\"")
+            Assertions.assertEquals("\r", it)
+        }
+        run {
+            val it = EDN.read("\"\\\"\"")
+            Assertions.assertEquals("\"", it)
+        }
 
-        EDN.read("\"\\\\\"").let { Assertions.assertEquals("\\", it) }
-        EDN.read("\"\\\\\\\\\"").let { Assertions.assertEquals("\\\\", it) }
-        EDN.read(
-            """
+        run {
+            val it = EDN.read("\"\\\\\"")
+            Assertions.assertEquals("\\", it)
+        }
+        run {
+            val it = EDN.read("\"\\\\\\\\\"")
+            Assertions.assertEquals("\\\\", it)
+        }
+        run {
+            val it = EDN.read(
+                """
             "\\"
         """.trimIndent()
-        ).let { Assertions.assertEquals("\\", it) }
-        EDN.read(
-            """
+            )
+            Assertions.assertEquals("\\", it)
+        }
+        run {
+            val it = EDN.read(
+                """
             "\\\\"
         """.trimIndent()
-        ).let { Assertions.assertEquals("\\\\", it) }
+            )
+            Assertions.assertEquals("\\\\", it)
+        }
 
-        EDN.read("\"\\t\\t\"").let { Assertions.assertEquals("\t\t", it) }
+        run {
+            val it = EDN.read("\"\\t\\t\"")
+            Assertions.assertEquals("\t\t", it)
+        }
     }
 
     @Test
     fun parseStringUnicodeSequenceTest() {
-        EDN.read("\"🎁\"").let { Assertions.assertEquals("🎁", it) }
-        EDN.read("\"\\uD83C\\uDF81\"").let { Assertions.assertEquals("🎁", it) }
-        EDN.read("\"\\uD83C\\uDF81\"").let { Assertions.assertEquals("🎁", it) }
-        EDN.read("\"\\x0001F381\"").let { Assertions.assertEquals("🎁", it) }
+        run {
+            val it = EDN.read("\"🎁\"")
+            Assertions.assertEquals("🎁", it)
+        }
+        run {
+            val it = EDN.read("\"\\uD83C\\uDF81\"")
+            Assertions.assertEquals("🎁", it)
+        }
+        run {
+            val it = EDN.read("\"\\uD83C\\uDF81\"")
+            Assertions.assertEquals("🎁", it)
+        }
+        run {
+            val it = EDN.read("\"\\x0001F381\"")
+            Assertions.assertEquals("🎁", it)
+        }
     }
 
     @Test

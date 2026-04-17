@@ -25,17 +25,23 @@ class EDNReaderTest {
 
         Assertions.assertEquals("\\", EDN.read("\"\\\\\""))
         Assertions.assertEquals("\\\\", EDN.read("\"\\\\\\\\\""))
-        EDN.read(
-            """
+        run {
+            val it = EDN.read(
+                """
             "\\"
         """.trimMargin()
-        ).let { Assertions.assertEquals("\\", it) }
+            )
+            Assertions.assertEquals("\\", it)
+        }
 
-        EDN.read(
-            """
+        run {
+            val it = EDN.read(
+                """
             "\\\\"
         """.trimMargin()
-        ).let { Assertions.assertEquals("\\\\", it) }
+            )
+            Assertions.assertEquals("\\\\", it)
+        }
 
         Assertions.assertEquals("\t\t", EDN.read("\"\\t\\t\""))
     }
@@ -88,19 +94,23 @@ class EDNReaderTest {
     @Test
     fun parseDiscardInCollectionTest() {
         // Discard is nothing. When discard appears in a list, vector, set, or map, it does nothing
-        EDN.read("( #_ 1 #_ 2 #_ 3 )").let {
+        run {
+            val it = EDN.read("( #_ 1 #_ 2 #_ 3 )")
             Assertions.assertTrue(it is Iterable<*>)
             Assertions.assertTrue((it as Iterable<*>).toList().isEmpty())
         }
-        EDN.read("[#_1 #_2 #_3]").let {
+        run {
+            val it = EDN.read("[#_1 #_2 #_3]")
             Assertions.assertTrue(it is List<*>)
             Assertions.assertTrue((it as List<*>).isEmpty())
         }
-        EDN.read("#{#_1 #_1 #_1}").let {
+        run {
+            val it = EDN.read("#{#_1 #_1 #_1}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
-        EDN.read("{#_1 #_1 #_1}").let {
+        run {
+            val it = EDN.read("{#_1 #_1 #_1}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
@@ -109,21 +119,25 @@ class EDNReaderTest {
     @Test
     fun parseEmptySet() {
         // Normal
-        EDN.read("#{}").let {
+        run {
+            val it = EDN.read("#{}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
 
         // Whitespace does not matter
-        EDN.read("#{  }").let {
+        run {
+            val it = EDN.read("#{  }")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
-        EDN.read("#{\t \n}").let {
+        run {
+            val it = EDN.read("#{\t \n}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
-        EDN.read("#{\n}").let {
+        run {
+            val it = EDN.read("#{\n}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
@@ -132,21 +146,25 @@ class EDNReaderTest {
     @Test
     fun parseEmptyMap() {
         // Normal
-        EDN.read("{}").let {
+        run {
+            val it = EDN.read("{}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
 
         // Whitespace does not matter
-        EDN.read("{  }").let {
+        run {
+            val it = EDN.read("{  }")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
-        EDN.read("{\t \n}").let {
+        run {
+            val it = EDN.read("{\t \n}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
-        EDN.read("{\n}").let {
+        run {
+            val it = EDN.read("{\n}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
@@ -154,15 +172,18 @@ class EDNReaderTest {
 
     @Test
     fun parseListSimple() {
-        EDN.read("(\\a)").let {
+        run {
+            val it = EDN.read("(\\a)")
             Assertions.assertTrue(it is Iterable<*>)
             Assertions.assertEquals(listOf<Any?>('a'), (it as Iterable<*>).toList())
         }
-        EDN.read("(\\a \\b)").let {
+        run {
+            val it = EDN.read("(\\a \\b)")
             Assertions.assertTrue(it is Iterable<*>)
             Assertions.assertEquals(listOf('a', 'b'), (it as Iterable<*>).toList())
         }
-        EDN.read("(())").let {
+        run {
+            val it = EDN.read("(())")
             Assertions.assertTrue(it is Iterable<*>)
             Assertions.assertEquals(listOf(listOf<Any?>()), (it as Iterable<*>).toList())
         }
@@ -170,15 +191,18 @@ class EDNReaderTest {
 
     @Test
     fun parseVectorSimple() {
-        EDN.read("[\\a]").let {
+        run {
+            val it = EDN.read("[\\a]")
             Assertions.assertTrue(it is List<*>)
             Assertions.assertEquals(listOf('a'), (it as List<*>))
         }
-        EDN.read("[\\a \\b]").let {
+        run {
+            val it = EDN.read("[\\a \\b]")
             Assertions.assertTrue(it is Iterable<*>)
             Assertions.assertEquals(listOf('a', 'b'), (it as List<*>))
         }
-        EDN.read("[[]]").let {
+        run {
+            val it = EDN.read("[[]]")
             Assertions.assertTrue(it is Iterable<*>)
             Assertions.assertEquals(listOf(listOf<Any?>()), (it as List<*>))
         }
@@ -186,15 +210,18 @@ class EDNReaderTest {
 
     @Test
     fun parseSetSimple() {
-        EDN.read("#{\\a \\b}").let {
+        run {
+            val it = EDN.read("#{\\a \\b}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertEquals(setOf('a', 'b'), (it as Set<*>))
         }
-        EDN.read("#{ \\a }").let {
+        run {
+            val it = EDN.read("#{ \\a }")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertEquals(setOf('a'), (it as Set<*>))
         }
-        EDN.read("#{\\a #{}}").let {
+        run {
+            val it = EDN.read("#{\\a #{}}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
         }
@@ -202,15 +229,18 @@ class EDNReaderTest {
 
     @Test
     fun parseMapSimple() {
-        EDN.read("{\\a \\b}").let {
+        run {
+            val it = EDN.read("{\\a \\b}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertEquals(mapOf('a' to 'b').entries, (it as Map<*, *>).entries)
         }
-        EDN.read("{\\a {}}").let {
+        run {
+            val it = EDN.read("{\\a {}}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertEquals(mapOf('a' to mapOf<Any?, Any?>()).entries, (it as Map<*, *>).entries)
         }
-        EDN.read("{{} {}}").let {
+        run {
+            val it = EDN.read("{{} {}}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertEquals(mapOf<Any?, Any?>(mapOf<Any?, Any?>() to mapOf<Any?, Any?>()), (it as Map<*, *>))
         }

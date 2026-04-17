@@ -9,11 +9,11 @@ import java.util.*
 class EDNReaderSetsMapsTest {
     @Test
     fun parseEmpty() {
-        EDN.read("{}").let {
+        run{val it = EDN.read("{}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertTrue((it as Map<*, *>).isEmpty())
         }
-        EDN.read("#{}").let {
+        run{val it = EDN.read("#{}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertTrue((it as Set<*>).isEmpty())
         }
@@ -21,17 +21,17 @@ class EDNReaderSetsMapsTest {
 
     @Test
     fun parseBasicList() {
-        EDN.read("{a b c d}").let {
+        run{val it = EDN.read("{a b c d}")
             Assertions.assertTrue(it is Map<*, *>)
             Assertions.assertEquals(
                 it,
                 mapOf(Symbol.symbol("a") to Symbol.symbol("b"), Symbol.symbol("c") to Symbol.symbol("d"))
             )
         }
-        EDN.read("{1 2 3 4}").let {
+        run{val it = EDN.read("{1 2 3 4}")
             Assertions.assertEquals(mapOf(1L to 2L, 3L to 4L), it)
         }
-        EDN.read("#{1 2 3 4}").let {
+        run{val it = EDN.read("#{1 2 3 4}")
             Assertions.assertTrue(it is Set<*>)
             Assertions.assertEquals(setOf(1L, 2L, 3L, 4L), (it as Set<*>))
         }

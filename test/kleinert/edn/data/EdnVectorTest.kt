@@ -118,14 +118,16 @@ class EdnVectorTest {
 
     @Test
     fun testEquals() {
-        EdnVector.of(1, 2, 3, 2, 1).let { list ->
+        run {
+            val list = EdnVector.of(1, 2, 3, 2, 1)
             Assertions.assertEquals(list, list)
             Assertions.assertEquals(list, EdnVector.of(1, 2, 3, 2, 1))
             Assertions.assertEquals(list, EdnVector.create(listOf(1, 2, 3, 2, 1)))
             Assertions.assertEquals(list, listOf(1, 2, 3, 2, 1))
             Assertions.assertNotEquals(list, listOf<Int>())
         }
-        EdnVector.create(listOf(1, 2, 3, 2, 1)).let { list ->
+        run {
+            val list = EdnVector.create(listOf(1, 2, 3, 2, 1))
             Assertions.assertEquals(list, list)
             Assertions.assertEquals(list, EdnVector.of(1, 2, 3, 2, 1))
             Assertions.assertEquals(list, EdnVector.create(listOf(1, 2, 3, 2, 1)))

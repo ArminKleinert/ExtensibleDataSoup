@@ -33,38 +33,48 @@ class KeywordTest {
 
     @Test
     fun getNamespace() {
-        Keyword.keyword(null, "abc").let {
+        run {
+            val it = Keyword.keyword(null, "abc")
             Assertions.assertEquals(null, it.namespace)
         }
-        Keyword.keyword("abc").let {
+        run {
+            val it = Keyword.keyword("abc")
             Assertions.assertEquals(null, it.namespace)
         }
-        Keyword.keyword("ns", "abc").let {
+        run {
+            val it = Keyword.keyword("ns", "abc")
             Assertions.assertEquals("ns", it.namespace)
         }
-        Keyword.keyword("", "abc").let {
+        run {
+            val it = Keyword.keyword("", "abc")
             Assertions.assertEquals("", it.namespace)
         }
-        Keyword.keyword("", "").let {
+        run {
+            val it = Keyword.keyword("", "")
             Assertions.assertEquals("", it.namespace)
         }
     }
 
     @Test
     fun getName() {
-        Keyword.keyword(null, "abc").let {
+        run {
+            val it = Keyword.keyword(null, "abc")
             Assertions.assertEquals("abc", it.name)
         }
-        Keyword.keyword("abc").let {
+        run {
+            val it = Keyword.keyword("abc")
             Assertions.assertEquals("abc", it.name)
         }
-        Keyword.keyword("ns", "abc").let {
+        run {
+            val it = Keyword.keyword("ns", "abc")
             Assertions.assertEquals("abc", it.name)
         }
-        Keyword.keyword("").let {
+        run {
+            val it = Keyword.keyword("")
             Assertions.assertEquals("", it.name)
         }
-        Keyword.keyword("", "").let {
+        run {
+            val it = Keyword.keyword("", "")
             Assertions.assertEquals("", it.name)
         }
     }
@@ -75,10 +85,12 @@ class KeywordTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Keyword.keyword(Symbol.symbol(string)).let {
+            run {
+                val it = Keyword.keyword(Symbol.symbol(string))
                 Assertions.assertEquals(Symbol.symbol(string), it.sym)
             }
-            Keyword.keyword(Symbol.symbol("a" + string + "b", "abc")).let {
+            run {
+                val it = Keyword.keyword(Symbol.symbol("a" + string + "b", "abc"))
                 Assertions.assertEquals(
                     Symbol.symbol("a" + string + "b", "abc"), it.sym
                 )
@@ -162,25 +174,29 @@ class KeywordTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Keyword.keyword(string, "abc").let {
+            run {
+                val it = Keyword.keyword(string, "abc")
                 Assertions.assertEquals(string, it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
         }
         for (string in xs) {
-            Keyword.keyword("a$string", "abc").let {
+            run {
+                val it = Keyword.keyword("a$string", "abc")
                 Assertions.assertEquals("a$string", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
         }
         for (string in xs) {
-            Keyword.keyword(string + "a", "abc").let {
+            run {
+                val it = Keyword.keyword(string + "a", "abc")
                 Assertions.assertEquals(string + "a", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
         }
         for (string in xs) {
-            Keyword.keyword("a" + string + "b", "abc").let {
+            run {
+                val it = Keyword.keyword("a" + string + "b", "abc")
                 Assertions.assertEquals("a" + string + "b", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
@@ -193,25 +209,29 @@ class KeywordTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Keyword.keyword(string).let {
+            run {
+                val it = Keyword.keyword(string)
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals(string, it.name)
             }
         }
         for (string in xs) {
-            Keyword.keyword("a$string").let {
+            run {
+                val it = Keyword.keyword("a$string")
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals("a$string", it.name)
             }
         }
         for (string in xs) {
-            Keyword.keyword(string + "a").let {
+            run {
+                val it = Keyword.keyword(string + "a")
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals(string + "a", it.name)
             }
         }
         for (string in xs) {
-            Keyword.keyword("a" + string + "b").let {
+            run {
+                val it = Keyword.keyword("a" + string + "b")
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals("a" + string + "b", it.name)
             }
@@ -224,11 +244,13 @@ class KeywordTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Keyword.keyword(Symbol.symbol(string)).let {
+            run {
+                val it = Keyword.keyword(Symbol.symbol(string))
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals(string, it.name)
             }
-            Keyword.keyword(Symbol.symbol("a" + string + "b", "abc")).let {
+            run {
+                val it = Keyword.keyword(Symbol.symbol("a" + string + "b", "abc"))
                 Assertions.assertEquals("a" + string + "b", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
@@ -241,11 +263,13 @@ class KeywordTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Keyword.intern(Symbol.symbol(string)).let {
+            run {
+                val it = Keyword.intern(Symbol.symbol(string))
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals(string, it.name)
             }
-            Keyword.intern(Symbol.symbol("a" + string + "b", "abc")).let {
+            run {
+                val it = Keyword.intern(Symbol.symbol("a" + string + "b", "abc"))
                 Assertions.assertEquals("a" + string + "b", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
@@ -273,7 +297,8 @@ class KeywordTest {
     @Test
     fun findSymbol() {
         val random = Random(0xCAFEC0FFEE)
-        Symbol.symbol(random.nextDouble().toString()).let { // A hopefully random name
+        run {
+            val it = Symbol.symbol(random.nextDouble().toString()) // A hopefully random name
             Assertions.assertNull(Keyword.find(it)) // Did not exist.
             Assertions.assertNull(Keyword.find(it)) // Was not interned by the first call.
 
@@ -285,7 +310,8 @@ class KeywordTest {
     @Test
     fun findString() {
         val random = Random(0xDEADBEEF)
-        random.nextDouble().toString().let { // A hopefully random name
+        run {
+            val it = random.nextDouble().toString() // A hopefully random name
             Assertions.assertNull(Keyword.find(it)) // Did not exist.
             Assertions.assertNull(Keyword.find(it)) // Was not interned by the first call.
 
@@ -296,7 +322,7 @@ class KeywordTest {
 
     @Test
     fun compareTo() {
-        let {
+        run {
             val ks = listOf(
                 Keyword.keyword(null, ""), Keyword.keyword("a", "b"),
                 Keyword.keyword(null, "b"), Keyword.keyword("a", "🎁")
@@ -325,7 +351,7 @@ class KeywordTest {
             Assertions.assertEquals(expect, res)
         }
 
-        let {
+        run {
             val ks = listOf(
                 Keyword.keyword(""), Keyword.keyword("a"),
                 Keyword.keyword("b"), Keyword.keyword("🎁")

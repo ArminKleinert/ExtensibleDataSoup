@@ -90,11 +90,11 @@ class EDNReaderKeywordTest {
 
     @Test
     fun parseKeywordSymbolsMixTest() {
-        EDN.read(":a+").let {
+        run{val it =         EDN.read(":a+")
             Assertions.assertTrue(it is Keyword)
             Assertions.assertSame(Keyword.parse(":a+"), it)
         }
-        EDN.read(":-a").let {
+        run{val it =         EDN.read(":-a")
             Assertions.assertTrue(it is Keyword)
             Assertions.assertSame(Keyword.parse(":-a"), it)
         }

@@ -118,14 +118,16 @@ class EdnListTest {
 
     @Test
     fun testEquals() {
-        EdnList.of(1, 2, 3, 2, 1).let { list ->
+        run {
+            val list = EdnList.of(1, 2, 3, 2, 1)
             Assertions.assertTrue(list.equals(list))
             Assertions.assertTrue(list.equals(EdnList.of(1, 2, 3, 2, 1)))
             Assertions.assertTrue(list.equals(EdnList.create(listOf(1, 2, 3, 2, 1))))
             Assertions.assertTrue(list.equals(listOf(1, 2, 3, 2, 1)))
             Assertions.assertFalse(list.equals(listOf<Int>()))
         }
-        EdnList.create(listOf(1, 2, 3, 2, 1)).let { list ->
+        run {
+            val list = EdnList.create(listOf(1, 2, 3, 2, 1))
             Assertions.assertTrue(list.equals(list))
             Assertions.assertTrue(list.equals(EdnList.of(1, 2, 3, 2, 1)))
             Assertions.assertTrue(list.equals(EdnList.create(listOf(1, 2, 3, 2, 1))))

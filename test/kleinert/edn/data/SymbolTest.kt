@@ -2,7 +2,6 @@ package kleinert.edn.data
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
 
 class SymbolTest {
     @Test
@@ -23,38 +22,48 @@ class SymbolTest {
 
     @Test
     fun getNamespace() {
-        Symbol.symbol(null, "abc").let {
+        run {
+            val it = Symbol.symbol(null, "abc")
             Assertions.assertEquals(null, it.namespace)
         }
-        Symbol.symbol("abc").let {
+        run {
+            val it = Symbol.symbol("abc")
             Assertions.assertEquals(null, it.namespace)
         }
-        Symbol.symbol("ns", "abc").let {
+        run {
+            val it = Symbol.symbol("ns", "abc")
             Assertions.assertEquals("ns", it.namespace)
         }
-        Symbol.symbol("", "abc").let {
+        run {
+            val it = Symbol.symbol("", "abc")
             Assertions.assertEquals("", it.namespace)
         }
-        Symbol.symbol("", "").let {
+        run {
+            val it = Symbol.symbol("", "")
             Assertions.assertEquals("", it.namespace)
         }
     }
 
     @Test
     fun getName() {
-        Symbol.symbol(null, "abc").let {
+        run {
+            val it = Symbol.symbol(null, "abc")
             Assertions.assertEquals("abc", it.name)
         }
-        Symbol.symbol("abc").let {
+        run {
+            val it = Symbol.symbol("abc")
             Assertions.assertEquals("abc", it.name)
         }
-        Symbol.symbol("ns", "abc").let {
+        run {
+            val it = Symbol.symbol("ns", "abc")
             Assertions.assertEquals("abc", it.name)
         }
-        Symbol.symbol("").let {
+        run {
+            val it = Symbol.symbol("")
             Assertions.assertEquals("", it.name)
         }
-        Symbol.symbol("", "").let {
+        run {
+            val it = Symbol.symbol("", "")
             Assertions.assertEquals("", it.name)
         }
     }
@@ -199,25 +208,29 @@ class SymbolTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Symbol.symbol(string, "abc").let {
+            run {
+                val it = Symbol.symbol(string, "abc")
                 Assertions.assertEquals(string, it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
         }
         for (string in xs) {
-            Symbol.symbol("a$string", "abc").let {
+            run {
+                val it = Symbol.symbol("a$string", "abc")
                 Assertions.assertEquals("a$string", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
         }
         for (string in xs) {
-            Symbol.symbol(string + "a", "abc").let {
+            run {
+                val it = Symbol.symbol(string + "a", "abc")
                 Assertions.assertEquals(string + "a", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
         }
         for (string in xs) {
-            Symbol.symbol("a" + string + "b", "abc").let {
+            run {
+                val it = Symbol.symbol("a" + string + "b", "abc")
                 Assertions.assertEquals("a" + string + "b", it.namespace)
                 Assertions.assertEquals("abc", it.name)
             }
@@ -230,25 +243,29 @@ class SymbolTest {
             "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁"
         )
         for (string in xs) {
-            Symbol.symbol(string).let {
+            run {
+                val it = Symbol.symbol(string)
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals(string, it.name)
             }
         }
         for (string in xs) {
-            Symbol.symbol("a$string").let {
+            run {
+                val it = Symbol.symbol("a$string")
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals("a$string", it.name)
             }
         }
         for (string in xs) {
-            Symbol.symbol(string + "a").let {
+            run {
+                val it = Symbol.symbol(string + "a")
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals(string + "a", it.name)
             }
         }
         for (string in xs) {
-            Symbol.symbol("a" + string + "b").let {
+            run {
+                val it = Symbol.symbol("a" + string + "b")
                 Assertions.assertEquals(null, it.namespace)
                 Assertions.assertEquals("a" + string + "b", it.name)
             }
@@ -266,7 +283,7 @@ class SymbolTest {
 
     @Test
     fun compareTo() {
-        let {
+        run {
             val ks = listOf(
                 Symbol.symbol(null, ""), Symbol.symbol("a", "b"),
                 Symbol.symbol(null, "b"), Symbol.symbol("a", "🎁")
